@@ -1,0 +1,33 @@
+<resources>
+
+    <string name="allow_write_storage_permission_help_text">Please allow storage permission in settings so that app can save file</string>
+    <string name="denied_write_storage_peermission_help_text">You need to allow storage permission so that app can save file</string>
+    <string name="allow_read_storage_permission_help_text">Please allow storage permission in settings so that app can read file</string>
+    <string name="denied_read_storage_peermission_help_text">You need to allow storage permission so that app can read file</string>
+    <string name="allow_camera_and_storage_permission_help_text">Please allow both camera and storage permission in settings so that app can capture image</string>
+    <string name="denied_camera_and_storage_permission_help_text">You need to allow both camera and storage permission so that app can capture image</string>
+    <string name="allow_location_permission_help_text">Please allow location permission in settings so that app can get location</string>
+    <string name="denied_location_permission_help_text">You need to allow location permission so that app can get location</string>
+    <string name="no_app_found">No applications found to perform the specified action</string>
+    <string name="take_photo">Take Photo</string>
+    <string name="choose_from_gallery">Choose from gallery</string>
+    <string name="remove_picture">Remove Picture</string>
+    <string name="ok">Ok</string>
+    <string name="failed">Failed</string>
+    <string name="download_success">Download Success</string>
+    <string name="audio_recording">Audio Recording</string>
+    <string name="audio_record_limit">maximum limit 120 second</string>
+    <string name="cancel_caps">CANCEL</string>
+    <string name="done">DONE</string>
+    <string name="please_try_again">Please Try Again</string>
+    <string name="share_txt">Share</string>
+    <string name="bio_other_device_txt1">You may need to install one or more apps for fingerprint scanning provided by the device manufacturer.</string>
+    <string name="permission_required">Permission Required</string>
+    <string name="open_settings">OPEN SETTINGS</string>
+    <string name="cancel">Cancel</string>
+    <string name="location_services_disabled">Location services disabled</string>
+    <string name="enable_location_txt">This service requires location services to be enabled. Would you like to enable location services?</string>
+    <string name="something_went_wrong">Something went wrong</string>
+    <string name="downloading_file">Downloading...</string>
+    <string name="open_multi">Open</string>
+</resources>

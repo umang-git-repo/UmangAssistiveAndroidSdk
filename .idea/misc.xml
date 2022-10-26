@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Users/Daffolap-674/.gradle/caches/transforms-3/c9502b0764183e5c3604e479cfa9cde5/transformed/UmangAssistiveSdk/res/layout/activity_bar_code_scanner.xml" value="0.1" />
+        <entry key="..\:/Users/Daffolap-674/Documents/Umang_Sdk/app/src/main/res/layout/activity_main.xml" value="0.20364583333333333" />
+        <entry key="..\:/Users/Daffolap-674/Documents/Umang_Sdk/umangWebView/src/main/res/drawable/custom_progress_bar_horizontal.xml" value="0.1245" />
+        <entry key="..\:/Users/Daffolap-674/Documents/Umang_Sdk/umangWebView/src/main/res/drawable/ic_baseline_arrow_back_24.xml" value="0.1245" />
+        <entry key="..\:/Users/Daffolap-674/Documents/Umang_Sdk/umangWebView/src/main/res/drawable/ic_baseline_camera_alt_24.xml" value="0.1245" />
+        <entry key="..\:/Users/Daffolap-674/Documents/Umang_Sdk/umangWebView/src/main/res/layout/activity_bar_code_scanner.xml" value="0.20364583333333333" />
+        <entry key="..\:/Users/Daffolap-674/Documents/Umang_Sdk/umangWebView/src/main/res/layout/activity_umang_web.xml" value="0.18958333333333333" />
+        <entry key="..\:/Users/Daffolap-674/Documents/Umang_Sdk/umangWebView/src/main/res/layout/choose_file_dialog_option.xml" value="0.67" />
+        <entry key="..\:/Users/Daffolap-674/Documents/Umang_Sdk/umangWebView/src/main/res/layout/custom_dialog_view.xml" value="0.20364583333333333" />
+        <entry key="..\:/Users/Daffolap-674/Documents/Umang_Sdk/umangWebView/src/main/res/layout/dialog_info.xml" value="0.16709401709401708" />
+        <entry key="..\:/Users/Daffolap-674/Documents/Umang_Sdk/umangWebView/src/main/res/layout/open_permission_settings_dialog.xml" value="0.16623931623931623" />
+        <entry key="..\:/Users/Daffolap-674/Documents/Umang_Sdk/umangWebView/src/main/res/layout/progress_dialog.xml" value="0.20364583333333333" />
+        <entry key="..\:/Users/Daffolap-674/Documents/Umang_Sdk/umangWebView/src/main/res/layout/record_audio_dialog.xml" value="0.16623931623931623" />
+        <entry key="..\:/Users/Daffolap-674/Documents/Umang_Sdk/umangWebView/src/main/res/layout/web_error_page.xml" value="0.16709401709401708" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>

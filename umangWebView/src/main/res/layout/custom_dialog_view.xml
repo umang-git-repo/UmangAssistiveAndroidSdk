@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+<androidx.appcompat.widget.LinearLayoutCompat
+
+
+        android:layout_width="300dp"
+        android:minWidth="300dp"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:padding="@dimen/margin_16dp"
+        android:orientation="vertical">
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/txtTitle"
+            style="@style/HeaderTextStyle"
+            android:layout_gravity="center"
+            android:padding="@dimen/margin_8dp"
+            tools:text="Title"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/text_16sp"/>
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/dividerColor"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            style="@style/HeaderTextStyle"
+            android:layout_marginTop="@dimen/margin_16dp"
+            android:id="@+id/contentText"
+           />
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_marginTop="@dimen/margin_16dp"
+            android:layout_gravity="center"
+            android:gravity="right"
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnYes"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:maxWidth="20dp"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:layout_height="wrap_content"
+                tools:text="OK"
+                android:padding="@dimen/margin_4dp"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_16sp"
+                android:background="@color/colorPrimary"
+                />
+
+            <Space
+                android:id="@+id/space"
+                android:layout_width="@dimen/margin_8dp"
+                android:layout_height="match_parent"
+                />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnNo"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimary"
+                tools:text="Cancel"
+                android:textSize="@dimen/text_16sp"
+                android:gravity="center"
+                android:padding="@dimen/margin_4dp"
+                android:textColor="@color/white"
+                />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+</layout>
