@@ -68,3 +68,4 @@
 }
 
 -keep class com.google.android.gms.location.** { *; }
+-keep class androidx.appcompat.widget.** { *; }
