@@ -9,7 +9,7 @@ android {
     compileSdk 30
 
     defaultConfig {
-        minSdk 23
+        minSdk 19
         targetSdk 30
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -17,8 +17,8 @@ android {
     }
 
     buildTypes.all {
-        buildConfigField "String", "VERSION_NAME", "\"1.0.0\"" // Escaping quote marks to convert property to String
-        buildConfigField "int", "VERSION_CODE", "1"
+        buildConfigField "String", "VERSION_NAME", "\"1.0.2\"" // Escaping quote marks to convert property to String
+        buildConfigField "int", "VERSION_CODE", "3"
     }
 
     buildTypes {
