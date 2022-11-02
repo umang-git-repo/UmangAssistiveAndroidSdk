@@ -38,7 +38,6 @@
     <application
         android:requestLegacyExternalStorage="true"
         android:hardwareAccelerated="true"
-        android:networkSecurityConfig="@xml/network_security"
         android:largeHeap="true">
         <activity
             android:name=".ui.BarCodeScannerActivity"
