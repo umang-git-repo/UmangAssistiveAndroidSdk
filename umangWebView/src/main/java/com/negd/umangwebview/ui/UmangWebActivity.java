@@ -33,6 +33,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.net.MailTo;
 import android.net.Uri;
+import android.net.http.SslCertificate;
 import android.net.http.SslError;
 import android.os.Build;
 import android.os.Bundle;
@@ -67,6 +68,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.gson.Gson;
 import com.just.agentweb.AgentWeb;
+import com.just.agentweb.AgentWebConfig;
 import com.just.agentweb.DefaultWebClient;
 import com.just.agentweb.WebChromeClient;
 import com.just.agentweb.WebViewClient;
@@ -110,6 +112,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -416,6 +419,26 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             @Override
             public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
 
+                try {
+
+                    SslCertificate serverCertificate = error.getCertificate();
+
+                    if (error.hasError(SslError.SSL_UNTRUSTED)) {
+                        // Check if Cert-Domain equals the Uri-Domain
+                        String certDomain = serverCertificate.getIssuedTo().getCName();
+
+                        Toast.makeText(UmangWebActivity.this,"URL-> "+error.getUrl(),Toast.LENGTH_LONG).show();
+                        Toast.makeText(UmangWebActivity.this,"DOMAIN-> "+certDomain,Toast.LENGTH_LONG).show();
+
+
+                        Log.e("URL->", error.getUrl());
+                        Log.e("DOMAIN->", certDomain);
+                    }
+                }catch (Exception ex){
+
+                }
+
+
                 final AlertDialog.Builder builder = new AlertDialog.Builder(UmangWebActivity.this);
                 builder.setMessage("SSL Certificate error . Do you want to continue ?");
                 builder.setPositiveButton("continue", new DialogInterface.OnClickListener() {
@@ -573,7 +596,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
         mAgentWeb.getAgentWebSettings().getWebSettings().setAppCacheEnabled(true);
         mAgentWeb.getAgentWebSettings().getWebSettings().setAppCachePath(
-                getApplicationContext().getCacheDir().getAbsolutePath());
+                this.getCacheDir().getAbsolutePath());
 
 
         mAgentWeb.getAgentWebSettings().getWebSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
@@ -583,6 +606,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             mAgentWeb.getAgentWebSettings().getWebSettings().setCacheMode(WebSettings.LOAD_CACHE_ONLY);
         }
 
+        AgentWebConfig.debug();
 
         mAgentWeb.getAgentWebSettings().getWebSettings().setGeolocationEnabled(true);
 
@@ -2631,7 +2655,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    SharedPreferences pref = getApplicationContext().getSharedPreferences("UmangSdkPref", 0);
+                    SharedPreferences pref = UmangWebActivity.this.getSharedPreferences("UmangSdkPref", 0);
                     requestImageFor= pref.getString(Constants.PREF_REQUEST_IMAGE_FOR,"");
                     if (requestImageFor.equalsIgnoreCase("edistrict")) {
                         try {
@@ -2713,7 +2737,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                 @Override
                 public void run() {
                     Uri uri = intent.getData();
-                    SharedPreferences pref = getApplicationContext().getSharedPreferences("UmangSdkPref", 0);
+                    SharedPreferences pref = UmangWebActivity.this.getSharedPreferences("UmangSdkPref", 0);
                     requestImageFor= pref.getString(Constants.PREF_REQUEST_IMAGE_FOR,"");
                     if (requestImageFor.equalsIgnoreCase("edistrict")) {
                         try {
@@ -3716,7 +3740,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                 @Override
                 public void run() {
                     try {
-                        SharedPreferences pref = getApplicationContext().getSharedPreferences("UmangSdkPref", 0);
+                        SharedPreferences pref = UmangWebActivity.this.getSharedPreferences("UmangSdkPref", 0);
                         String tempUri= pref.getString(Constants.PREF_CAMERA_IMAGE_URI,imageSelectedPath);
                         Uri uri = Uri.parse(tempUri);
                         Bitmap bitmap = ImageUtils.rescaleImage(UmangWebActivity.this, Uri.parse(tempUri), 500);

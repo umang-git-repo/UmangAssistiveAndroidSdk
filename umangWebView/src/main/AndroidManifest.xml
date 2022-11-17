@@ -38,6 +38,7 @@
     <application
         android:requestLegacyExternalStorage="true"
         android:hardwareAccelerated="true"
+
         android:largeHeap="true">
         <activity
             android:name=".ui.BarCodeScannerActivity"
