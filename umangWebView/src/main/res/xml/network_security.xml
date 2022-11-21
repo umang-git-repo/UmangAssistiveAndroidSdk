@@ -5,8 +5,17 @@
             <certificates src="system" />
         </trust-anchors>
     </base-config>
+
+
     <domain-config >
         <domain includeSubdomains="true">https://training.pfms.gov.in</domain>
+        <trust-anchors>
+            <certificates src="system"/>
+        </trust-anchors>
+    </domain-config>
+
+    <domain-config >
+        <domain includeSubdomains="true">https://stats.g.doubleclick.net</domain>
         <trust-anchors>
             <certificates src="system"/>
         </trust-anchors>
@@ -39,6 +48,15 @@
             <certificates src="system"/>
         </trust-anchors>
     </domain-config>
+
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">stats.g.doubleclick.net</domain>
+        <trust-anchors>
+            <certificates src="system"/>
+        </trust-anchors>
+    </domain-config>
+
+
 
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">sbmurban.org</domain>
