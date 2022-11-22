@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
+import android.webkit.CookieManager;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -84,7 +85,9 @@ import com.negd.umangwebview.callbacks.MHAInterface;
 import com.negd.umangwebview.databinding.ActivityUmangWebBinding;
 import com.negd.umangwebview.utils.AudioRecord;
 import com.negd.umangwebview.utils.Constants;
+import com.negd.umangwebview.utils.DeviceUtils;
 import com.negd.umangwebview.utils.FileUtils;
+import com.negd.umangwebview.utils.GpsTracker;
 import com.negd.umangwebview.utils.ImageSelect;
 import com.negd.umangwebview.utils.ImageUtils;
 import com.negd.umangwebview.utils.Utils;
@@ -187,7 +190,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
     protected String mUploadableFileTypes = "*/*";
 
     //location
-    private FusedLocationProviderClient mFusedLocationClient;
+    //private FusedLocationProviderClient mFusedLocationClient;
     private Location mLastLocation;
     private LocationRequest mLocationRequest;
 
@@ -216,7 +219,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
         binding.imgLogo.setOnClickListener(view -> onBackPressed());
 
         //fused location client
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        //mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         //get intent values and set UI
         setIntentValues();
@@ -239,6 +242,18 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
         setWebView();
 
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if(isFromGpsSettings){
+            isFromGpsSettings=false;
+            if(isLocationEnabled()){
+                getLastLocation();
+            }
+        }
     }
 
     @Override
@@ -306,6 +321,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             }
 
             if(intent.hasExtra(Constants.DEPT_NAME)){
+                binding.toolBar.setVisibility(View.VISIBLE);
                 binding.headerTxt.setText(intent.getStringExtra(Constants.DEPT_NAME));
             }
 
@@ -549,6 +565,25 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
      */
     private void setWebView(){
 
+        Map<String,String> header;
+
+        JSONObject myObject = new JSONObject();
+        try {
+            myObject.put("Type", "Assistive");
+            myObject.put("version", 140);
+            myObject.put("Mobile_OS", DeviceUtils.getMobileOS());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        header = new HashMap<>();
+        header.put(deptUrl, "Umang-Assistive=" +myObject);
+        CookieManager cookieMgr = CookieManager.getInstance();
+        cookieMgr.acceptCookie();
+        cookieMgr.setCookie(deptUrl, "Umang-Assistive=" +myObject);
+        AgentWebConfig.syncCookie(deptUrl, "Umang-Assistive=" +myObject);
+        AgentWebConfig.debug();
+
         mAgentWeb= AgentWeb.with(this)
                 .setAgentWebParent(binding.main, new LinearLayout.LayoutParams(-1, -1))
                 .useDefaultIndicator(Color.parseColor(loaderColor))
@@ -557,6 +592,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                 .setWebViewClient(mWebViewClient)
                 .setSecurityType(AgentWeb.SecurityType.DEFAULT_CHECK)
                 .setOpenOtherPageWays(DefaultWebClient.OpenOtherPageWays.ASK)
+                .additionalHttpHeader(deptUrl,header)
                 .interceptUnkownUrl()
                 .createAgentWeb()
                 .ready()
@@ -3881,10 +3917,13 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
         dialog.show(getSupportFragmentManager());
     }
 
+    private boolean isFromGpsSettings=false;
+
     @Override
     public void onOkClick(String type) {
         switch (type) {
             case "PERMISSION":
+                isFromGpsSettings=true;
                 Intent intent = new Intent();
                 intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
                 Uri uri = Uri.fromParts("package", getPackageName(), null);
@@ -3914,24 +3953,22 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
     }
 
 
-
+    private GpsTracker gpsTracker;
     @SuppressLint("MissingPermission")
     public void getLastLocation() {
         if (checkPermissions()) {
             if (isLocationEnabled()) {
-                mFusedLocationClient.getLastLocation().addOnCompleteListener(
-                        new OnCompleteListener<Location>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Location> task) {
-                                Location location = task.getResult();
-                                if (location == null) {
-                                    requestNewLocationData();
-                                } else {
-                                    sendLocationCallBack("S", "" + location.getLatitude() + "," + location.getLongitude(), LocationInterface.locationResponse);
-                                }
-                            }
-                        }
-                );
+
+
+                gpsTracker = new GpsTracker(UmangWebActivity.this);
+                if(gpsTracker.canGetLocation()){
+
+
+                    double latitude = gpsTracker.getLatitude();
+                    double longitude = gpsTracker.getLongitude();
+                    sendLocationCallBack("S", "" + latitude + "," + longitude, LocationInterface.locationResponse);
+                }
+
             } else {
                 String TYPE = "PERMISSION";
                 openDialog(getResources().getString(R.string.permission_required),
@@ -3946,30 +3983,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
     }
 
 
-    @SuppressLint("MissingPermission")
-    private void requestNewLocationData(){
 
-        LocationRequest mLocationRequest = new LocationRequest();
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mLocationRequest.setInterval(0);
-        mLocationRequest.setFastestInterval(0);
-        mLocationRequest.setNumUpdates(1);
-
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        mFusedLocationClient.requestLocationUpdates(
-                mLocationRequest, mLocationCallback,
-                Looper.myLooper()
-        );
-
-    }
-
-    private LocationCallback mLocationCallback = new LocationCallback() {
-        @Override
-        public void onLocationResult(LocationResult locationResult) {
-            Location mLastLocation = locationResult.getLastLocation();
-            sendLocationCallBack("S", "" + mLastLocation.getLatitude() + "," + mLastLocation.getLongitude(), LocationInterface.locationResponse);
-        }
-    };
 
     private boolean checkPermissions() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&

@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
         button.setOnClickListener(view -> {
 
-            String PARTNER_URL= "https://external.umang.gov.in/?tenantId=spicemoney.com&domain=spicemoney.com&token=dg96341a3738jjk64y53dbdb8815ty689c271642fde03hdd4sm10f";
+            String PARTNER_URL= "https://web.umang.gov.in/assistive?tenantId=rnfiservices.com&domain=rnfiservices.com&token=qa96341217382y6aifnrsbyty689c23a5c50cefde03r3n1f9i4";
 
             umangAssistiveAndroidSdk = UmangAssistiveAndroidSdk.Builder.newInstance()
                     .setDeptUrl(PARTNER_URL)

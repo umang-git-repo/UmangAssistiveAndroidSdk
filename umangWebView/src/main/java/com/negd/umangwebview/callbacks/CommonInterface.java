@@ -18,6 +18,7 @@ import android.print.PrintDocumentAdapter;
 import android.print.PrintJob;
 import android.print.PrintManager;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
@@ -1103,5 +1104,20 @@ public class CommonInterface implements OnDatePicker {
     public void deptLogout(String deptId){
         Toast.makeText(act.getApplicationContext(),"You are logged out",Toast.LENGTH_LONG).show();
         act.finish();
+    }
+
+    @JavascriptInterface
+    public void sendJPStatus(String deptData){
+        Log.e("DeptData",deptData.toString());
+
+        try {
+            JSONObject job = new JSONObject(deptData);
+            Intent intent = new Intent(act,UmangWebActivity.class);
+            intent.putExtra(Constants.DEPT_URL,job.getString("url"));
+            intent.putExtra(Constants.DEPT_ID,job.getString("id"));
+            intent.putExtra(Constants.DEPT_NAME,job.getString("name"));
+            act.startActivity(intent);
+        } catch (Exception e) {
+        }
     }
 }
