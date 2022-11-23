@@ -7,6 +7,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
+
+import android.os.Handler;
 import android.webkit.CookieManager;
 
 import android.Manifest;
@@ -214,6 +216,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
         //set toolbar
         setSupportActionBar(binding.toolBar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+
 
         //back button listener
         binding.imgLogo.setOnClickListener(view -> onBackPressed());
@@ -3914,7 +3917,17 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
         CustomDialog dialog = CustomDialog.newInstance(title, msg, yesBtn, noBtn, type);
         dialog.setDialogButtonClickListener(this);
         dialog.setCancelable(false);
-        dialog.show(getSupportFragmentManager());
+
+
+        final Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                //Do something after 100ms
+                dialog.show(getSupportFragmentManager());
+            }
+        }, 1000);
+
     }
 
     private boolean isFromGpsSettings=false;
@@ -3970,7 +3983,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                 }
 
             } else {
-                String TYPE = "PERMISSION";
+                String TYPE = "LOCATION_DISABLE";
                 openDialog(getResources().getString(R.string.permission_required),
                         getResources().getString(R.string.denied_location_permission_help_text),
                         getResources().getString(R.string.ok),

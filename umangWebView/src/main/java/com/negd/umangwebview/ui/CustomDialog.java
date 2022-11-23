@@ -2,6 +2,7 @@ package com.negd.umangwebview.ui;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -118,6 +119,15 @@ public class CustomDialog extends DialogFragment implements CustomDialogCallback
                 binding.btnNo.setVisibility(View.GONE);
                 binding.space.setVisibility(View.GONE);
             }
+
+
+            binding.btnYes.setOnClickListener(v -> {
+                onYesClick();
+            });
+
+            binding.btnNo.setOnClickListener(v -> {
+                onNoClick();
+            });
         }
     }
 
@@ -129,7 +139,7 @@ public class CustomDialog extends DialogFragment implements CustomDialogCallback
         try{
             super.show(fragmentManager, TAG);
         }catch (Exception ex){
-
+            Log.d("error","error");
         }
 
     }
