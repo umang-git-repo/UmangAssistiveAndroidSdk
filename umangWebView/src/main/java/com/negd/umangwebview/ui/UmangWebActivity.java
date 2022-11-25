@@ -77,6 +77,7 @@ import com.just.agentweb.WebChromeClient;
 import com.just.agentweb.WebViewClient;
 import com.negd.umangwebview.BuildConfig;
 import com.negd.umangwebview.R;
+import com.negd.umangwebview.UmangApplication;
 import com.negd.umangwebview.UmangAssistiveAndroidSdk;
 import com.negd.umangwebview.callbacks.CameraInterface;
 import com.negd.umangwebview.callbacks.CommonInterface;
@@ -85,7 +86,11 @@ import com.negd.umangwebview.callbacks.DownloadInterface;
 import com.negd.umangwebview.callbacks.LocationInterface;
 import com.negd.umangwebview.callbacks.MHAInterface;
 import com.negd.umangwebview.databinding.ActivityUmangWebBinding;
+import com.negd.umangwebview.ui.jeevan_pramaan.device_select_screen.JPDeviceSelectActivity;
+import com.negd.umangwebview.utils.AppConstants;
+import com.negd.umangwebview.utils.AppLogger;
 import com.negd.umangwebview.utils.AudioRecord;
+import com.negd.umangwebview.utils.CommonUtils;
 import com.negd.umangwebview.utils.Constants;
 import com.negd.umangwebview.utils.DeviceUtils;
 import com.negd.umangwebview.utils.FileUtils;
@@ -99,6 +104,7 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -117,7 +123,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -126,6 +136,14 @@ import java.util.Map;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -1314,7 +1332,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     //TODO need to implement
-                    //openBiometricDeviceScreen(CommonInterface.jp_successCallback, CommonInterface.jp_failureCallback);
+                    openBiometricDeviceScreen(CommonInterface.jp_successCallback, CommonInterface.jp_failureCallback);
 
                 } else {
 
@@ -2387,8 +2405,6 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             });
         }
     }
-
-
     /**
      * Jeevan Praman (JP) send device info to web
      * Method to send Bio Metric Device Info to web
@@ -2396,6 +2412,8 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
      * @param intent
      * @throws Exception
      */
+
+
     void handleBiometricDeviceInfo(Intent intent) throws Exception {
         String rd_info = intent.getStringExtra("RD_SERVICE_INFO");
         if (rd_info != null && rd_info.contains("NOTREADY")) {
@@ -2520,18 +2538,19 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
      * @param intent
      * @throws Exception
      */
+
     void handleUserFingerPrint(Intent intent) throws Exception {
         String pidDataXML = intent.getStringExtra("PID_DATA");
-        Log.d(TAG, "pid data....." + pidDataXML);
+        AppLogger.d(TAG, "pid data....." + pidDataXML);
         if (pidDataXML != null) {
             if (pidDataXML.equals("") || pidDataXML.isEmpty()) {
-                Log.d(TAG, "Error occurred in PID DATA XML..................");
-                Utils.showInfoDialog(this,"Not able to get your fingerprint properly. Please try again.");
+                AppLogger.d(TAG, "Error occurred in PID DATA XML..................");
+//                onFingerPrintError("Not able to get your fingerprint properly. Please try again.");
                 return;
             }
             if (pidDataXML.startsWith("ERROR:-")) {
-                Log.d(TAG, "ERROR............." + pidDataXML);
-                Utils.showInfoDialog(this,"An error occurred while capturing your fingerprint. Please try again.");
+                AppLogger.d(TAG, "ERROR............." + pidDataXML);
+                CommonUtils.showInfoDialog(this,"An error occurred while capturing your fingerprint. Please try again.");
                 return;
             }
             DocumentBuilderFactory db = DocumentBuilderFactory.newInstance();
@@ -2544,8 +2563,6 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             } catch (Exception ex) {
 
             }
-
-
             Document inputDocument = db.newDocumentBuilder().parse(new InputSource(new StringReader(pidDataXML)));
             NodeList nodes = inputDocument.getElementsByTagName("PidData");
             if (nodes != null) {
@@ -2565,8 +2582,9 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                         errInfoStr = errInfo.getNodeValue();
                     }
                     if (Integer.parseInt(errCodeStr) > 0) {
-                        Log.d(TAG, "Capture error :- " + errCodeStr + " , " + errInfoStr);
-                        Utils.showInfoDialog(this,errInfoStr);
+                        AppLogger.d(TAG, "Capture error :- " + errCodeStr + " , " + errInfoStr);
+//                        onFingerPrintError(errInfoStr);
+                        CommonUtils.showInfoDialog(this,errInfoStr);
                         return;
                     }
                 }
@@ -2593,34 +2611,34 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
             XPathExpression expResp = xpath2.compile("/PidData/Resp/@errCode");
             String resp = (String) expResp.evaluate(doc2, XPathConstants.STRING);
-            Log.e("errCode", "-->" + resp);
+            AppLogger.e("errCode", "-->" + resp);
 
             if (resp.equalsIgnoreCase("0")) {
 
                 XPathExpression expImei = xpath2.compile("/PidData/DeviceInfo/@dpId");
                 String dpid = (String) expImei.evaluate(doc2, XPathConstants.STRING);
-                Log.e("dpId", "-->" + dpid);
+                AppLogger.e("dpId", "-->" + dpid);
 
 
                 XPathExpression expci = xpath2.compile("/PidData/Skey/@ci");
                 String ci = (String) expci.evaluate(doc2, XPathConstants.STRING);
-                Log.e("ci", "-->" + ci);
+                AppLogger.e("ci", "-->" + ci);
 
                 XPathExpression expSkey = xpath2.compile("/PidData/Skey/text()");
                 String Skey = (String) expSkey.evaluate(doc2, XPathConstants.STRING);
-                Log.e("Skey", "-->" + Skey);
+                AppLogger.e("Skey", "-->" + Skey);
 
                 XPathExpression expHmac = xpath2.compile("/PidData/Hmac/text()");
                 String Hmac = (String) expHmac.evaluate(doc2, XPathConstants.STRING);
-                Log.e("Hmac", "-->" + Hmac);
+                AppLogger.e("Hmac", "-->" + Hmac);
 
                 XPathExpression expData = xpath2.compile("/PidData/Data/text()");
                 String Data = (String) expData.evaluate(doc2, XPathConstants.STRING);
-                Log.e("Data", "-->" + Data);
+                AppLogger.e("Data", "-->" + Data);
 
                 XPathExpression experror = xpath2.compile("/PidData/Resp/@errCode");
                 String errorCode = (String) experror.evaluate(doc2, XPathConstants.STRING);
-                Log.e("errorCode", "-->" + errorCode);
+                AppLogger.e("errorCode", "-->" + errorCode);
 
                 XPathExpression expdc = xpath2.compile("/PidData/DeviceInfo/@dc");
                 String dc = (String) expdc.evaluate(doc2, XPathConstants.STRING);
@@ -2637,40 +2655,189 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                 XPathExpression exprdsVer = xpath2.compile("/PidData/DeviceInfo/@rdsVer");
                 String rdsVer = (String) exprdsVer.evaluate(doc2, XPathConstants.STRING);
 
-
                 JSONObject dataJson = new JSONObject();
-                dataJson.put(Constants.HMAC, Hmac);
-                dataJson.put(Constants.SKEY, Skey);
-                dataJson.put(Constants.DATA, Data);
-                dataJson.put(Constants.CI, ci);
-                dataJson.put(Constants.RD_SLD, rdsId);
-                dataJson.put(Constants.RD_VER, rdsVer);
-                dataJson.put(Constants.DPLD, dpid);
-                dataJson.put(Constants.DC, dc);
-                dataJson.put(Constants.MI, mi);
-                dataJson.put(Constants.MC, mc);
+                dataJson.put(AppConstants.HMAC, Hmac);
+                dataJson.put(AppConstants.SKEY, Skey);
+                dataJson.put(AppConstants.DATA, Data);
+                dataJson.put(AppConstants.CI, ci);
+                dataJson.put(AppConstants.RD_SLD, rdsId);
+                dataJson.put(AppConstants.RD_VER, rdsVer);
+                dataJson.put(AppConstants.DPLD, dpid);
+                dataJson.put(AppConstants.DC, dc);
+                dataJson.put(AppConstants.MI, mi);
+                dataJson.put(AppConstants.MC, mc);
 
                 String strWithEscape = "";
                 strWithEscape = dataJson.toString();
                 Gson gson = new Gson();
                 strWithEscape = gson.toJson(dataJson);
-                Log.d(TAG, "SCAN RESULT ====  " + strWithEscape);
+                AppLogger.d(TAG, "SCAN RESULT ====  " + strWithEscape);
                 mAgentWeb.getWebCreator().getWebView().loadUrl("javascript:scanResult(" + strWithEscape + ")");
-
 
             } else {
 
                 XPathExpression experror = xpath2.compile("/PidData/Resp/@errCode");
                 String errorCode = (String) experror.evaluate(doc2, XPathConstants.STRING);
-                Log.e("errorCode", "-->" + errorCode);
-                Log.d(TAG, "Error Info->....." + resp + " & Error Code-> " + errorCode);
+                AppLogger.e("errorCode", "-->" + errorCode);
+                AppLogger.d(TAG, "Error Info->....." + resp + " & Error Code-> " + errorCode);
             }
 
         } else {
-            Log.d(TAG, "Scan Failure.................");
+            AppLogger.d(TAG, "Scan Failure.................");
             //getNavigator().onFingerPrintError("Please check your device ");
         }
     }
+
+
+//    void handleUserFingerPrint(Intent intent) throws Exception {
+//        String pidDataXML = intent.getStringExtra("PID_DATA");
+//        Log.d(TAG, "pid data....." + pidDataXML);
+//        if (pidDataXML != null) {
+//            if (pidDataXML.equals("") || pidDataXML.isEmpty()) {
+//                Log.d(TAG, "Error occurred in PID DATA XML..................");
+//                Utils.showInfoDialog(this,"Not able to get your fingerprint properly. Please try again.");
+//                return;
+//            }
+//            if (pidDataXML.startsWith("ERROR:-")) {
+//                Log.d(TAG, "ERROR............." + pidDataXML);
+//                Utils.showInfoDialog(this,"An error occurred while capturing your fingerprint. Please try again.");
+//                return;
+//            }
+//            DocumentBuilderFactory db = DocumentBuilderFactory.newInstance();
+//            // disable external entities
+//
+//            try {
+//                db.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+//                db.setFeature("http://xml.org/sax/features/external-general-entities", false);
+//                db.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+//            } catch (Exception ex) {
+//
+//            }
+//            Document inputDocument = db.newDocumentBuilder().parse(new InputSource(new StringReader(pidDataXML)));
+//            NodeList nodes = inputDocument.getElementsByTagName("PidData");
+//            if (nodes != null) {
+//                Element element = (Element) nodes.item(0);
+//                NodeList respNode = inputDocument.getElementsByTagName("Resp");
+//                if (respNode != null) {
+//                    Node respData = respNode.item(0);
+//                    NamedNodeMap attsResp = respData.getAttributes();
+//                    String errCodeStr = "";
+//                    String errInfoStr = "";
+//                    Node errCode = attsResp.getNamedItem("errCode");
+//                    if (errCode != null) {
+//                        errCodeStr = errCode.getNodeValue();
+//                    } else errCodeStr = "0";
+//                    Node errInfo = attsResp.getNamedItem("errInfo");
+//                    if (errInfo != null) {
+//                        errInfoStr = errInfo.getNodeValue();
+//                    }
+//                    if (Integer.parseInt(errCodeStr) > 0) {
+//                        Log.d(TAG, "Capture error :- " + errCodeStr + " , " + errInfoStr);
+//                        Utils.showInfoDialog(this,errInfoStr);
+//                        return;
+//                    }
+//                }
+//            }
+//        }
+//        if (pidDataXML != null) {   //deviceInfoXML != null &&
+//            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+//            // disable external entities
+//
+//            try {
+//                dbFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+//                dbFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+//                dbFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+//            } catch (Exception ex) {
+//
+//            }
+//
+//            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+//            Document doc2 = dBuilder.parse(new InputSource(new StringReader(pidDataXML)));
+//
+//
+//            // XPath to retrieve the content of the <FamilyAnnualDeductibleAmount> tag
+//            XPath xpath2 = XPathFactory.newInstance().newXPath();
+//
+//            XPathExpression expResp = xpath2.compile("/PidData/Resp/@errCode");
+//            String resp = (String) expResp.evaluate(doc2, XPathConstants.STRING);
+//            Log.e("errCode", "-->" + resp);
+//
+//            if (resp.equalsIgnoreCase("0")) {
+//
+//                XPathExpression expImei = xpath2.compile("/PidData/DeviceInfo/@dpId");
+//                String dpid = (String) expImei.evaluate(doc2, XPathConstants.STRING);
+//                Log.e("dpId", "-->" + dpid);
+//
+//
+//                XPathExpression expci = xpath2.compile("/PidData/Skey/@ci");
+//                String ci = (String) expci.evaluate(doc2, XPathConstants.STRING);
+//                Log.e("ci", "-->" + ci);
+//
+//                XPathExpression expSkey = xpath2.compile("/PidData/Skey/text()");
+//                String Skey = (String) expSkey.evaluate(doc2, XPathConstants.STRING);
+//                Log.e("Skey", "-->" + Skey);
+//
+//                XPathExpression expHmac = xpath2.compile("/PidData/Hmac/text()");
+//                String Hmac = (String) expHmac.evaluate(doc2, XPathConstants.STRING);
+//                Log.e("Hmac", "-->" + Hmac);
+//
+//                XPathExpression expData = xpath2.compile("/PidData/Data/text()");
+//                String Data = (String) expData.evaluate(doc2, XPathConstants.STRING);
+//                Log.e("Data", "-->" + Data);
+//
+//                XPathExpression experror = xpath2.compile("/PidData/Resp/@errCode");
+//                String errorCode = (String) experror.evaluate(doc2, XPathConstants.STRING);
+//                Log.e("errorCode", "-->" + errorCode);
+//
+//                XPathExpression expdc = xpath2.compile("/PidData/DeviceInfo/@dc");
+//                String dc = (String) expdc.evaluate(doc2, XPathConstants.STRING);
+//
+//                XPathExpression expmi = xpath2.compile("/PidData/DeviceInfo/@mi");
+//                String mi = (String) expmi.evaluate(doc2, XPathConstants.STRING);
+//
+//                XPathExpression expmc = xpath2.compile("/PidData/DeviceInfo/@mc");
+//                String mc = (String) expmc.evaluate(doc2, XPathConstants.STRING);
+//
+//                XPathExpression exprdsId = xpath2.compile("/PidData/DeviceInfo/@rdsId");
+//                String rdsId = (String) exprdsId.evaluate(doc2, XPathConstants.STRING);
+//
+//                XPathExpression exprdsVer = xpath2.compile("/PidData/DeviceInfo/@rdsVer");
+//                String rdsVer = (String) exprdsVer.evaluate(doc2, XPathConstants.STRING);
+//
+//
+//                JSONObject dataJson = new JSONObject();
+//                dataJson.put(Constants.HMAC, Hmac);
+//                dataJson.put(Constants.SKEY, Skey);
+//                dataJson.put(Constants.DATA, Data);
+//                dataJson.put(Constants.CI, ci);
+//                dataJson.put(Constants.RD_SLD, rdsId);
+//                dataJson.put(Constants.RD_VER, rdsVer);
+//                dataJson.put(Constants.DPLD, dpid);
+//                dataJson.put(Constants.DC, dc);
+//                dataJson.put(Constants.MI, mi);
+//                dataJson.put(Constants.MC, mc);
+//
+//                String strWithEscape = "";
+//                strWithEscape = dataJson.toString();
+//                Gson gson = new Gson();
+//                strWithEscape = gson.toJson(dataJson);
+//                Log.d(TAG, "SCAN RESULT ====  " + strWithEscape);
+//                mAgentWeb.getWebCreator().getWebView().loadUrl("javascript:scanResult(" + strWithEscape + ")");
+//
+//
+//            } else {
+//
+//                XPathExpression experror = xpath2.compile("/PidData/Resp/@errCode");
+//                String errorCode = (String) experror.evaluate(doc2, XPathConstants.STRING);
+//                Log.e("errorCode", "-->" + errorCode);
+//                Log.d(TAG, "Error Info->....." + resp + " & Error Code-> " + errorCode);
+//            }
+//
+//        } else {
+//            Log.d(TAG, "Scan Failure.................");
+//            //getNavigator().onFingerPrintError("Please check your device ");
+//        }
+//    }
 
 
     /**
@@ -4095,7 +4262,12 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             }
         });
     }
-
+    public void openBiometricDeviceScreen(final String successCallback, final String failureCallback) {
+        Intent i = new Intent(UmangWebActivity.this, JPDeviceSelectActivity.class);
+        i.putExtra("successCallback", successCallback);
+        i.putExtra("failureCallback", failureCallback);
+        startActivityForResult(i, Constants.BIO_RD_INFO_REQUEST_CODE);
+    }
 
     class CustomWebChromeClient extends WebChromeClient{
 
@@ -4147,7 +4319,6 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             getSupportActionBar().hide();
             runOnUiThread(new Runnable() {
                 public void run() {
-
                     //stuff that updates ui
                     UmangWebActivity.this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                     UmangWebActivity.this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -4189,6 +4360,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
             // Remove the custom view from its container.
             binding.customViewContainer.removeView(videoView);
+
             videoViewCallback.onCustomViewHidden();
 
             videoView = null;
@@ -4264,6 +4436,215 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
         } catch (IOException e) {
             mAgentWeb.getWebCreator().getWebView().loadUrl("javascript:" + callBackFailureFunction + "(\"" + "IO_EXCEPTION" + "\")");
         }
+    }
+
+    public void showScannerPopupRD(String deviceType) {
+        //check bio device connection
+        showBioDeviceConnectionInfo();
+    }
+    /**
+     * Jeevan Praman (JP)
+     * Method to show Connected device
+     */
+    public void showBioDeviceConnectionInfo() {
+        UsbManager manager = (UsbManager) UmangWebActivity.this.getSystemService(Context.USB_SERVICE);
+        HashMap<String, UsbDevice> deviceList = manager.getDeviceList();
+        //AppLogger.d("DeviceDetected == >>", "" + deviceList.size());
+
+        if (deviceList.size() > 0) {
+            startDeviceScanIntent();
+        } else {
+            UmangWebActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+
+                        mAgentWeb.getWebCreator().getWebView().loadUrl("javascript:showWrongDeviceError()");
+                    } catch (Exception e) {
+                        AppLogger.e(TAG, "Error in showBioDeviceConnectionInfo", e);
+                    }
+                }
+            });
+        }
+    }
+    /**
+     * Jeevan Praman (JP)
+     * Method to scan connected Bio Devices
+     */
+    private void startDeviceScanIntent() {
+        try {
+            String pidOption = generatePidOptXml();
+            if (pidOption != null) {
+                AppLogger.e(TAG, "pidOptions..." + pidOption);
+                Intent intent2 = new Intent();
+                intent2.setAction("in.gov.uidai.rdservice.fp.CAPTURE");
+                intent2.putExtra("PID_OPTIONS", pidOption);
+                UmangWebActivity.this.startActivityForResult(intent2, Constants.DEVICE_SCAN_REQUEST_CODE);
+                UmangApplication.openingIntent = true;
+            }
+        } catch (Exception e) {
+            AppLogger.e("Error", e.toString());
+        }
+    }
+
+    /**
+     * Jeevan Praman (JP)
+     * Method to generate connected bio device PID
+     *
+     * @return
+     */
+    private String generatePidOptXml() {
+        String tmpOptXml = "";
+        String pidFormate = "0";
+        String environment = "P";
+        int fingsToCap = 1;
+        try {
+            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+//            // disable external entities CHECK HERE
+            try {
+                docFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+                docFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+                docFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            } catch (Exception ex) {
+
+            }
+
+
+            docFactory.setNamespaceAware(true);
+            DocumentBuilder docBuilder = null;
+
+            docBuilder = docFactory.newDocumentBuilder();
+            Document doc = docBuilder.newDocument();
+            doc.setXmlStandalone(true);
+
+            Element rootElement = doc.createElement("PidOptions");
+            doc.appendChild(rootElement);
+
+            Attr attrVer = doc.createAttribute("ver");
+            attrVer.setValue("1.0");
+            rootElement.setAttributeNode(attrVer);
+
+            Element opts = doc.createElement("Opts");
+            rootElement.appendChild(opts);
+
+            Attr attr = doc.createAttribute("fCount");
+            attr.setValue(String.valueOf(fingsToCap));
+            opts.setAttributeNode(attr);
+
+            attr = doc.createAttribute("fType");
+            attr.setValue("2");
+            opts.setAttributeNode(attr);
+
+            attr = doc.createAttribute("iCount");
+            attr.setValue("0");
+            opts.setAttributeNode(attr);
+
+            attr = doc.createAttribute("iType");
+            attr.setValue("0");
+            opts.setAttributeNode(attr);
+
+            attr = doc.createAttribute("pCount");
+            attr.setValue("0");
+            opts.setAttributeNode(attr);
+
+            attr = doc.createAttribute("pType");
+            attr.setValue("0");
+            opts.setAttributeNode(attr);
+
+            attr = doc.createAttribute("format");
+            attr.setValue(pidFormate);
+            opts.setAttributeNode(attr);
+
+            attr = doc.createAttribute("pidVer");
+            attr.setValue("2.0");
+            opts.setAttributeNode(attr);
+
+            attr = doc.createAttribute("timeout");
+            attr.setValue("5000");
+            opts.setAttributeNode(attr);
+
+            attr = doc.createAttribute("otp");
+            attr.setValue("");
+
+            attr = doc.createAttribute("env");
+            attr.setValue(environment);
+            opts.setAttributeNode(attr);
+
+            attr = doc.createAttribute("wadh");
+            attr.setValue(mywadh(""));
+            opts.setAttributeNode(attr);
+
+            attr = doc.createAttribute("posh");
+            attr.setValue("UNKNOWN");
+            opts.setAttributeNode(attr);
+
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+
+            Transformer transformer = transformerFactory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.STANDALONE, "yes");
+            DOMSource source = new DOMSource(doc);
+            StringWriter writer = new StringWriter();
+            StreamResult result = new StreamResult(writer);
+            transformer.transform(source, result);
+
+            tmpOptXml = writer.getBuffer().toString().replaceAll("\n|\r", "");
+            tmpOptXml = tmpOptXml.replaceAll("&lt;", "<").replaceAll("&gt;", ">");
+
+            tmpOptXml = tmpOptXml.replaceAll("\\<\\?xml(.+?)\\?\\>", "").trim();
+
+            return tmpOptXml;
+        } catch (ParserConfigurationException e) {
+            return "ERROR in PID formation";
+        } catch (TransformerConfigurationException e) {
+            return "ERROR in PID formation";
+        } catch (TransformerException e) {
+            return "ERROR  in PID formation";
+        }
+
+    }
+
+    /**
+     * Jeevan Praman (JP)
+     * Method to get the wadh for JP
+     *
+     * @param myval
+     * @return
+     */
+    public String mywadh(String myval) {
+
+        MessageDigest md = null;
+        try {
+            md = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+        }
+
+        String ra = "F";
+        String rc = "Y";
+        String lr = "Y";
+        String de = "N";
+        String pfr = "N";
+
+//        String jvwadh = getDataManager().getStringPreference(AppPreferencesHelper.PREF_JV_WADH_VER, "2.5");
+        String jvwadh = "2.5";
+
+        String text = jvwadh + ra + rc + lr + de + pfr;
+        if (md != null) {
+            if (text != null) {
+                try {
+                    md.update(text.getBytes("UTF-8")); // Change this to "UTF-16" if needed
+                } catch (UnsupportedEncodingException e) {
+                }
+            } else
+                return "";
+
+            byte[] digest = md.digest();
+            myval = Base64.encodeToString(digest, Base64.NO_WRAP);
+        } else {
+            return "";
+        }
+
+        return myval;
     }
 
 }

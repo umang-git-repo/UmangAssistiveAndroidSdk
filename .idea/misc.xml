@@ -17,10 +17,19 @@
         <entry key="..\:/Users/Daffolap-674/Documents/Umang_Sdk/umangWebView/src/main/res/layout/progress_dialog.xml" value="0.20364583333333333" />
         <entry key="..\:/Users/Daffolap-674/Documents/Umang_Sdk/umangWebView/src/main/res/layout/record_audio_dialog.xml" value="0.16623931623931623" />
         <entry key="..\:/Users/Daffolap-674/Documents/Umang_Sdk/umangWebView/src/main/res/layout/web_error_page.xml" value="0.16709401709401708" />
+        <entry key="umangWebView/src/main/res/drawable/home_gradient.xml" value="0.1195" />
+        <entry key="umangWebView/src/main/res/drawable/ic_bbps_latest.xml" value="0.1195" />
+        <entry key="umangWebView/src/main/res/drawable/rounded_border.xml" value="0.1195" />
+        <entry key="umangWebView/src/main/res/layout/activity_device_info.xml" value="0.18072916666666666" />
+        <entry key="umangWebView/src/main/res/layout/activity_j_p_device_select.xml" value="0.18072916666666666" />
+        <entry key="umangWebView/src/main/res/layout/activity_other_device.xml" value="0.18072916666666666" />
+        <entry key="umangWebView/src/main/res/layout/appbar_digilocker_view.xml" value="0.18072916666666666" />
+        <entry key="umangWebView/src/main/res/layout/custom_bio_app_lay.xml" value="0.18072916666666666" />
+        <entry key="umangWebView/src/main/res/layout/jp_device_item_view.xml" value="0.18072916666666666" />
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

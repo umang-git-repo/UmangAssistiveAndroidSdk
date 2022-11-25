@@ -16,6 +16,8 @@ import android.util.Log;
 
 import androidx.core.content.ContextCompat;
 
+import com.negd.umangwebview.UmangApplication;
+
 import java.security.MessageDigest;
 
 
@@ -95,6 +97,67 @@ public final class DeviceUtils {
         }
     }
 
+    public static String getMD5( String json) {
+        String md5 = "";
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            md.update((json + "|" + UmangApplication.u_md_s).getBytes());
+            byte[] mdbytes = md.digest();
+            //convert the byte to hex format
+            StringBuffer sb = new StringBuffer("");
+            for (int i = 0; i < mdbytes.length; i++) {
+                sb.append(Integer.toString((mdbytes[i] & 0xff) + 0x100, 16).substring(1));
+            }
+            md5 = sb.toString();
+        } catch (Exception e) {
+            AppLogger.e(TAG, e.getMessage());
+            md5 = "";
+        }
+        AppLogger.d(TAG, "getMD5 : " + md5);
+        return md5;
+    }
+
+
+    public static String getHashedToken(){
+        TokenHashing tokenHashing=new TokenHashing();
+        String xReqHeader = tokenHashing.getHashWithSalt("|" + CommonUtils.getTimeStamp() + "|" + UmangApplication.u_x_k + "|");
+        return xReqHeader;
+    }
+
+    public static String getEmail(Context context) {
+        AccountManager accountManager = AccountManager.get(context);
+        Account account = getAccount(context, accountManager);
+
+        if (account == null) {
+            return "";
+        } else {
+            return account.name;
+        }
+    }
+    private static Account getAccount(Context context, AccountManager accountManager) {
+        try {
+
+            if (ContextCompat.checkSelfPermission(context,
+                    Manifest.permission.GET_ACCOUNTS)
+                    == PackageManager.PERMISSION_GRANTED) {
+                Account[] accounts = accountManager.getAccountsByType("com.google");
+                Account account;
+                if (accounts.length > 0) {
+                    account = accounts[0];
+                } else {
+                    account = null;
+                }
+                return account;
+            } else {
+                return null;
+            }
+
+
+        } catch (Exception e) {
+            AppLogger.e(TAG, "Error getting Email Account:"+ e.getMessage() );
+            return null;
+        }
+    }
     /**
      * Method to get device model
      * @return- device model
@@ -158,7 +221,13 @@ public final class DeviceUtils {
         }
         return "";
     }
-
+    public static String isRooted() {
+        if (RootUtils.isDeviceRooted()) {
+            return "yes";
+        } else {
+            return "no";
+        }
+    }
 
     /**
      * Method to get MCC

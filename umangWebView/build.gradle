@@ -19,6 +19,13 @@ android {
     buildTypes.all {
         buildConfigField "String", "VERSION_NAME", "\"1.0.6\"" // Escaping quote marks to convert property to String
         buildConfigField "int", "VERSION_CODE", "7"
+        buildConfigField "String", "HOST", "\"apigw.umangapp.in\""
+        buildConfigField "String", "API_KEY", "\"VKE9PnbY5k1ZYapR5PyYQ33I26sXTX569Ed7eqyg\""
+        buildConfigField "String", "BASE_URL_NEW", "\"/umangApiShard/ws1/\""
+        buildConfigField "String", "HOST_DOMAIN", "\"/t/negd.gov.in/coreApi/2.0/\""
+        buildConfigField "String", "APP_BUILD_TYPE", "\"S\""
+        buildConfigField "String", "AUTH_BEARER", "\"Bearer f6854d92-da1b-3562-9066-4238aa4f69e7\""
+        buildConfigField "String", "WSO2_BEARER", "\"Bearer f410bcb9-c874-32ab-b502-7b01561e9b2f\""
     }
 
     buildTypes {
@@ -62,10 +69,8 @@ android {
 dependencies {
 
     implementation 'androidx.appcompat:appcompat:1.1.0'
-    //implementation 'com.google.android.material:material:1.3.0'
+    implementation 'com.google.android.material:material:1.3.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-
-
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
 
@@ -102,7 +107,31 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
 
 
+    // dependency injection
+    implementation "com.google.dagger:dagger:2.23"
+    annotationProcessor "com.google.dagger:dagger-compiler:2.23"
+    annotationProcessor "com.google.dagger:dagger-android-processor:2.23"
+    implementation "com.google.dagger:dagger-android-support:2.23"
+    // reactive extension
+    implementation "io.reactivex.rxjava2:rxjava:2.1.9"
+    implementation "io.reactivex.rxjava2:rxandroid:2.1.1"
+    // logger
+    implementation "com.jakewharton.timber:timber:4.7.1"
+    // view model
+    implementation "androidx.lifecycle:lifecycle-viewmodel:2.2.0"
+    implementation "androidx.lifecycle:lifecycle-livedata:2.2.0"
+    implementation "androidx.lifecycle:lifecycle-common-java8:2.2.0"
+    // network
+    implementation "com.amitshekhar.android:rx2-android-networking:1.0.2"
 
+    //secure shared preference
+    implementation "at.favre.lib:armadillo:0.9.0"
+
+    //jsoup librayr
+    implementation 'org.jsoup:jsoup:1.13.1'
+    // image glide
+    implementation "com.github.bumptech.glide:glide:4.11.0"
+    annotationProcessor "com.github.bumptech.glide:compiler:4.11.0"
 }
 
 afterEvaluate {

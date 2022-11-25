@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.mindorks.framework.mvvm.ui.splash.SplashActivity">
+    <data>
+
+        <import type="android.view.View"/>
+
+        <variable
+            name="pos"
+            type="Integer" />
+
+        <variable
+            name="device"
+            type="com.negd.umangwebview.data.model.jp.DeviceData" />
+
+        <variable
+            name="viewModel"
+            type="com.negd.umangwebview.ui.jeevan_pramaan.device_select_screen.JPDeviceSelectItemViewModel" />
+
+    </data>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:clickable="true"
+        android:onClick="@{()->viewModel.itemClick(pos,device)}"
+        android:focusable="true">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/bioDeviceLay"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="@dimen/padding_8dp"
+            android:paddingEnd="@dimen/padding_10dp"
+            android:paddingStart="@dimen/padding_10dp"
+            android:paddingTop="@dimen/padding_10dp">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/bioDeviceImg"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                app:image_url="@{viewModel.image}"/>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/padding_10dp"
+                android:layout_marginStart="@dimen/padding_10dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/bioDeviceTxt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    tools:text="Mantra MFS100"
+                    android:text="@{viewModel.name}"
+                    android:textColor="@color/txt_color_header"
+                    android:textSize="@dimen/text_16sp" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/bioDeviceMakeTxt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    tools:text="Mantra MFS100"
+
+                    android:text="@{viewModel.make}"
+                    android:textColor="@color/textColorLight"
+                    android:textSize="@dimen/text_12sp" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="@dimen/margin_16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/arrow" />
+
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+</layout>

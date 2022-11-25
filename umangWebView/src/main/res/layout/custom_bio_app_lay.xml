@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/appInstallLay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/padding_2dp"
+        android:layout_marginStart="@dimen/padding_2dp"
+        android:layout_marginTop="@dimen/padding5dp"
+        android:background="@drawable/rounded_border"
+        android:padding="@dimen/padding_8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/appInstallImg"
+            android:layout_width="@dimen/margin_16dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/margin_12dp"
+            android:contentDescription="email_verified_not"
+            android:src="@drawable/not_installed" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/appNameTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:lineSpacingExtra="@dimen/padding_2dp"
+            android:maxLines="1"
+            android:text="Morpho SCL RD Service"
+            android:textColor="@color/txt_color_header"
+            android:textSize="@dimen/text_16sp" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/appInstallTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:lineSpacingExtra="@dimen/padding_2dp"
+            android:padding="@dimen/margin_5dp"
+            android:text="@string/package_install"
+            android:textAllCaps="true"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/text_14sp" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+</LinearLayout>
