@@ -55,11 +55,11 @@
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />
 
-        <activity android:name=".ui.jeevan_pramaan.device_select_screen.JPDeviceSelectActivity"/>
+        <activity android:name=".ui.jeevan_pramaan.JPDeviceSelectActivity"/>
 
-        <activity android:name=".ui.jeevan_pramaan.device_detail_screen.DeviceInfoActivity"/>
+        <activity android:name=".ui.jeevan_pramaan.DeviceInfoActivity"/>
 
-        <activity android:name=".ui.jeevan_pramaan.other_device_screen.OtherDeviceActivity"/>
+        <activity android:name=".ui.jeevan_pramaan.OtherDeviceActivity"/>
 
         <provider
             android:name=".utils.UmangFileProvider"

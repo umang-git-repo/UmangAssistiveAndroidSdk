@@ -6,7 +6,6 @@ import android.util.Log;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.negd.umangwebview.data.DataManager;
 import com.negd.umangwebview.utils.Constants;
 import com.negd.umangwebview.utils.DeviceUtils;
 
@@ -15,7 +14,7 @@ import java.io.Serializable;
 
 public class CommonParams implements Serializable {
 
-    private DataManager dataManager;
+
 
     protected CommonParams(){
 
@@ -115,23 +114,21 @@ public class CommonParams implements Serializable {
     @SerializedName("node")
     public String node;
 
-    public static CommonParams getInstance(Context context, DataManager dataManager){
+    public static CommonParams getInstance(Context context){
         if(commonParams==null) {
             commonParams = new CommonParams();
-            commonParams.init(context,dataManager);
+
 
         }
         return commonParams;
     }
 
-    public void init(Context context,DataManager dataManager) {
+    public void init(Context context) {
 
         try{
             SharedPreferences pref = context.getSharedPreferences("UmangSdkPref", 0);
             String pref_token= pref.getString(Constants.DEVICE_TOKEN,"");
             Log.d("MyValueIs",pref_token);
-
-            this.dataManager=dataManager;
             deviceId = DeviceUtils.getDeviceId(context);
             deviceImei=DeviceUtils.getDeviceImei(context);
             deviceImsi=DeviceUtils.getImsiNumber(context);
@@ -274,13 +271,7 @@ public class CommonParams implements Serializable {
         this.appLanguage = appLanguage;
     }
 
-    public DataManager getDataManager() {
-        return dataManager;
-    }
 
-    public void setDataManager(DataManager dataManager) {
-        this.dataManager = dataManager;
-    }
 
     public static CommonParams getCommonParams() {
         return commonParams;

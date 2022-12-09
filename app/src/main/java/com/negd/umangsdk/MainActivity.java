@@ -30,10 +30,7 @@ public class MainActivity extends AppCompatActivity {
             umangAssistiveAndroidSdk = UmangAssistiveAndroidSdk.Builder.newInstance()
                     .setDeptUrl(PARTNER_URL)
                     .build();
-
             umangAssistiveAndroidSdk.startUmangWebview(this);
-
-
 
         });
     }

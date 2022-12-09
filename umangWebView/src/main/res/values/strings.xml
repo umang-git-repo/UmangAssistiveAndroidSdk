@@ -59,5 +59,6 @@
     <string name="update">Update</string>
     <string name="other">Other</string>
     <string name="bio_other_device_txt2">Please contact your device manufacturer for more information.</string>
+    <string name="select_your_biometric_device">Select your Biometric Device</string>
 
 </resources>

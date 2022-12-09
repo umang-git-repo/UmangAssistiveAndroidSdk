@@ -1,4 +1,4 @@
-package com.negd.umangwebview.data.model.jp;
+package com.negd.umangwebview.data.model.biomodel;
 
 import android.os.Parcel;
 import android.os.Parcelable;

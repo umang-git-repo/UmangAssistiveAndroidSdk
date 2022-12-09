@@ -1,4 +1,4 @@
-package com.negd.umangwebview.data.model.jp;
+package com.negd.umangwebview.data.model.biomodel;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

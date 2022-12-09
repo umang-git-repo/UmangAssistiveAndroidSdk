@@ -20,12 +20,20 @@
         <entry key="umangWebView/src/main/res/drawable/home_gradient.xml" value="0.1195" />
         <entry key="umangWebView/src/main/res/drawable/ic_bbps_latest.xml" value="0.1195" />
         <entry key="umangWebView/src/main/res/drawable/rounded_border.xml" value="0.1195" />
+        <entry key="umangWebView/src/main/res/layout/activity_bar_code_scanner.xml" value="0.18072916666666666" />
         <entry key="umangWebView/src/main/res/layout/activity_device_info.xml" value="0.18072916666666666" />
         <entry key="umangWebView/src/main/res/layout/activity_j_p_device_select.xml" value="0.18072916666666666" />
         <entry key="umangWebView/src/main/res/layout/activity_other_device.xml" value="0.18072916666666666" />
+        <entry key="umangWebView/src/main/res/layout/activity_umang_web.xml" value="0.18072916666666666" />
         <entry key="umangWebView/src/main/res/layout/appbar_digilocker_view.xml" value="0.18072916666666666" />
+        <entry key="umangWebView/src/main/res/layout/choose_file_dialog_option.xml" value="0.18072916666666666" />
         <entry key="umangWebView/src/main/res/layout/custom_bio_app_lay.xml" value="0.18072916666666666" />
+        <entry key="umangWebView/src/main/res/layout/custom_dialog_view.xml" value="0.18072916666666666" />
+        <entry key="umangWebView/src/main/res/layout/dialog_info.xml" value="0.18072916666666666" />
         <entry key="umangWebView/src/main/res/layout/jp_device_item_view.xml" value="0.18072916666666666" />
+        <entry key="umangWebView/src/main/res/layout/open_permission_settings_dialog.xml" value="0.18072916666666666" />
+        <entry key="umangWebView/src/main/res/layout/record_audio_dialog.xml" value="0.18072916666666666" />
+        <entry key="umangWebView/src/main/res/layout/web_error_page.xml" value="0.18072916666666666" />
       </map>
     </option>
   </component>

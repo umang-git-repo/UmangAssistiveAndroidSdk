@@ -79,7 +79,6 @@ public class UmangAssistiveAndroidSdk {
       }
    }
 
-
    public static class Builder{
       private String deptUrl;
       private String deptHeader;

@@ -36,7 +36,8 @@
                     style="?attr/actionButtonStyle"
                     android:clickable="true"
                     android:focusable="true"
-                    app:srcCompat="@drawable/ic_back_icon" />
+                    app:srcCompat="@drawable/ic_back_icon"
+                    android:padding="5dp"/>
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/header_txt"

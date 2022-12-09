@@ -3,12 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.mindorks.framework.mvvm.ui.splash.SplashActivity">
-    <data>
+<!--    <data>-->
 
-        <variable
-            name="viewModel"
-            type="com.negd.umangwebview.ui.jeevan_pramaan.other_device_screen.OtherDeviceViewModel" />
-    </data>
+<!--        <variable-->
+<!--            name="viewModel"-->
+<!--            type="com.negd.umangwebview.ui.jeevan_pramaan.other_device_screen.OtherDeviceViewModel" />-->
+<!--    </data>-->
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
@@ -16,7 +16,8 @@
         android:orientation="vertical"
         android:background="@color/white">
 
-        <include android:id="@+id/actionbar" layout="@layout/appbar_digilocker_view"/>
+        <include android:id="@+id/actionbar"
+            layout="@layout/appbar_digilocker_view"/>
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
@@ -60,7 +61,7 @@
                 android:text="@string/next"
                 android:textColor="@color/white"
                 android:clickable="true"
-                android:onClick="@{()->viewModel.nextClick()}"
+
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackgroundBorderless"
                 android:textSize="@dimen/text_18sp" />

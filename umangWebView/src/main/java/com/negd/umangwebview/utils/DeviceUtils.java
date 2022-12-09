@@ -96,34 +96,6 @@ public final class DeviceUtils {
             return "";
         }
     }
-
-    public static String getMD5( String json) {
-        String md5 = "";
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            md.update((json + "|" + UmangApplication.u_md_s).getBytes());
-            byte[] mdbytes = md.digest();
-            //convert the byte to hex format
-            StringBuffer sb = new StringBuffer("");
-            for (int i = 0; i < mdbytes.length; i++) {
-                sb.append(Integer.toString((mdbytes[i] & 0xff) + 0x100, 16).substring(1));
-            }
-            md5 = sb.toString();
-        } catch (Exception e) {
-            AppLogger.e(TAG, e.getMessage());
-            md5 = "";
-        }
-        AppLogger.d(TAG, "getMD5 : " + md5);
-        return md5;
-    }
-
-
-    public static String getHashedToken(){
-        TokenHashing tokenHashing=new TokenHashing();
-        String xReqHeader = tokenHashing.getHashWithSalt("|" + CommonUtils.getTimeStamp() + "|" + UmangApplication.u_x_k + "|");
-        return xReqHeader;
-    }
-
     public static String getEmail(Context context) {
         AccountManager accountManager = AccountManager.get(context);
         Account account = getAccount(context, accountManager);

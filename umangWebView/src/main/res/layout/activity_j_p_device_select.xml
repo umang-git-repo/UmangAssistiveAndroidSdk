@@ -3,12 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.mindorks.framework.mvvm.ui.splash.SplashActivity">
-    <data>
-        <variable
-            name="viewModel"
-            type="com.negd.umangwebview.ui.jeevan_pramaan.device_select_screen.JPDeviceSelectViewModel" />
 
-    </data>
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
@@ -16,7 +11,8 @@
         android:orientation="vertical"
         android:background="@color/white">
 
-        <include android:id="@+id/actionbar" layout="@layout/appbar_digilocker_view"/>
+        <include android:id="@+id/actionbar"
+            layout="@layout/appbar_digilocker_view"/>
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
@@ -29,9 +25,7 @@
                 android:id="@+id/rv_devices"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                tools:listitem="@layout/jp_device_item_view"
-                app:device_select_adapter="@{viewModel.observableArrayList}"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+                tools:listitem="@layout/jp_device_item_view" />
 
         </androidx.appcompat.widget.LinearLayoutCompat>
     </androidx.appcompat.widget.LinearLayoutCompat>
