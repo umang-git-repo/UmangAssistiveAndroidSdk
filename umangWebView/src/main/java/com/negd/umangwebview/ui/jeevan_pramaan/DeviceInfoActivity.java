@@ -158,10 +158,7 @@ public class DeviceInfoActivity extends AppCompatActivity {
         });
         //add layout
         addLayout();
-
-
     }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -176,7 +173,6 @@ public class DeviceInfoActivity extends AppCompatActivity {
 //        List<AppData> appDataList=new ArrayList<>();
 ////        appDataList = deviceData.getAppList();
 //        appDataList = myList;
-
         for (int i = 0; i < myList.size(); i++) {
             AppData appData = myList.get(i);
             ViewGroup newView = (ViewGroup) LayoutInflater.from(this).inflate(R.layout.custom_bio_app_lay, binding.appLayout, false);

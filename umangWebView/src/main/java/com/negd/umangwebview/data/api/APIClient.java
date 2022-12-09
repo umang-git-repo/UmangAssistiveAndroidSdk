@@ -8,7 +8,6 @@ public class APIClient {
     public static final String BASE_URL = "https://apigw.umangapp.in/";
     private static Retrofit retrofit = null;
 
-
     public static final Retrofit getClient() {
         if (retrofit == null) {
             retrofit = new Retrofit.Builder()

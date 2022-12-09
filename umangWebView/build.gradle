@@ -17,15 +17,8 @@ android {
     }
 
     buildTypes.all {
-        buildConfigField "String", "VERSION_NAME", "\"1.0.6\"" // Escaping quote marks to convert property to String
-        buildConfigField "int", "VERSION_CODE", "7"
-        buildConfigField "String", "HOST", "\"apigw.umangapp.in\""
-        buildConfigField "String", "API_KEY", "\"VKE9PnbY5k1ZYapR5PyYQ33I26sXTX569Ed7eqyg\""
-        buildConfigField "String", "BASE_URL_NEW", "\"/umangApiShard/ws1/\""
-        buildConfigField "String", "HOST_DOMAIN", "\"/t/negd.gov.in/coreApi/2.0/\""
-        buildConfigField "String", "APP_BUILD_TYPE", "\"S\""
-        buildConfigField "String", "AUTH_BEARER", "\"Bearer f6854d92-da1b-3562-9066-4238aa4f69e7\""
-        buildConfigField "String", "WSO2_BEARER", "\"Bearer f410bcb9-c874-32ab-b502-7b01561e9b2f\""
+        buildConfigField "String", "VERSION_NAME", "\"1.0.9\"" // Escaping quote marks to convert property to String
+        buildConfigField "int", "VERSION_CODE", "9"
     }
 
     buildTypes {
@@ -71,46 +64,28 @@ dependencies {
     implementation 'com.google.android.material:material:1.3.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-
-
     //web view
     implementation 'com.github.Justson.AgentWeb:agentweb-core:v5.0.6-androidx'
     implementation 'com.github.Justson.AgentWeb:agentweb-filechooser:v5.0.6-androidx'
     implementation 'com.github.Justson:Downloader:v5.0.4-androidx'
-
     //ios parser library for audio
     implementation 'com.googlecode.mp4parser:isoparser:1.1.22'
-
-    //barcode reader
-    //implementation 'xyz.belvi.mobilevision:barcodescanner:2.0.3'
-
     // parser
     implementation "com.google.code.gson:gson:2.8.6"
-
     //image cropper
     implementation 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
-
     //compressorzacx
     implementation 'id.zelory:compressor:2.1.1'
-
     //google location service
     //noinspection GradleCompatible
-
     //implementation files('libs/play-services-location-17.0.0.aar')
     implementation 'com.google.android.gms:play-services-location:17.1.0'
-
     //multi-dex
     implementation "com.android.support:multidex:1.0.3"
-
     //okhttp client
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
-
-
     // logger
     implementation "com.jakewharton.timber:timber:4.7.1"
-
-
-
     //jsoup librayr
     implementation 'org.jsoup:jsoup:1.13.1'
     // image glide
