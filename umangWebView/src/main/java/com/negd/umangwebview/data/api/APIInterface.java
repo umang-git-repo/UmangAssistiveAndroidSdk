@@ -8,17 +8,6 @@ import retrofit2.http.Headers;
 import retrofit2.http.POST;
 
 public  interface APIInterface {
-
-//    @Headers({
-//            "Accept: application/json",
-//            "Content-Type: application/json",
-//            "Authorization: Bearer f410bcb9-c874-32ab-b502-7b01561e9b2f"
-//    })
-//    @POST("coreApi/2.0/openbiolist")
-//    Call<RDResponse> getDeviceList(@Body RdDeviceRequest deviceRequest);
-
-
-
     @Headers({
             "Accept: application/json",
             "Content-Type: application/json",

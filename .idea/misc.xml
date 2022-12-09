@@ -32,6 +32,7 @@
         <entry key="umangWebView/src/main/res/layout/dialog_info.xml" value="0.18072916666666666" />
         <entry key="umangWebView/src/main/res/layout/jp_device_item_view.xml" value="0.18072916666666666" />
         <entry key="umangWebView/src/main/res/layout/open_permission_settings_dialog.xml" value="0.18072916666666666" />
+        <entry key="umangWebView/src/main/res/layout/progress_dialog.xml" value="0.18072916666666666" />
         <entry key="umangWebView/src/main/res/layout/record_audio_dialog.xml" value="0.18072916666666666" />
         <entry key="umangWebView/src/main/res/layout/web_error_page.xml" value="0.18072916666666666" />
       </map>

@@ -19,10 +19,8 @@ import com.negd.umangwebview.data.adapter.RecyclerViewAdapter;
 import com.negd.umangwebview.data.api.APIClient;
 import com.negd.umangwebview.data.api.APIInterface;
 import com.negd.umangwebview.data.model.biomodel.DeviceData;
-import com.negd.umangwebview.data.model.biomodel.DeviceList;
 import com.negd.umangwebview.data.model.biomodel.DeviceListResponse;
 import com.negd.umangwebview.data.model.biomodel.RdDeviceRequest;
-import com.negd.umangwebview.utils.AppLogger;
 import com.negd.umangwebview.utils.DeviceUtils;
 
 import java.util.ArrayList;

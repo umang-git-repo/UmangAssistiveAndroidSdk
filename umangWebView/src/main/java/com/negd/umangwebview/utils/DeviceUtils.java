@@ -15,9 +15,6 @@ import android.util.Base64;
 import android.util.Log;
 
 import androidx.core.content.ContextCompat;
-
-import com.negd.umangwebview.UmangApplication;
-
 import java.security.MessageDigest;
 
 

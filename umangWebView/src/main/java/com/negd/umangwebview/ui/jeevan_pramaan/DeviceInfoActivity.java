@@ -162,17 +162,12 @@ public class DeviceInfoActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-//        CommonUtils.sendScreenNameAnalytics(this, "JP Device Info Screen");
         addLayout();
     }
 
     private void addLayout() {
-//        DeviceData deviceData=getIntent().getParcelableExtra("bioDevice");
         myList = (ArrayList<AppData>) getIntent().getSerializableExtra("bioDevice");
         binding.appLayout.removeAllViews();
-//        List<AppData> appDataList=new ArrayList<>();
-////        appDataList = deviceData.getAppList();
-//        appDataList = myList;
         for (int i = 0; i < myList.size(); i++) {
             AppData appData = myList.get(i);
             ViewGroup newView = (ViewGroup) LayoutInflater.from(this).inflate(R.layout.custom_bio_app_lay, binding.appLayout, false);
@@ -202,17 +197,7 @@ public class DeviceInfoActivity extends AppCompatActivity {
             appInstallLay.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-//
-//                    CommonUtils.sendClickEventAnalytics(
-//                            DeviceInfoActivity.this,
-//                            null,
-//                            "Install Button",
-//                            "clicked",
-//                            "JP Device Info Screen"
-//                    );
-
                     String pkgName = (String) appInstallLay.getTag();
-
                     try {
                         startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + pkgName)));
                     } catch (ActivityNotFoundException e) {

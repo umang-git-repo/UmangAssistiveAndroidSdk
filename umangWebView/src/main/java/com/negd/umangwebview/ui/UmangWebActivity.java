@@ -71,7 +71,6 @@ import com.just.agentweb.WebChromeClient;
 import com.just.agentweb.WebViewClient;
 import com.negd.umangwebview.BuildConfig;
 import com.negd.umangwebview.R;
-import com.negd.umangwebview.UmangApplication;
 import com.negd.umangwebview.UmangAssistiveAndroidSdk;
 import com.negd.umangwebview.callbacks.CameraInterface;
 import com.negd.umangwebview.callbacks.CommonInterface;
@@ -235,6 +234,8 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
         //fused location client
         //mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        AppLogger.init();
 
         //get intent values and set UI
         setIntentValues();
@@ -2097,21 +2098,12 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                 if (perms.get(Manifest.permission.READ_CALL_LOG) == PackageManager.PERMISSION_GRANTED
                         && perms.get(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED
                         && perms.get(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
-                    // All Permissions Granted
-                    //traiInterface.setMyCallsStatus(mJsonParams, callBackSuccessFunction);
-
                 } else {
 
                     Log.d(TAG, "Permission denied........................................");
 
                     // Permission Denied
                     String TYPE = "PERMISSION";
-//                    openDialog(getResources().getString(R.string.permission_required),
-//                            getResources().getString(R.string.allow_read_calllogs_contact_permission_help_text),
-//                            getResources().getString(R.string.open_settings),
-//                            getResources().getString(R.string.cancel),
-//                            TYPE);
-
                     try {
                         JSONObject object = new JSONObject();
                         object.put("status", "f");
@@ -2363,10 +2355,6 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
         }
     }
-
-
-
-
     private String deviceInfoSuccessCallback;
 
     /**
@@ -2523,8 +2511,6 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             }
         }
     }
-
-
     /**
      * Jeevan Praman (JP)
      * Method to send Finger prints to Web
@@ -2681,159 +2667,6 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             //getNavigator().onFingerPrintError("Please check your device ");
         }
     }
-
-
-//    void handleUserFingerPrint(Intent intent) throws Exception {
-//        String pidDataXML = intent.getStringExtra("PID_DATA");
-//        Log.d(TAG, "pid data....." + pidDataXML);
-//        if (pidDataXML != null) {
-//            if (pidDataXML.equals("") || pidDataXML.isEmpty()) {
-//                Log.d(TAG, "Error occurred in PID DATA XML..................");
-//                Utils.showInfoDialog(this,"Not able to get your fingerprint properly. Please try again.");
-//                return;
-//            }
-//            if (pidDataXML.startsWith("ERROR:-")) {
-//                Log.d(TAG, "ERROR............." + pidDataXML);
-//                Utils.showInfoDialog(this,"An error occurred while capturing your fingerprint. Please try again.");
-//                return;
-//            }
-//            DocumentBuilderFactory db = DocumentBuilderFactory.newInstance();
-//            // disable external entities
-//
-//            try {
-//                db.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-//                db.setFeature("http://xml.org/sax/features/external-general-entities", false);
-//                db.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-//            } catch (Exception ex) {
-//
-//            }
-//            Document inputDocument = db.newDocumentBuilder().parse(new InputSource(new StringReader(pidDataXML)));
-//            NodeList nodes = inputDocument.getElementsByTagName("PidData");
-//            if (nodes != null) {
-//                Element element = (Element) nodes.item(0);
-//                NodeList respNode = inputDocument.getElementsByTagName("Resp");
-//                if (respNode != null) {
-//                    Node respData = respNode.item(0);
-//                    NamedNodeMap attsResp = respData.getAttributes();
-//                    String errCodeStr = "";
-//                    String errInfoStr = "";
-//                    Node errCode = attsResp.getNamedItem("errCode");
-//                    if (errCode != null) {
-//                        errCodeStr = errCode.getNodeValue();
-//                    } else errCodeStr = "0";
-//                    Node errInfo = attsResp.getNamedItem("errInfo");
-//                    if (errInfo != null) {
-//                        errInfoStr = errInfo.getNodeValue();
-//                    }
-//                    if (Integer.parseInt(errCodeStr) > 0) {
-//                        Log.d(TAG, "Capture error :- " + errCodeStr + " , " + errInfoStr);
-//                        Utils.showInfoDialog(this,errInfoStr);
-//                        return;
-//                    }
-//                }
-//            }
-//        }
-//        if (pidDataXML != null) {   //deviceInfoXML != null &&
-//            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-//            // disable external entities
-//
-//            try {
-//                dbFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-//                dbFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-//                dbFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-//            } catch (Exception ex) {
-//
-//            }
-//
-//            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-//            Document doc2 = dBuilder.parse(new InputSource(new StringReader(pidDataXML)));
-//
-//
-//            // XPath to retrieve the content of the <FamilyAnnualDeductibleAmount> tag
-//            XPath xpath2 = XPathFactory.newInstance().newXPath();
-//
-//            XPathExpression expResp = xpath2.compile("/PidData/Resp/@errCode");
-//            String resp = (String) expResp.evaluate(doc2, XPathConstants.STRING);
-//            Log.e("errCode", "-->" + resp);
-//
-//            if (resp.equalsIgnoreCase("0")) {
-//
-//                XPathExpression expImei = xpath2.compile("/PidData/DeviceInfo/@dpId");
-//                String dpid = (String) expImei.evaluate(doc2, XPathConstants.STRING);
-//                Log.e("dpId", "-->" + dpid);
-//
-//
-//                XPathExpression expci = xpath2.compile("/PidData/Skey/@ci");
-//                String ci = (String) expci.evaluate(doc2, XPathConstants.STRING);
-//                Log.e("ci", "-->" + ci);
-//
-//                XPathExpression expSkey = xpath2.compile("/PidData/Skey/text()");
-//                String Skey = (String) expSkey.evaluate(doc2, XPathConstants.STRING);
-//                Log.e("Skey", "-->" + Skey);
-//
-//                XPathExpression expHmac = xpath2.compile("/PidData/Hmac/text()");
-//                String Hmac = (String) expHmac.evaluate(doc2, XPathConstants.STRING);
-//                Log.e("Hmac", "-->" + Hmac);
-//
-//                XPathExpression expData = xpath2.compile("/PidData/Data/text()");
-//                String Data = (String) expData.evaluate(doc2, XPathConstants.STRING);
-//                Log.e("Data", "-->" + Data);
-//
-//                XPathExpression experror = xpath2.compile("/PidData/Resp/@errCode");
-//                String errorCode = (String) experror.evaluate(doc2, XPathConstants.STRING);
-//                Log.e("errorCode", "-->" + errorCode);
-//
-//                XPathExpression expdc = xpath2.compile("/PidData/DeviceInfo/@dc");
-//                String dc = (String) expdc.evaluate(doc2, XPathConstants.STRING);
-//
-//                XPathExpression expmi = xpath2.compile("/PidData/DeviceInfo/@mi");
-//                String mi = (String) expmi.evaluate(doc2, XPathConstants.STRING);
-//
-//                XPathExpression expmc = xpath2.compile("/PidData/DeviceInfo/@mc");
-//                String mc = (String) expmc.evaluate(doc2, XPathConstants.STRING);
-//
-//                XPathExpression exprdsId = xpath2.compile("/PidData/DeviceInfo/@rdsId");
-//                String rdsId = (String) exprdsId.evaluate(doc2, XPathConstants.STRING);
-//
-//                XPathExpression exprdsVer = xpath2.compile("/PidData/DeviceInfo/@rdsVer");
-//                String rdsVer = (String) exprdsVer.evaluate(doc2, XPathConstants.STRING);
-//
-//
-//                JSONObject dataJson = new JSONObject();
-//                dataJson.put(Constants.HMAC, Hmac);
-//                dataJson.put(Constants.SKEY, Skey);
-//                dataJson.put(Constants.DATA, Data);
-//                dataJson.put(Constants.CI, ci);
-//                dataJson.put(Constants.RD_SLD, rdsId);
-//                dataJson.put(Constants.RD_VER, rdsVer);
-//                dataJson.put(Constants.DPLD, dpid);
-//                dataJson.put(Constants.DC, dc);
-//                dataJson.put(Constants.MI, mi);
-//                dataJson.put(Constants.MC, mc);
-//
-//                String strWithEscape = "";
-//                strWithEscape = dataJson.toString();
-//                Gson gson = new Gson();
-//                strWithEscape = gson.toJson(dataJson);
-//                Log.d(TAG, "SCAN RESULT ====  " + strWithEscape);
-//                mAgentWeb.getWebCreator().getWebView().loadUrl("javascript:scanResult(" + strWithEscape + ")");
-//
-//
-//            } else {
-//
-//                XPathExpression experror = xpath2.compile("/PidData/Resp/@errCode");
-//                String errorCode = (String) experror.evaluate(doc2, XPathConstants.STRING);
-//                Log.e("errorCode", "-->" + errorCode);
-//                Log.d(TAG, "Error Info->....." + resp + " & Error Code-> " + errorCode);
-//            }
-//
-//        } else {
-//            Log.d(TAG, "Scan Failure.................");
-//            //getNavigator().onFingerPrintError("Please check your device ");
-//        }
-//    }
-
-
     /**
      * Method to send result canceled to Web
      */
@@ -2892,8 +2725,6 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             Toast.makeText(this,getString(R.string.please_try_again),Toast.LENGTH_LONG).show();
         }
     }
-
-
     /**
      * check the size of Input stream  with max size
      *
@@ -2924,8 +2755,6 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
         }
         return false;
     }
-
-
     /**
      * Method to handle image result for URI
      *
@@ -2975,9 +2804,6 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             //activity.showToast(activity.getResources().getString(R.string.please_try_again));
         }
     }
-
-
-
     /**
      * Method to handle result from CropActivity
      *
@@ -4474,7 +4300,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                 intent2.setAction("in.gov.uidai.rdservice.fp.CAPTURE");
                 intent2.putExtra("PID_OPTIONS", pidOption);
                 UmangWebActivity.this.startActivityForResult(intent2, Constants.DEVICE_SCAN_REQUEST_CODE);
-                UmangApplication.openingIntent = true;
+                UmangAssistiveAndroidSdk.openingIntent = true;
             }
         } catch (Exception e) {
             AppLogger.e("Error", e.toString());
@@ -4637,8 +4463,6 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
         } else {
             return "";
         }
-
         return myval;
     }
-
 }
