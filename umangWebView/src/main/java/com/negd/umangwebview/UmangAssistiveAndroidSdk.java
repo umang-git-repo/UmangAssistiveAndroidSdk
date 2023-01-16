@@ -21,6 +21,7 @@ public class UmangAssistiveAndroidSdk {
 
    public static boolean openingIntent=false;
 
+
    public UmangAssistiveAndroidSdk(Builder builder)
    {
       this.deptUrl=builder.deptUrl;
@@ -78,7 +79,6 @@ public class UmangAssistiveAndroidSdk {
 
       }
    }
-
 
    public static class Builder{
       private String deptUrl;

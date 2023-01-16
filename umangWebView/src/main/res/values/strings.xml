@@ -30,4 +30,35 @@
     <string name="something_went_wrong">Something went wrong</string>
     <string name="downloading_file">Downloading...</string>
     <string name="open_multi">Open</string>
+
+    <string name="oops_message">Oops!! There seems to be some issue at Department servers providing this service on UMANG.</string>
+    <string name="session_loggedout_msg">Dear user, you will be logged out. Please log in to access UMANG</string>
+    <string name="session_expire_msg">Your session has expired. Please log in again</string>
+    <string name="other_devices">Other Devices</string>
+    <string name="please_check_network_and_try_again">Please check your Internet Connection and try again</string>
+
+    <string name="is_your_device_registered">Is your device registered?</string>
+    <string name="morpho_desc1">As per the latest guidelines from UIDAI, only Registered Devices (RD) can be used for Aadhaar biometric authentication.</string>
+    <string name="morpho_desc2">All the biometric devices used currently were classified as Public Devices. These Devices will no longer be usable for Aadhaar authentication and will be discontinued soon.</string>
+    <string name="morpho_desc3">All Morpho device owners can visit https://rdserviceonline.com and register their respective devices.</string>
+    <string name="morpho_desc4">Post registration, the Morpho SCL RD Service app is required to be installed for device activation.</string>
+    <string name="mantra_desc1">As per the latest guidelines from UIDAI, only Registered Devices (RD) can be used for Aadhaar biometric authentication.</string>
+    <string name="mantra_desc2">All the biometric devices used currently were classified as Public Devices. These Devices will no longer be usable for Aadhaar authentication and will be discontinued soon.</string>
+    <string name="mantra_desc3">As per the information available, all Mantra device owners, with devices that were manufactured before April 2017, are required to visit http://servico.mantratecapp.com and register their respective devices for RD service.</string>
+    <string name="mantra_desc4">Post Registration, users need to install Mantra RD service and Mantra Management Client app to proceed.</string>
+    <string name="mantra_desc5">Users for rest of the devices can simply install Mantra RD service and Mantra Management Client apps and get their device registered.</string>
+    <string name="please_note">Please note:</string>
+    <string name="above_apps_needs_to_be_installed">The apps mentioned above need to be installed before you can continue to the next step.</string>
+    <string name="download_user_manual"><u>Download User Manual</u></string>
+    <string name="user_manual">User Manual</string>
+    <string name="next">Next</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="email_address">Email Address</string>
+    <string name="package_install">INSTALL</string>
+    <string name="package_installed">INSTALLED</string>
+    <string name="update">Update</string>
+    <string name="other">Other</string>
+    <string name="bio_other_device_txt2">Please contact your device manufacturer for more information.</string>
+    <string name="select_your_biometric_device">Select your Biometric Device</string>
+
 </resources>

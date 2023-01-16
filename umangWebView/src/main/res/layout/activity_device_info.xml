@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.mindorks.framework.mvvm.ui.splash.SplashActivity">
+
+
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/white">
+
+        <include android:id="@+id/actionbar" layout="@layout/appbar_digilocker_view"/>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginBottom="@dimen/margin_16dp">
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:padding="@dimen/padding_16dp"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/bioDeviceImg"
+                    android:layout_width="90dp"
+                    android:layout_height="90dp"
+                    android:layout_gravity="center_horizontal" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/bioDeviceTxt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="@dimen/padding5dp"
+
+                    android:textColor="@color/colorPrimary"
+                    tools:text="Morpho"
+                    android:textSize="@dimen/margin_14dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
+                    android:orientation="vertical"
+                    android:padding="@dimen/padding7dp">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/appHeadingTxt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_5dp"
+                        android:gravity="center"
+
+                        tools:text="RD Service Apps"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="@dimen/text_14sp" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/appDescTxt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin10"
+                        tools:text="@string/morpho_desc1"
+                        android:text=""
+                        android:textColor="@color/txt_color_header"
+                        android:textSize="@dimen/text_14sp" />
+
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin10">
+
+                        <androidx.appcompat.widget.LinearLayoutCompat
+                            android:id="@+id/appLayout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"/>
+                    </FrameLayout>
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/noteTxt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin10"
+                        tools:text="@string/please_note"
+                        android:text=""
+                        android:textColor="@color/red"
+                        android:textSize="@dimen/text_14sp" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="@dimen/margin_16dp"
+                        android:background="@color/dividerColor" />
+
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/regDevHeadingTxt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_16dp"
+                        android:gravity="center"
+                        tools:text="Registered Devices"
+                        android:text=""
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="@dimen/text_14sp" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/regDevDescTxt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin10"
+
+                        tools:text="@string/morpho_desc1"
+                        android:text=""
+                        android:textColor="@color/txt_color_header"
+                        android:textSize="@dimen/text_14sp" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="@dimen/margin_16dp"
+                        android:background="@color/dividerColor" />
+
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/helpHeadingTxt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_16dp"
+
+                        android:gravity="center"
+                        tools:text="Help and Support"
+                        android:text=""
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="@dimen/text_14sp" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/helpDescTxt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin10"
+
+                        tools:text="help desc"
+                        android:text=""
+                        android:textColor="@color/txt_color_header"
+                        android:textSize="@dimen/text_14sp" />
+
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/userManualLay"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_20dp"
+                        android:gravity="center_vertical"
+                        android:minHeight="40dp"
+                        android:orientation="horizontal"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackgroundBorderless"
+                        >
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:src="@drawable/user_manual" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/userManualTxt"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/margin_16dp"
+                            android:paddingTop="@dimen/margin_5dp"
+                            android:paddingBottom="@dimen/padding5dp"
+                            android:text="@string/user_manual"
+                            android:textColor="@color/txt_color_header"
+                            android:textSize="@dimen/text_16sp" />
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/emailLay"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_20dp"
+                        android:gravity="center_vertical"
+                        android:minHeight="40dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackgroundBorderless"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:layout_gravity="center_vertical"
+                            android:src="@drawable/bio_email" />
+
+                        <androidx.appcompat.widget.LinearLayoutCompat
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/margin_16dp"
+                            android:orientation="vertical">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/email_address"
+                                android:textColor="@color/txt_color_header"
+                                android:textSize="@dimen/text_16sp" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/emailTxt"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                tools:text="helpdesk@rdserviceonline.com"
+                                android:text=""
+                                android:textColor="@color/txt_color_header"
+                                android:textSize="@dimen/text_16sp" />
+
+                        </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/phoneLay"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_20dp"
+                        android:gravity="center_vertical"
+                        android:minHeight="40dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackgroundBorderless"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:src="@drawable/bio_call" />
+
+                        <androidx.appcompat.widget.LinearLayoutCompat
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/margin_16dp"
+                            android:orientation="vertical">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/phone_number"
+                                android:textColor="@color/txt_color_header"
+                                android:textSize="@dimen/text_16sp" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/callTxt"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                tools:text="helpdesk@rdserviceonline.com"
+                                android:text=""
+                                android:textColor="@color/txt_color_header"
+                                android:textSize="@dimen/text_14sp" />
+
+                        </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+                </LinearLayout>
+            </androidx.appcompat.widget.LinearLayoutCompat>
+        </ScrollView>
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/nextTxt"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/padding_45dp"
+            android:layout_marginTop="@dimen/padding5dp"
+            android:gravity="center"
+            android:background="@color/colorPrimary"
+            android:text="@string/next"
+            android:onClick=""
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_20sp" />
+
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+</layout>

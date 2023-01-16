@@ -15,7 +15,6 @@ import android.util.Base64;
 import android.util.Log;
 
 import androidx.core.content.ContextCompat;
-
 import java.security.MessageDigest;
 
 
@@ -94,7 +93,40 @@ public final class DeviceUtils {
             return "";
         }
     }
+    public static String getEmail(Context context) {
+        AccountManager accountManager = AccountManager.get(context);
+        Account account = getAccount(context, accountManager);
 
+        if (account == null) {
+            return "";
+        } else {
+            return account.name;
+        }
+    }
+    private static Account getAccount(Context context, AccountManager accountManager) {
+        try {
+
+            if (ContextCompat.checkSelfPermission(context,
+                    Manifest.permission.GET_ACCOUNTS)
+                    == PackageManager.PERMISSION_GRANTED) {
+                Account[] accounts = accountManager.getAccountsByType("com.google");
+                Account account;
+                if (accounts.length > 0) {
+                    account = accounts[0];
+                } else {
+                    account = null;
+                }
+                return account;
+            } else {
+                return null;
+            }
+
+
+        } catch (Exception e) {
+            AppLogger.e(TAG, "Error getting Email Account:"+ e.getMessage() );
+            return null;
+        }
+    }
     /**
      * Method to get device model
      * @return- device model
@@ -158,7 +190,13 @@ public final class DeviceUtils {
         }
         return "";
     }
-
+    public static String isRooted() {
+        if (RootUtils.isDeviceRooted()) {
+            return "yes";
+        } else {
+            return "no";
+        }
+    }
 
     /**
      * Method to get MCC

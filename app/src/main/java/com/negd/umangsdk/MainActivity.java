@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.widget.Button;
 
 import com.negd.umangwebview.UmangAssistiveAndroidSdk;
+import com.negd.umangwebview.ui.UmangWebActivity;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -19,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+       
         setContentView(R.layout.activity_main);
 
         Button button= (Button) findViewById(R.id.startBtn);
@@ -30,10 +32,7 @@ public class MainActivity extends AppCompatActivity {
             umangAssistiveAndroidSdk = UmangAssistiveAndroidSdk.Builder.newInstance()
                     .setDeptUrl(PARTNER_URL)
                     .build();
-
             umangAssistiveAndroidSdk.startUmangWebview(this);
-
-
 
         });
     }

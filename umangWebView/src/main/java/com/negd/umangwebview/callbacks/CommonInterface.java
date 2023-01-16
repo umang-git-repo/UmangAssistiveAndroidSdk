@@ -156,7 +156,7 @@ public class CommonInterface implements OnDatePicker {
         } else {
 
             //TODO need to implement nativescreen
-            //((UmangWebActivity) act).openBiometricDeviceScreen(successCallback, failureCallback);
+            ((UmangWebActivity) act).openBiometricDeviceScreen(successCallback, failureCallback);
         }
     }
 
@@ -165,8 +165,9 @@ public class CommonInterface implements OnDatePicker {
     public void startScannerRD(String deviceType) {
 
         //TODO need to implement nativescreen
-        //((UmangWebActivity) act).showScannerPopupRD(deviceType);
+        ((UmangWebActivity) act).showScannerPopupRD(deviceType);
     }
+
 
     public static String nps_fileData;
     public static String nps_fileName;
@@ -1108,14 +1109,16 @@ public class CommonInterface implements OnDatePicker {
 
     @JavascriptInterface
     public void sendJPStatus(String deptData){
-        Log.e("DeptData",deptData.toString());
-
         try {
             JSONObject job = new JSONObject(deptData);
             Intent intent = new Intent(act,UmangWebActivity.class);
             intent.putExtra(Constants.DEPT_URL,job.getString("url"));
             intent.putExtra(Constants.DEPT_ID,job.getString("id"));
             intent.putExtra(Constants.DEPT_NAME,job.getString("name"));
+            SharedPreferences pref = act.getApplicationContext().getSharedPreferences("UmangSdkPref", 0); // 0 - for private mode
+            SharedPreferences.Editor editor = pref.edit();
+            editor.putString(Constants.DEVICE_TOKEN,job.getString("tkn"));
+            editor.commit();
             act.startActivity(intent);
         } catch (Exception e) {
         }
