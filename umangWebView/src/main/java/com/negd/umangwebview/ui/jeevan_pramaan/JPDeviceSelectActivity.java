@@ -109,7 +109,6 @@ public class JPDeviceSelectActivity extends AppCompatActivity implements Recycle
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
         }
     }
 

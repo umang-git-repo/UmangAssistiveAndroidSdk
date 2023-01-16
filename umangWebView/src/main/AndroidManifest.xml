@@ -45,10 +45,12 @@
         <activity
             android:name=".ui.BarCodeScannerActivity"
             android:exported="false" />
+<!--        android:theme="@style/AppTheme"-->
         <activity
             android:name=".ui.UmangWebActivity"
             android:exported="false"
-            android:theme="@style/AppTheme" />
+
+            />
 
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"

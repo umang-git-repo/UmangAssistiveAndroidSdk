@@ -172,7 +172,6 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
     private android.webkit.WebChromeClient.CustomViewCallback videoViewCallback;
     private CustomWebChromeClient customWebchromeClient;
     private WebViewClient mWebViewClient;
-
     protected int mRequestCodeFilePicker = 51426;
 
     private String loaderColor="#00599f";
@@ -218,6 +217,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
 
         binding= ActivityUmangWebBinding.inflate(getLayoutInflater());
@@ -225,8 +225,9 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
         setContentView(binding.getRoot());
 
         //set toolbar
-        setSupportActionBar(binding.toolBar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+//        setSupportActionBar(binding.toolBar);
+//        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().hide();
 
 
         //back button listener
