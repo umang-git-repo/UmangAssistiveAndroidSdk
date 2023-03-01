@@ -6,12 +6,6 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-<!--    <style name="MyProjectTheme" parent="@style/Theme.AppCompat.Light">-->
-<!--        <item name="windowNoTitle">true</item>-->
-<!--        <item name="windowActionBar">false</item>-->
-<!--        <item name="android:windowFullscreen">true</item>-->
-<!--        <item name="android:windowContentOverlay">@null</item>-->
-<!--    </style>-->
 
     <style name="CustomProgressBar" parent="android:Widget.ProgressBar.Horizontal">
         <item name="android:indeterminateOnly">false</item>
@@ -23,7 +17,7 @@
     <style name="HeaderTextStyle" parent="AppTheme">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textSize">@dimen/text_14sp</item>
+        <item name="android:textSize">@dimen/text_14sp</item    >
         <item name="android:textColor">@color/txt_color_header</item>
     </style>
 

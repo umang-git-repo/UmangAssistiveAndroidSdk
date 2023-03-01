@@ -148,9 +148,9 @@ import id.zelory.compressor.Compressor;
 public class UmangWebActivity extends AppCompatActivity implements CustomDialog.DialogButtonClickListener {
 
     private static final String TAG = UmangWebActivity.class.getSimpleName();
-    private String deptUrl=null;
-    private String deptId=null;
-    private String serviceId=null;
+    private String deptUrl = null;
+    private String deptId = null;
+    private String serviceId = null;
 
     private ActivityUmangWebBinding binding;
     private ProgressDialog mProgressDialog;
@@ -174,8 +174,8 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
     private WebViewClient mWebViewClient;
     protected int mRequestCodeFilePicker = 51426;
 
-    private String loaderColor="#00599f";
-    private boolean isError=false;
+    private String loaderColor = "#00599f";
+    private boolean isError = false;
     private String lastURL = "";
 
 
@@ -185,7 +185,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
     public boolean mIsCrop;
     public int mCropHeight;
     public int mCropWidth;
-    public String mTypes="";
+    public String mTypes = "";
     public String mCropType;
     public String mJsonParams;
 
@@ -217,16 +217,17 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
 
-        binding= ActivityUmangWebBinding.inflate(getLayoutInflater());
+
+        binding = ActivityUmangWebBinding.inflate(getLayoutInflater());
 
         setContentView(binding.getRoot());
 
         //set toolbar
 //        setSupportActionBar(binding.toolBar);
 //        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
         getSupportActionBar().hide();
 
 
@@ -242,12 +243,12 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
         setIntentValues();
 
         //custom web chrome client
-        customWebchromeClient=new CustomWebChromeClient();
+        customWebchromeClient = new CustomWebChromeClient();
 
         //adding version code
         binding.txtVersion.setText("Powered by UMANG");
 
-        binding.txtVersion2.setText("Version : "+BuildConfig.VERSION_NAME);
+        binding.txtVersion2.setText("Version : " + BuildConfig.VERSION_NAME);
 
         //clear focus if activity recreating
         clearFocus();
@@ -265,9 +266,9 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
     protected void onResume() {
         super.onResume();
 
-        if(isFromGpsSettings){
-            isFromGpsSettings=false;
-            if(isLocationEnabled()){
+        if (isFromGpsSettings) {
+            isFromGpsSettings = false;
+            if (isLocationEnabled()) {
                 getLastLocation();
             }
         }
@@ -275,7 +276,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
     @Override
     public void onBackPressed() {
-        if(mAgentWeb!=null && mAgentWeb.getWebCreator()!=null) {
+        if (mAgentWeb != null && mAgentWeb.getWebCreator() != null) {
 
             mAgentWeb.getWebCreator().getWebView().requestFocus();
 
@@ -288,13 +289,13 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                     //Log.d(TAG, webView.getUrl().toString() + "====" + lastURL);
                     if (webView.isFocused() && webView.canGoBack()) {
 
-                        if (webView.getUrl().toString().equalsIgnoreCase(lastURL) || webView.getUrl().toString().equalsIgnoreCase(lastURL+"/")) {
+                        if (webView.getUrl().toString().equalsIgnoreCase(lastURL) || webView.getUrl().toString().equalsIgnoreCase(lastURL + "/")) {
                             finish();
                         } else {
 
-                            try{
-                                    webView.goBack();
-                            }catch (Exception ex){
+                            try {
+                                webView.goBack();
+                            } catch (Exception ex) {
                                 webView.goBack();
                             }
                         }
@@ -320,47 +321,47 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
     /**
      * Method to set the intent value and configuration for the UI
      */
-    private void setIntentValues(){
-        Intent intent=getIntent();
+    private void setIntentValues() {
+        Intent intent = getIntent();
 
-        if(intent!=null){
+        if (intent != null) {
 
-            if(intent.hasExtra(Constants.DEPT_URL)){
-                this.deptUrl=intent.getStringExtra(Constants.DEPT_URL);
+            if (intent.hasExtra(Constants.DEPT_URL)) {
+                this.deptUrl = intent.getStringExtra(Constants.DEPT_URL);
             }
 
-            if(intent.hasExtra(Constants.DEPT_ID)){
-                this.deptId=intent.getStringExtra(Constants.DEPT_ID);
+            if (intent.hasExtra(Constants.DEPT_ID)) {
+                this.deptId = intent.getStringExtra(Constants.DEPT_ID);
             }
 
-            if(intent.hasExtra(Constants.SERVICE_ID)){
-                this.serviceId=intent.getStringExtra(Constants.DEPT_ID);
+            if (intent.hasExtra(Constants.SERVICE_ID)) {
+                this.serviceId = intent.getStringExtra(Constants.DEPT_ID);
             }
 
-            if(intent.hasExtra(Constants.DEPT_NAME)){
+            if (intent.hasExtra(Constants.DEPT_NAME)) {
                 binding.toolBar.setVisibility(View.VISIBLE);
                 binding.headerTxt.setText(intent.getStringExtra(Constants.DEPT_NAME));
             }
 
-            if(intent.hasExtra(Constants.BACK_BUTTON_COLOR)){
+            if (intent.hasExtra(Constants.BACK_BUTTON_COLOR)) {
                 binding.imgLogo.setColorFilter(Color.parseColor(getIntent().getStringExtra(Constants.BACK_BUTTON_COLOR)), PorterDuff.Mode.SRC_IN);
             }
 
-            if(intent.hasExtra(Constants.HEADER_TEXT_COLOR)){
+            if (intent.hasExtra(Constants.HEADER_TEXT_COLOR)) {
                 binding.headerTxt.setTextColor(Color.parseColor(getIntent().getStringExtra(Constants.HEADER_TEXT_COLOR)));
             }
 
-            if(intent.hasExtra(Constants.HEADER_COLOR)){
+            if (intent.hasExtra(Constants.HEADER_COLOR)) {
                 binding.toolBar.setBackgroundColor(Color.parseColor(getIntent().getStringExtra(Constants.HEADER_COLOR)));
             }
 
-            if(intent.hasExtra(Constants.LOADER_COLOR)){
-                loaderColor=intent.getStringExtra(Constants.LOADER_COLOR);
+            if (intent.hasExtra(Constants.LOADER_COLOR)) {
+                loaderColor = intent.getStringExtra(Constants.LOADER_COLOR);
             }
 
 
-        }else{
-            Toast.makeText(this,"something went wrong !! please check your configuration .",Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(this, "something went wrong !! please check your configuration .", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -399,11 +400,11 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
     /**
      * clear webview focus
      */
-    private void clearFocus(){
-        try{
+    private void clearFocus() {
+        try {
 
-            if(mAgentWeb !=null)
-                mAgentWeb.getWebCreator().getWebView().setOnKeyListener(new View.OnKeyListener(){
+            if (mAgentWeb != null)
+                mAgentWeb.getWebCreator().getWebView().setOnKeyListener(new View.OnKeyListener() {
                     public boolean onKey(View v, int keyCode, KeyEvent event) {
                         if ((keyCode == KeyEvent.KEYCODE_BACK) && mAgentWeb.getWebCreator().getWebView().canGoBack()) {
                             mAgentWeb.getWebCreator().getWebView().clearFocus();
@@ -413,8 +414,8 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                         return false;
                     }
                 });
-        }catch (Exception ex){
-            Log.e("Error clear focus","error in clear focus");
+        } catch (Exception ex) {
+            Log.e("Error clear focus", "error in clear focus");
         }
     }
 
@@ -422,21 +423,20 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
     /**
      * Set chrome client
      */
-    private void setWebViewClient(){
-        mWebViewClient= new WebViewClient(){
+    private void setWebViewClient() {
+        mWebViewClient = new WebViewClient() {
 
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
                 super.onReceivedError(view, request, error);
-                if(error.getDescription().toString().equalsIgnoreCase("net::ERR_INTERNET_DISCONNECTED"))
-                    isError=true;
+                if (error.getDescription().toString().equalsIgnoreCase("net::ERR_INTERNET_DISCONNECTED"))
+                    isError = true;
 
 
-                else if( error.getDescription().toString().equalsIgnoreCase("net::ERR_CACHE_MISS"))
-                {
+                else if (error.getDescription().toString().equalsIgnoreCase("net::ERR_CACHE_MISS")) {
 
-                    if(Utils.isNetworkConnected(UmangWebActivity.this)) {
+                    if (Utils.isNetworkConnected(UmangWebActivity.this)) {
                         Intent intent = getIntent();
                         finish();
                         startActivity(intent);
@@ -460,34 +460,37 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                         // Check if Cert-Domain equals the Uri-Domain
                         String certDomain = serverCertificate.getIssuedTo().getCName();
 
-                        Toast.makeText(UmangWebActivity.this,"URL-> "+error.getUrl(),Toast.LENGTH_LONG).show();
-                        Toast.makeText(UmangWebActivity.this,"DOMAIN-> "+certDomain,Toast.LENGTH_LONG).show();
+                        Toast.makeText(UmangWebActivity.this, "URL-> " + error.getUrl(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(UmangWebActivity.this, "DOMAIN-> " + certDomain, Toast.LENGTH_LONG).show();
 
 
                         Log.e("URL->", error.getUrl());
                         Log.e("DOMAIN->", certDomain);
                     }
-                }catch (Exception ex){
-
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
 
-
-                final AlertDialog.Builder builder = new AlertDialog.Builder(UmangWebActivity.this);
-                builder.setMessage("SSL Certificate error . Do you want to continue ?");
-                builder.setPositiveButton("continue", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        handler.proceed();
-                    }
-                });
-                builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        handler.cancel();
-                    }
-                });
-                final AlertDialog dialog = builder.create();
-                dialog.show();
+                try {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(UmangWebActivity.this);
+                    builder.setMessage("SSL Certificate error . Do you want to continue ?");
+                    builder.setPositiveButton("continue", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            handler.proceed();
+                        }
+                    });
+                    builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            handler.cancel();
+                        }
+                    });
+                    final AlertDialog dialog = builder.create();
+                    dialog.show();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
             }
 
@@ -501,7 +504,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             @Override
             public boolean shouldOverrideUrlLoading(WebView webView, WebResourceRequest request) {
 
-                String url=request.getUrl().toString().trim();
+                String url = request.getUrl().toString().trim();
 
                 if (url.contains("https://www.google.com/maps/")) {
                     Uri IntentUri = Uri.parse(url);
@@ -509,16 +512,14 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                     mapIntent.setPackage("com.google.android.apps.maps");
                     startActivity(mapIntent);
                     return true;
-                }
-
-                else if (url.startsWith("http:") || url.startsWith("https:")) {
+                } else if (url.startsWith("http:") || url.startsWith("https:")) {
                     webView.loadUrl(url);
                     return true;
-                }else if (url.startsWith("tel:")) {
+                } else if (url.startsWith("tel:")) {
                     Intent tel = new Intent(Intent.ACTION_DIAL, Uri.parse(url));
                     startActivity(tel);
                     return true;
-                }else if (url.startsWith("mailto:")) {
+                } else if (url.startsWith("mailto:")) {
                     MailTo mt = MailTo.parse(url);
                     Intent mail = new Intent(Intent.ACTION_SEND);
                     mail.setType("application/octet-stream");
@@ -527,7 +528,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                     mail.putExtra(Intent.EXTRA_TEXT, mt.getBody());
                     startActivity(mail);
                     return true;
-                }else if (url.startsWith("geo:")) {
+                } else if (url.startsWith("geo:")) {
                     Uri gmmIntentUri = Uri.parse(url);
                     Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
                     mapIntent.setPackage("com.google.android.apps.maps");
@@ -535,7 +536,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                         startActivity(mapIntent);
                     } catch (Exception e) {
                         Toast.makeText(UmangWebActivity.this, "Map app not found", Toast.LENGTH_SHORT).show();
-                        Log.e("Map exception",e.toString());
+                        Log.e("Map exception", e.toString());
                     }
                     return true;
                 }
@@ -546,12 +547,12 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
 
-                super.onPageStarted(view,url,favicon);
+                super.onPageStarted(view, url, favicon);
                 //do you  work
-                if(isError){
-                    isError=false;
+                if (isError) {
+                    isError = false;
 
-                    if(Utils.isNetworkConnected(UmangWebActivity.this)) {
+                    if (Utils.isNetworkConnected(UmangWebActivity.this)) {
                         Intent intent = getIntent();
                         finish();
                         startActivity(intent);
@@ -580,9 +581,9 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
     /**
      * Method to set webview dynamically to top main layout
      */
-    private void setWebView(){
+    private void setWebView() {
 
-        Map<String,String> header;
+        Map<String, String> header;
 
         JSONObject myObject = new JSONObject();
         try {
@@ -594,14 +595,14 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
         }
 
         header = new HashMap<>();
-        header.put(deptUrl, "Umang-Assistive=" +myObject);
+        header.put(deptUrl, "Umang-Assistive=" + myObject);
         CookieManager cookieMgr = CookieManager.getInstance();
         cookieMgr.acceptCookie();
-        cookieMgr.setCookie(deptUrl, "Umang-Assistive=" +myObject);
-        AgentWebConfig.syncCookie(deptUrl, "Umang-Assistive=" +myObject);
+        cookieMgr.setCookie(deptUrl, "Umang-Assistive=" + myObject);
+        AgentWebConfig.syncCookie(deptUrl, "Umang-Assistive=" + myObject);
         AgentWebConfig.debug();
 
-        mAgentWeb= AgentWeb.with(this)
+        mAgentWeb = AgentWeb.with(this)
                 .setAgentWebParent(binding.main, new LinearLayout.LayoutParams(-1, -1))
                 .useDefaultIndicator(Color.parseColor(loaderColor))
                 .setMainFrameErrorView(R.layout.web_error_page, R.id.retryWebBtn)
@@ -609,7 +610,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                 .setWebViewClient(mWebViewClient)
                 .setSecurityType(AgentWeb.SecurityType.DEFAULT_CHECK)
                 .setOpenOtherPageWays(DefaultWebClient.OpenOtherPageWays.ASK)
-                .additionalHttpHeader(deptUrl,header)
+                .additionalHttpHeader(deptUrl, header)
                 .interceptUnkownUrl()
                 .createAgentWeb()
                 .ready()
@@ -620,8 +621,8 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
         cameraInterface = new CameraInterface(this);
         locationInterface = new LocationInterface(this);
         contactInterface = new ContactInterface(this);
-        downloadInterface= new DownloadInterface(this);
-        mhaInterface= new MHAInterface(this);
+        downloadInterface = new DownloadInterface(this);
+        mhaInterface = new MHAInterface(this);
 
         //set java script interfaces
         Map<String, Object> callbackInterfaces = new HashMap();
@@ -655,7 +656,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
         mAgentWeb.getAgentWebSettings().getWebSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
 
 
-        if(!Utils.isNetworkConnected(this)){
+        if (!Utils.isNetworkConnected(this)) {
             mAgentWeb.getAgentWebSettings().getWebSettings().setCacheMode(WebSettings.LOAD_CACHE_ONLY);
         }
 
@@ -694,7 +695,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                         fos.write(buffer, 0, read);
                     }
                     fos.flush();
-                    Toast.makeText(this,getString(R.string.download_success) + " : " + file.getAbsolutePath(),Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, getString(R.string.download_success) + " : " + file.getAbsolutePath(), Toast.LENGTH_LONG).show();
                 } catch (Exception ed) {
 
                 } finally {
@@ -767,7 +768,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                             try {
                                 startActivity(intent);
                             } catch (ActivityNotFoundException e) {
-                                Toast.makeText(this,getString(R.string.no_app_found),Toast.LENGTH_LONG).show();
+                                Toast.makeText(this, getString(R.string.no_app_found), Toast.LENGTH_LONG).show();
                             }
                         } else {
                             Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -780,7 +781,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                             try {
                                 startActivity(intent);
                             } catch (Exception e) {
-                                Toast.makeText(this,getString(R.string.no_app_found),Toast.LENGTH_LONG).show();
+                                Toast.makeText(this, getString(R.string.no_app_found), Toast.LENGTH_LONG).show();
                             }
                         }
 
@@ -854,7 +855,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                         fos.write(buffer, 0, read);
                     }
                     fos.flush();
-                    Toast.makeText(this,getString(R.string.download_success)+ " : " + file.getAbsolutePath(),Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, getString(R.string.download_success) + " : " + file.getAbsolutePath(), Toast.LENGTH_LONG).show();
                     if (file != null) {
 
                         Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -867,7 +868,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                         try {
                             startActivity(intent);
                         } catch (Exception e) {
-                            Toast.makeText(this,getString(R.string.no_app_found),Toast.LENGTH_LONG).show();
+                            Toast.makeText(this, getString(R.string.no_app_found), Toast.LENGTH_LONG).show();
                         }
                     }
                 } catch (Exception ed) {
@@ -983,7 +984,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
     public void hideLoading() {
 
-        if(!isFinishing()){
+        if (!isFinishing()) {
             if (mProgressDialog != null && mProgressDialog.isShowing()) {
                 mProgressDialog.cancel();
             }
@@ -994,7 +995,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
     public void showLoading() {
         hideLoading();
 
-        if(!isFinishing())
+        if (!isFinishing())
             mProgressDialog = Utils.showLoadingDialog(this);
     }
 
@@ -1059,7 +1060,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                         fos.write(buffer, 0, read);
                     }
                     fos.flush();
-                    Toast.makeText(this,getString(R.string.download_success)+ " : " + file.getAbsolutePath(),Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, getString(R.string.download_success) + " : " + file.getAbsolutePath(), Toast.LENGTH_LONG).show();
                     if (file != null && file.exists()) {
 
                         Intent intent = new Intent(Intent.ACTION_SEND);
@@ -1135,7 +1136,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             case Constants.MY_PERMISSIONS_REQUEST_CODE: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
-                        &&  (grantResults[0] == PackageManager.PERMISSION_GRANTED
+                        && (grantResults[0] == PackageManager.PERMISSION_GRANTED
                         && grantResults[1] == PackageManager.PERMISSION_GRANTED
                 )) {
 
@@ -1279,7 +1280,8 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
                 }
                 return;
-            }case Constants.MY_PERMISSIONS_WRITE_EXTERNAL_STORATE_FOR_DELETE: {
+            }
+            case Constants.MY_PERMISSIONS_WRITE_EXTERNAL_STORATE_FOR_DELETE: {
 
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -1728,7 +1730,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                         && perms.get(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED
                 ) {
                     // All Permissions Granted
-                   // traiInterface.getSMSLogs(callBackSuccessFunction, mJsonParams);
+                    // traiInterface.getSMSLogs(callBackSuccessFunction, mJsonParams);
                 } else {
 
                     // Permission Denied
@@ -1960,7 +1962,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-                   // traiInterface.checkRegisteredNumber(callBackSuccessFunction);
+                    // traiInterface.checkRegisteredNumber(callBackSuccessFunction);
 
                 } else {
                     Log.d(TAG, "Permission denied........................................");
@@ -2065,9 +2067,9 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-                    try{
+                    try {
                         //downloadInterface.downloadPDF(DownloadInterface.mFileName, DownloadInterface.mFileURL);
-                    }catch (Exception ex){
+                    } catch (Exception ex) {
                         //LogUtil.printStackTrace(ex);
                     }
 
@@ -2190,9 +2192,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                     mFileUploadCallbackSecond = null;
                 }
             }
-        }
-
-        else if (requestCode == Constants.BIO_RD_INFO_REQUEST_CODE && resultCode == RESULT_OK) {
+        } else if (requestCode == Constants.BIO_RD_INFO_REQUEST_CODE && resultCode == RESULT_OK) {
             try {
                 if (intent != null) {
                     String deviceSelected = intent.getStringExtra("deviceSelected");
@@ -2213,7 +2213,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                 }
             } catch (Exception e) {
 
-                Utils.showInfoDialog(this,"Please check your biometric device is properly connected and try again.");
+                Utils.showInfoDialog(this, "Please check your biometric device is properly connected and try again.");
 
 
             }
@@ -2225,7 +2225,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                 }
             } catch (Exception e) {
 
-                Utils.showInfoDialog(this,"Not able to capture your fingerprint properly, please try again");
+                Utils.showInfoDialog(this, "Not able to capture your fingerprint properly, please try again");
 
             }
         } else if (requestCode == 2016 && resultCode == RESULT_CANCELED) {
@@ -2278,7 +2278,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
             handleIdentityProofResult(intent);
 
-        } else if (resultCode == RESULT_OK && requestCode == Constants.REQUEST_PDF_FILE){
+        } else if (resultCode == RESULT_OK && requestCode == Constants.REQUEST_PDF_FILE) {
 
             handlePdfFile(intent);
 
@@ -2301,15 +2301,15 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
             handleBioMetricAuthDepResult(intent);
 
-        }  else if (requestCode == Constants.BIO_DEVICE_REGISTERATION_STEP && resultCode == RESULT_OK) {
+        } else if (requestCode == Constants.BIO_DEVICE_REGISTERATION_STEP && resultCode == RESULT_OK) {
 
             handleBioMetricRegistrationStepsResult(intent);
 
-        } else if (requestCode == Constants.BARCODE_SCAN_REQUEST_CODE && resultCode == RESULT_OK){
+        } else if (requestCode == Constants.BARCODE_SCAN_REQUEST_CODE && resultCode == RESULT_OK) {
 
             handleBarcodeScannerResult(intent);
 
-        } else if(requestCode == Constants.DIGI_GET_DOC_REQUEST_CODE && resultCode == RESULT_OK){
+        } else if (requestCode == Constants.DIGI_GET_DOC_REQUEST_CODE && resultCode == RESULT_OK) {
 
             //viewModel.handleDigiLockerGetDocsResult(intent);
 
@@ -2325,7 +2325,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
             String data = intent.getStringExtra("message");
             sendLogs(data);
-        }  else if (requestCode == Constants.INTENT_SMS_TRAI_SMS_LOG_ACTIVITY && resultCode == RESULT_OK) {
+        } else if (requestCode == Constants.INTENT_SMS_TRAI_SMS_LOG_ACTIVITY && resultCode == RESULT_OK) {
 
             String data = intent.getStringExtra("message");
             sendLogs(data);
@@ -2338,7 +2338,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
             sendMHAFile(intent.getData(), true);
 
-        }  else if (requestCode == Constants.INTENT_CALL_RATE_TRAI_RETURN) {
+        } else if (requestCode == Constants.INTENT_CALL_RATE_TRAI_RETURN) {
 
             //viewModel.handleIntentForCallRate(resultCode, intent);
 
@@ -2352,10 +2352,11 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             } else {
                 //TODO send fail login response
             }
-        } else{
+        } else {
 
         }
     }
+
     private String deviceInfoSuccessCallback;
 
     /**
@@ -2376,7 +2377,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                 startActivityForResult(intent1, Constants.BIOMETRIC_DEVICE_INFO);
                 UmangAssistiveAndroidSdk.openingIntent = true;
             } catch (ActivityNotFoundException e) {
-                Toast.makeText(this,getString(R.string.bio_other_device_txt1),Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.bio_other_device_txt1), Toast.LENGTH_LONG).show();
             } catch (Exception e) {
             }
         } else {
@@ -2388,6 +2389,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             });
         }
     }
+
     /**
      * Jeevan Praman (JP) send device info to web
      * Method to send Bio Metric Device Info to web
@@ -2417,7 +2419,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
 
             String DeviceInfoXml = intent.getStringExtra("DEVICE_INFO");
-           
+
 
             if (DeviceInfoXml != null) {
                 if (DeviceInfoXml.equals("") || DeviceInfoXml.isEmpty()) {
@@ -2512,6 +2514,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             }
         }
     }
+
     /**
      * Jeevan Praman (JP)
      * Method to send Finger prints to Web
@@ -2531,7 +2534,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             }
             if (pidDataXML.startsWith("ERROR:-")) {
                 AppLogger.d(TAG, "ERROR............." + pidDataXML);
-                CommonUtils.showInfoDialog(this,"An error occurred while capturing your fingerprint. Please try again.");
+                CommonUtils.showInfoDialog(this, "An error occurred while capturing your fingerprint. Please try again.");
                 return;
             }
             DocumentBuilderFactory db = DocumentBuilderFactory.newInstance();
@@ -2565,7 +2568,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                     if (Integer.parseInt(errCodeStr) > 0) {
                         AppLogger.d(TAG, "Capture error :- " + errCodeStr + " , " + errInfoStr);
 //                        onFingerPrintError(errInfoStr);
-                        CommonUtils.showInfoDialog(this,errInfoStr);
+                        CommonUtils.showInfoDialog(this, errInfoStr);
                         return;
                     }
                 }
@@ -2668,6 +2671,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             //getNavigator().onFingerPrintError("Please check your device ");
         }
     }
+
     /**
      * Method to send result canceled to Web
      */
@@ -2690,11 +2694,11 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                 @Override
                 public void run() {
                     SharedPreferences pref = UmangWebActivity.this.getSharedPreferences("UmangSdkPref", 0);
-                    requestImageFor= pref.getString(Constants.PREF_REQUEST_IMAGE_FOR,"");
+                    requestImageFor = pref.getString(Constants.PREF_REQUEST_IMAGE_FOR, "");
                     if (requestImageFor.equalsIgnoreCase("edistrict")) {
                         try {
 
-                            String tempUri= pref.getString(Constants.PREF_CAMERA_IMAGE_URI,imageSelectedPath);
+                            String tempUri = pref.getString(Constants.PREF_CAMERA_IMAGE_URI, imageSelectedPath);
                             Bitmap bitmap = ImageUtils.rescaleImage(UmangWebActivity.this, Uri.parse(tempUri), 500);
                             ByteArrayOutputStream stream = new ByteArrayOutputStream();
                             bitmap.compress(Bitmap.CompressFormat.JPEG, 70, stream);
@@ -2711,7 +2715,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                             //Log.e(e.toString());
                         }
                     } else {
-                        String tempUri= pref.getString(Constants.PREF_CAMERA_IMAGE_URI,imageSelectedPath);
+                        String tempUri = pref.getString(Constants.PREF_CAMERA_IMAGE_URI, imageSelectedPath);
                         CropImage.activity(Uri.parse(tempUri))
                                 .setAspectRatio(500, 500)
                                 .setFixAspectRatio(true)
@@ -2723,9 +2727,10 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             });
         } catch (Exception e) {
             //Log.e(e.toString());
-            Toast.makeText(this,getString(R.string.please_try_again),Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.please_try_again), Toast.LENGTH_LONG).show();
         }
     }
+
     /**
      * check the size of Input stream  with max size
      *
@@ -2756,6 +2761,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
         }
         return false;
     }
+
     /**
      * Method to handle image result for URI
      *
@@ -2768,7 +2774,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                 public void run() {
                     Uri uri = intent.getData();
                     SharedPreferences pref = UmangWebActivity.this.getSharedPreferences("UmangSdkPref", 0);
-                    requestImageFor= pref.getString(Constants.PREF_REQUEST_IMAGE_FOR,"");
+                    requestImageFor = pref.getString(Constants.PREF_REQUEST_IMAGE_FOR, "");
                     if (requestImageFor.equalsIgnoreCase("edistrict")) {
                         try {
 
@@ -2801,10 +2807,11 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             });
         } catch (Exception e) {
             //Log.e(e.toString());
-            Toast.makeText(this,getString(R.string.please_try_again),Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.please_try_again), Toast.LENGTH_LONG).show();
             //activity.showToast(activity.getResources().getString(R.string.please_try_again));
         }
     }
+
     /**
      * Method to handle result from CropActivity
      *
@@ -3105,7 +3112,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             return compressedImageByte;
         } catch (FileNotFoundException e) {
             mAgentWeb.getWebCreator().getWebView().loadUrl("javascript:" + callBackFailureFunction + "(\"" + Constants.FILE_NOT_FOUND + "\")");
-           // Log.e(e.toString());
+            // Log.e(e.toString());
             return null;
         }
     }
@@ -3268,7 +3275,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                                     } else
                                         mAgentWeb.getWebCreator().getWebView().loadUrl("javascript:" + CommonInterface.m4agriImageSuccessCallback + "(\"" + encodedStr.replaceAll("\\s+", "") + "\")");
                                 } else {
-                                    Toast.makeText(UmangWebActivity.this,"Maximum of three images can be selected",Toast.LENGTH_LONG).show();
+                                    Toast.makeText(UmangWebActivity.this, "Maximum of three images can be selected", Toast.LENGTH_LONG).show();
                                 }
                             } catch (Exception e) {
                                 sendImagesFailToWeb();
@@ -3279,7 +3286,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             });
         } catch (Exception e) {
             //Log.e(e.toString());
-            Toast.makeText(UmangWebActivity.this,getString(R.string.please_try_again),Toast.LENGTH_LONG).show();
+            Toast.makeText(UmangWebActivity.this, getString(R.string.please_try_again), Toast.LENGTH_LONG).show();
         }
 
     }
@@ -3320,7 +3327,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
         } catch (Exception e) {
             //Log.e(e.toString());
             sendImagesFailToWeb();
-            Toast.makeText(UmangWebActivity.this,getString(R.string.please_try_again),Toast.LENGTH_LONG).show();
+            Toast.makeText(UmangWebActivity.this, getString(R.string.please_try_again), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -3562,7 +3569,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
             try {
                 mAgentWeb.getWebCreator().getWebView().loadUrl("javascript:" + callBackFailureFunction + "(\"" + Constants.PERMISSION_NOT_GRANTED + "\")");
-            }catch (Exception ex){
+            } catch (Exception ex) {
 
             }
         }
@@ -3768,7 +3775,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                 public void run() {
                     try {
                         SharedPreferences pref = UmangWebActivity.this.getSharedPreferences("UmangSdkPref", 0);
-                        String tempUri= pref.getString(Constants.PREF_CAMERA_IMAGE_URI,imageSelectedPath);
+                        String tempUri = pref.getString(Constants.PREF_CAMERA_IMAGE_URI, imageSelectedPath);
                         Uri uri = Uri.parse(tempUri);
                         Bitmap bitmap = ImageUtils.rescaleImage(UmangWebActivity.this, Uri.parse(tempUri), 500);
 
@@ -3818,7 +3825,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(UmangWebActivity.this,getString(R.string.please_try_again),Toast.LENGTH_LONG).show();
+                        Toast.makeText(UmangWebActivity.this, getString(R.string.please_try_again), Toast.LENGTH_LONG).show();
                     }
                 });
             }
@@ -3918,13 +3925,13 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
     }
 
-    private boolean isFromGpsSettings=false;
+    private boolean isFromGpsSettings = false;
 
     @Override
     public void onOkClick(String type) {
         switch (type) {
             case "PERMISSION":
-                isFromGpsSettings=true;
+                isFromGpsSettings = true;
                 Intent intent = new Intent();
                 intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
                 Uri uri = Uri.fromParts("package", getPackageName(), null);
@@ -3946,7 +3953,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
     @Override
     public void onCancelClick(String type) {
 
-        switch (type){
+        switch (type) {
             case "LOCATION_DISABLE":
                 sendLocationCallBack("F", "", LocationInterface.locationResponse);
                 break;
@@ -3955,6 +3962,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
 
     private GpsTracker gpsTracker;
+
     @SuppressLint("MissingPermission")
     public void getLastLocation() {
         if (checkPermissions()) {
@@ -3962,7 +3970,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
 
                 gpsTracker = new GpsTracker(UmangWebActivity.this);
-                if(gpsTracker.canGetLocation()){
+                if (gpsTracker.canGetLocation()) {
 
 
                     double latitude = gpsTracker.getLatitude();
@@ -3982,8 +3990,6 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             requestPermissions();
         }
     }
-
-
 
 
     private boolean checkPermissions() {
@@ -4011,8 +4017,9 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
 
     /**
-     *  From: - Location Interface
-     *  Method to send location to web
+     * From: - Location Interface
+     * Method to send location to web
+     *
      * @param action
      * @param latlng
      * @param s
@@ -4057,7 +4064,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
     }
 
 
-    public  void openEmailShareWithAttachment(String emailAddrss) {
+    public void openEmailShareWithAttachment(String emailAddrss) {
 
         String downloadFilePath = "file:////storage/emulated/0/Download/android-app-testing.pdf";
         Intent mail = new Intent(Intent.ACTION_SEND);
@@ -4077,12 +4084,13 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             public void run() {
 
 
-                if(mAgentWeb !=null)
+                if (mAgentWeb != null)
                     mAgentWeb.getWebCreator().getWebView().loadUrl("javascript:" + methodName + "(\"" + response + "\")");
 
             }
         });
     }
+
     public void openBiometricDeviceScreen(final String successCallback, final String failureCallback) {
         Intent i = new Intent(UmangWebActivity.this, JPDeviceSelectActivity.class);
         i.putExtra("successCallback", successCallback);
@@ -4090,7 +4098,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
         startActivityForResult(i, Constants.BIO_RD_INFO_REQUEST_CODE);
     }
 
-    class CustomWebChromeClient extends WebChromeClient{
+    class CustomWebChromeClient extends WebChromeClient {
 
         private Bitmap mDefaultVideoPoster;
         private View mVideoProgressView;
@@ -4146,7 +4154,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                 }
             });
             videoView = view;
-            if(mAgentWeb !=null)
+            if (mAgentWeb != null)
                 mAgentWeb.getWebCreator().getWebView().setVisibility(View.GONE);
             binding.customViewContainer.setVisibility(View.VISIBLE);
             binding.customViewContainer.addView(view);
@@ -4171,7 +4179,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             if (videoView == null)
                 return;
 
-            if(mAgentWeb !=null)
+            if (mAgentWeb != null)
                 mAgentWeb.getWebCreator().getWebView().setVisibility(View.VISIBLE);
 
             binding.customViewContainer.setVisibility(View.GONE);
@@ -4263,6 +4271,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
         //check bio device connection
         showBioDeviceConnectionInfo();
     }
+
     /**
      * Jeevan Praman (JP)
      * Method to show Connected device
@@ -4288,6 +4297,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             });
         }
     }
+
     /**
      * Jeevan Praman (JP)
      * Method to scan connected Bio Devices
