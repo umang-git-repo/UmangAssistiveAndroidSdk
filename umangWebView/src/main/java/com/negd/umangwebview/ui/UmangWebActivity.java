@@ -221,14 +221,18 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
 
         binding = ActivityUmangWebBinding.inflate(getLayoutInflater());
-
         setContentView(binding.getRoot());
 
         //set toolbar
 //        setSupportActionBar(binding.toolBar);
 //        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        getSupportActionBar().hide();
+        try {
+            assert getSupportActionBar() != null;
+            getSupportActionBar().hide();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
 
         //back button listener
@@ -4145,20 +4149,30 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                 callback.onCustomViewHidden();
                 return;
             }
-            getSupportActionBar().hide();
-            runOnUiThread(new Runnable() {
-                public void run() {
-                    //stuff that updates ui
-                    UmangWebActivity.this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                    UmangWebActivity.this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-                }
-            });
-            videoView = view;
-            if (mAgentWeb != null)
-                mAgentWeb.getWebCreator().getWebView().setVisibility(View.GONE);
-            binding.customViewContainer.setVisibility(View.VISIBLE);
-            binding.customViewContainer.addView(view);
-            videoViewCallback = callback;
+
+            try {
+
+                assert getSupportActionBar() != null;
+                getSupportActionBar().hide();
+
+
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        //stuff that updates ui
+                        UmangWebActivity.this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                        UmangWebActivity.this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                    }
+                });
+                videoView = view;
+                if (mAgentWeb != null)
+                    mAgentWeb.getWebCreator().getWebView().setVisibility(View.GONE);
+                binding.customViewContainer.setVisibility(View.VISIBLE);
+                binding.customViewContainer.addView(view);
+                videoViewCallback = callback;
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
         }
 
@@ -4166,33 +4180,38 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
         public void onHideCustomView() {
             super.onHideCustomView();    //To change body of overridden methods use File | Settings | File Templates.
 
-            getSupportActionBar().show();
+            try {
+                assert getSupportActionBar() != null;
+                getSupportActionBar().show();
 
-            runOnUiThread(new Runnable() {
-                public void run() {
+                runOnUiThread(new Runnable() {
+                    public void run() {
 
-                    //stuff that updates ui
-                    UmangWebActivity.this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                    UmangWebActivity.this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-                }
-            });
-            if (videoView == null)
-                return;
+                        //stuff that updates ui
+                        UmangWebActivity.this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                        UmangWebActivity.this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                    }
+                });
+                if (videoView == null)
+                    return;
 
-            if (mAgentWeb != null)
-                mAgentWeb.getWebCreator().getWebView().setVisibility(View.VISIBLE);
+                if (mAgentWeb != null)
+                    mAgentWeb.getWebCreator().getWebView().setVisibility(View.VISIBLE);
 
-            binding.customViewContainer.setVisibility(View.GONE);
+                binding.customViewContainer.setVisibility(View.GONE);
 
-            // Hide the custom view.
-            videoView.setVisibility(View.GONE);
+                // Hide the custom view.
+                videoView.setVisibility(View.GONE);
 
-            // Remove the custom view from its container.
-            binding.customViewContainer.removeView(videoView);
+                // Remove the custom view from its container.
+                binding.customViewContainer.removeView(videoView);
 
-            videoViewCallback.onCustomViewHidden();
+                videoViewCallback.onCustomViewHidden();
 
-            videoView = null;
+                videoView = null;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
