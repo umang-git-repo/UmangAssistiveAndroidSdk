@@ -8,7 +8,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
+import android.app.Dialog;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Handler;
+import android.view.Window;
 import android.webkit.CookieManager;
 
 import android.Manifest;
@@ -59,6 +62,7 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -510,37 +514,68 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
                 String url = request.getUrl().toString().trim();
 
-                if (url.contains("https://www.google.com/maps/")) {
-                    Uri IntentUri = Uri.parse(url);
-                    Intent mapIntent = new Intent(Intent.ACTION_VIEW, IntentUri);
-                    mapIntent.setPackage("com.google.android.apps.maps");
-                    startActivity(mapIntent);
-                    return true;
-                } else if (url.startsWith("http:") || url.startsWith("https:")) {
-                    webView.loadUrl(url);
-                    return true;
-                } else if (url.startsWith("tel:")) {
-                    Intent tel = new Intent(Intent.ACTION_DIAL, Uri.parse(url));
-                    startActivity(tel);
-                    return true;
-                } else if (url.startsWith("mailto:")) {
-                    MailTo mt = MailTo.parse(url);
-                    Intent mail = new Intent(Intent.ACTION_SEND);
-                    mail.setType("application/octet-stream");
-                    mail.putExtra(Intent.EXTRA_EMAIL, new String[]{mt.getTo()});
-                    mail.putExtra(Intent.EXTRA_SUBJECT, mt.getSubject());
-                    mail.putExtra(Intent.EXTRA_TEXT, mt.getBody());
-                    startActivity(mail);
-                    return true;
-                } else if (url.startsWith("geo:")) {
-                    Uri gmmIntentUri = Uri.parse(url);
-                    Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-                    mapIntent.setPackage("com.google.android.apps.maps");
-                    try {
+                if (url.contains("trai")) {
+                    final Dialog dialog = new Dialog(UmangWebActivity.this);
+                    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+                    dialog.setCancelable(false);
+                    dialog.setContentView(R.layout.dialog_user_agreement);
+
+                    Button dialogButton = (Button) dialog.findViewById(R.id.btnCancel);
+                    Button dialogOK = (Button) dialog.findViewById(R.id.btnOk);
+                    dialogButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            dialog.dismiss();
+                            onBackPressed();
+                        }
+                    });
+                    dialogOK.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            webView.loadUrl(url);
+                            dialog.dismiss();
+                        }
+                    });
+                    dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT,
+                            WindowManager.LayoutParams.MATCH_PARENT);
+                    dialog.show();
+
+                } else {
+
+                    if (url.contains("https://www.google.com/maps/")) {
+                        Uri IntentUri = Uri.parse(url);
+                        Intent mapIntent = new Intent(Intent.ACTION_VIEW, IntentUri);
+                        mapIntent.setPackage("com.google.android.apps.maps");
                         startActivity(mapIntent);
-                    } catch (Exception e) {
-                        Toast.makeText(UmangWebActivity.this, "Map app not found", Toast.LENGTH_SHORT).show();
-                        Log.e("Map exception", e.toString());
+                        return true;
+                    } else if (url.startsWith("http:") || url.startsWith("https:")) {
+                        webView.loadUrl(url);
+                        return true;
+                    } else if (url.startsWith("tel:")) {
+                        Intent tel = new Intent(Intent.ACTION_DIAL, Uri.parse(url));
+                        startActivity(tel);
+                        return true;
+                    } else if (url.startsWith("mailto:")) {
+                        MailTo mt = MailTo.parse(url);
+                        Intent mail = new Intent(Intent.ACTION_SEND);
+                        mail.setType("application/octet-stream");
+                        mail.putExtra(Intent.EXTRA_EMAIL, new String[]{mt.getTo()});
+                        mail.putExtra(Intent.EXTRA_SUBJECT, mt.getSubject());
+                        mail.putExtra(Intent.EXTRA_TEXT, mt.getBody());
+                        startActivity(mail);
+                        return true;
+                    } else if (url.startsWith("geo:")) {
+                        Uri gmmIntentUri = Uri.parse(url);
+                        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                        mapIntent.setPackage("com.google.android.apps.maps");
+                        try {
+                            startActivity(mapIntent);
+                        } catch (Exception e) {
+                            Toast.makeText(UmangWebActivity.this, "Map app not found", Toast.LENGTH_SHORT).show();
+                            Log.e("Map exception", e.toString());
+                        }
+                        return true;
                     }
                     return true;
                 }
@@ -4186,7 +4221,6 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
                 runOnUiThread(new Runnable() {
                     public void run() {
-
                         //stuff that updates ui
                         UmangWebActivity.this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                         UmangWebActivity.this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);

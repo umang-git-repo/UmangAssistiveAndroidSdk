@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:layout_marginEnd="@dimen/margin10"
+    android:layout_marginStart="@dimen/margin10"
+    android:background="@drawable/rounded_digi_btn"
+    android:padding="@dimen/padding_2dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:paddingBottom="@dimen/padding_10dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/txt_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_5dp"
+            android:layout_marginTop="@dimen/margin_5dp"
+            android:layout_marginEnd="@dimen/margin_3dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:text="@string/privacy_text"
+            android:textColor="@color/textColor"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/txt_contact"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_8dp"
+            android:text="@string/contacts_text"
+            android:textColor="@color/text_color_new"
+            android:textSize="@dimen/text_12sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@+id/txt_view"
+            app:layout_constraintTop_toBottomOf="@+id/txt_view" />
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/txt_contact_des"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_5dp"
+            android:text="@string/contact_desc"
+            android:textColor="@color/textColor"
+            app:layout_constraintEnd_toEndOf="@+id/txt_view"
+            app:layout_constraintStart_toStartOf="@+id/txt_view"
+            app:layout_constraintTop_toBottomOf="@+id/txt_contact" />
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/txt_calllog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_8dp"
+            android:text="@string/call_logs_text"
+            android:textColor="@color/text_color_new"
+            android:textSize="@dimen/text_12sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@+id/txt_view"
+            app:layout_constraintTop_toBottomOf="@+id/txt_contact_des" />
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/txt_calllog_des"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_5dp"
+            app:layout_constraintEnd_toEndOf="@+id/txt_view"
+            android:text="@string/call_log_desc"
+            android:textColor="@color/textColor"
+            app:layout_constraintStart_toStartOf="@+id/txt_view"
+            app:layout_constraintTop_toBottomOf="@+id/txt_calllog" />
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/txt_make_manage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_8dp"
+            android:text="@string/make_and_manage"
+            android:textColor="@color/text_color_new"
+            android:textSize="@dimen/text_12sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@+id/txt_view"
+            app:layout_constraintTop_toBottomOf="@+id/txt_calllog_des" />
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/txt_make_manage_des"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_5dp"
+            app:layout_constraintEnd_toEndOf="@+id/txt_view"
+            android:text="@string/make_manage_des"
+            android:textColor="@color/textColor"
+            app:layout_constraintStart_toStartOf="@+id/txt_view"
+            app:layout_constraintTop_toBottomOf="@+id/txt_make_manage" />
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/txt_sms_log"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_8dp"
+            android:text="@string/sms_logs"
+            android:textColor="@color/text_color_new"
+            android:textSize="@dimen/text_12sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@+id/txt_view"
+            app:layout_constraintTop_toBottomOf="@+id/txt_make_manage_des" />
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/txt_sms_log_des"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_5dp"
+
+            app:layout_constraintEnd_toEndOf="@+id/txt_view"
+            android:text="@string/sms_log_text"
+            android:textColor="@color/textColor"
+            app:layout_constraintStart_toStartOf="@+id/txt_view"
+            app:layout_constraintTop_toBottomOf="@+id/txt_sms_log" />
+
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/txt_about_url"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_5dp"
+            android:layout_marginTop="10dp"
+            app:layout_constraintEnd_toEndOf="@+id/txt_view"
+            android:text="@string/trai_new_text"
+            android:textColor="@color/text_color_new"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@+id/txt_view"
+            app:layout_constraintTop_toBottomOf="@+id/txt_sms_log_des" />
+
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/btnGrpOkCancel"
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:layout_marginTop="15dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txt_about_url">
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guidLine"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent=".5" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnCancel"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/margin_5dp"
+                android:layout_marginEnd="2dp"
+                android:background="@drawable/rectangle_btn_without_cureve"
+
+                android:gravity="center"
+                android:text="@string/deny_text"
+                android:textAllCaps="true"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="@+id/guidLine"
+                app:layout_constraintStart_toStartOf="parent" />
+
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnOk"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="@dimen/margin_5dp"
+                android:background="@drawable/rectangle_btn_without_cureve"
+                android:gravity="center"
+                android:text="@string/allow_text"
+                android:textAllCaps="true"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/guidLine" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
