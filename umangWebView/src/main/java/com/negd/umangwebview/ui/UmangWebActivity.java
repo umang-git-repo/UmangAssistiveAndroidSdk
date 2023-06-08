@@ -514,34 +514,36 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
                 String url = request.getUrl().toString().trim();
 
-                if (url.contains("trai")) {
-                    final Dialog dialog = new Dialog(UmangWebActivity.this);
-                    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                    dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-                    dialog.setCancelable(false);
-                    dialog.setContentView(R.layout.dialog_user_agreement);
+//                if (url.contains("trai")) {
+//                    final Dialog dialog = new Dialog(UmangWebActivity.this);
+//                    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+//                    dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+//                    dialog.setCancelable(false);
+//                    dialog.setContentView(R.layout.dialog_user_agreement);
+//
+//                    Button dialogButton = (Button) dialog.findViewById(R.id.btnCancel);
+//                    Button dialogOK = (Button) dialog.findViewById(R.id.btnOk);
+//                    dialogButton.setOnClickListener(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View v) {
+//                            dialog.dismiss();
+//                            onBackPressed();
+//                        }
+//                    });
+//                    dialogOK.setOnClickListener(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View v) {
+//                            webView.loadUrl(url);
+//                            dialog.dismiss();
+//                        }
+//                    });
+//                    dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT,
+//                            WindowManager.LayoutParams.MATCH_PARENT);
+//                    dialog.show();
+//
+//                }
 
-                    Button dialogButton = (Button) dialog.findViewById(R.id.btnCancel);
-                    Button dialogOK = (Button) dialog.findViewById(R.id.btnOk);
-                    dialogButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            dialog.dismiss();
-                            onBackPressed();
-                        }
-                    });
-                    dialogOK.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            webView.loadUrl(url);
-                            dialog.dismiss();
-                        }
-                    });
-                    dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT,
-                            WindowManager.LayoutParams.MATCH_PARENT);
-                    dialog.show();
-
-                } else {
+//                else {
 
                     if (url.contains("https://www.google.com/maps/")) {
                         Uri IntentUri = Uri.parse(url);
@@ -578,26 +580,23 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                         return true;
                     }
                     return true;
-                }
-                return true;
+//                }
+//                return true;
             }
 
 
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
-
                 super.onPageStarted(view, url, favicon);
                 //do you  work
                 if (isError) {
                     isError = false;
-
                     if (Utils.isNetworkConnected(UmangWebActivity.this)) {
                         Intent intent = getIntent();
                         finish();
                         startActivity(intent);
                     }
                 }
-
                 Log.i("Info", "BaseWebActivity onPageStarted");
             }
 
@@ -2189,7 +2188,6 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
         if (this.isFinishing()) {
             return;
         }
-
         if (requestCode == mRequestCodeFilePicker) {
             if (resultCode == Activity.RESULT_OK) {
                 if (intent != null) {
@@ -3327,7 +3325,6 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             //Log.e(e.toString());
             Toast.makeText(UmangWebActivity.this, getString(R.string.please_try_again), Toast.LENGTH_LONG).show();
         }
-
     }
 
     /**
@@ -3339,7 +3336,6 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-
                     try {
                         Bitmap bitmap = ImageUtils.rescaleImage(UmangWebActivity.this, imageSelect.mCapturedImageURI, 400);
                         ByteArrayOutputStream stream = new ByteArrayOutputStream();
