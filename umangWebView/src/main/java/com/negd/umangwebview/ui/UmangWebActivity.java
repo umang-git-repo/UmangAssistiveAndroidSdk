@@ -8,10 +8,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
-import android.app.Dialog;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Handler;
-import android.view.Window;
 import android.webkit.CookieManager;
 
 import android.Manifest;
@@ -62,7 +59,6 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -78,7 +74,6 @@ import com.negd.umangwebview.R;
 import com.negd.umangwebview.UmangAssistiveAndroidSdk;
 import com.negd.umangwebview.callbacks.CameraInterface;
 import com.negd.umangwebview.callbacks.CommonInterface;
-import com.negd.umangwebview.callbacks.ContactInterface;
 import com.negd.umangwebview.callbacks.DownloadInterface;
 import com.negd.umangwebview.callbacks.LocationInterface;
 import com.negd.umangwebview.callbacks.MHAInterface;
@@ -214,7 +209,6 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
     public CommonInterface commonInterface;
     public CameraInterface cameraInterface;
     public LocationInterface locationInterface;
-    public ContactInterface contactInterface;
     public DownloadInterface downloadInterface;
     public MHAInterface mhaInterface;
 
@@ -658,7 +652,6 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
         commonInterface = new CommonInterface(this);
         cameraInterface = new CameraInterface(this);
         locationInterface = new LocationInterface(this);
-        contactInterface = new ContactInterface(this);
         downloadInterface = new DownloadInterface(this);
         mhaInterface = new MHAInterface(this);
 
@@ -667,7 +660,6 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
         callbackInterfaces.put("Common", commonInterface);
         callbackInterfaces.put("Camera", cameraInterface);
         callbackInterfaces.put("Location", locationInterface);
-        callbackInterfaces.put("Contacts", contactInterface);
         callbackInterfaces.put("FileDownload", downloadInterface);
         callbackInterfaces.put("MHA", mhaInterface);
 
@@ -1678,351 +1670,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                 }
                 return;
             }
-            case Constants.PERMISSIONS_READ_CALL_LOGS_COMMON_METHOD: {
 
-                Map<String, Integer> perms = new HashMap<String, Integer>();
-                // Initial
-                perms.put(Manifest.permission.READ_CALL_LOG, PackageManager.PERMISSION_GRANTED);
-                perms.put(Manifest.permission.READ_CONTACTS, PackageManager.PERMISSION_GRANTED);
-                // Fill with results
-                for (int i = 0; i < permissions.length; i++)
-                    perms.put(permissions[i], grantResults[i]);
-                // Check for ACCESS_FINE_LOCATION
-                if (perms.get(Manifest.permission.READ_CALL_LOG) == PackageManager.PERMISSION_GRANTED
-                        && perms.get(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED
-                ) {
-                    // All Permissions Granted
-                    //traiInterface.getCallLogs(callBackSuccessFunction, mJsonParams);
-                } else {
-                    // Permission Denied
-
-                    // Permission Denied
-                    String TYPE = "PERMISSION";
-//                    openDialog(getResources().getString(R.string.permission_required),
-//                            getResources().getString(R.string.denied_read_calllogs_permission_help_text),
-//                            getResources().getString(R.string.open_settings),
-//                            getResources().getString(R.string.cancel),
-//                            TYPE);
-                    try {
-                        JSONObject object = new JSONObject();
-                        object.put("status", "f");
-                        object.put("message", "permission_denied");
-                        sendLogs(object.toString());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                return;
-            }
-            case Constants.PERMISSIONS_READ_CALL_LOGS_COMMON_METHOD_TRAI: {
-
-                Map<String, Integer> perms = new HashMap<String, Integer>();
-                // Initial
-                perms.put(Manifest.permission.READ_CALL_LOG, PackageManager.PERMISSION_GRANTED);
-                perms.put(Manifest.permission.READ_CONTACTS, PackageManager.PERMISSION_GRANTED);
-                // Fill with results
-                for (int i = 0; i < permissions.length; i++)
-                    perms.put(permissions[i], grantResults[i]);
-                // Check for ACCESS_FINE_LOCATION
-                if (perms.get(Manifest.permission.READ_CALL_LOG) == PackageManager.PERMISSION_GRANTED
-                        && perms.get(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED
-                ) {
-                    // All Permissions Granted
-                    //traiInterface.getCallLogNumber(callBackSuccessFunction, mJsonParams);
-                } else {
-                    // Permission Denied
-
-                    // Permission Denied
-                    String TYPE = "PERMISSION";
-//                    openDialog(getResources().getString(R.string.permission_required),
-//                            getResources().getString(R.string.denied_read_calllogs_permission_help_text),
-//                            getResources().getString(R.string.open_settings),
-//                            getResources().getString(R.string.cancel),
-//                            TYPE);
-                    try {
-                        JSONObject object = new JSONObject();
-                        object.put("status", "f");
-                        object.put("message", "permission_denied");
-                        sendLogs(object.toString());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                return;
-            }
-            case Constants.PERMISSIONS_READ_SMS_LOGS_COMMON_METHOD: {
-
-                Map<String, Integer> perms = new HashMap<String, Integer>();
-                // Initial
-                perms.put(Manifest.permission.READ_SMS, PackageManager.PERMISSION_GRANTED);
-                perms.put(Manifest.permission.READ_PHONE_STATE, PackageManager.PERMISSION_GRANTED);
-                perms.put(Manifest.permission.READ_CONTACTS, PackageManager.PERMISSION_GRANTED);
-                // Fill with results
-                for (int i = 0; i < permissions.length; i++)
-                    perms.put(permissions[i], grantResults[i]);
-                // Check for ACCESS_FINE_LOCATION
-                if (perms.get(Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED
-                        && perms.get(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED
-                        && perms.get(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED
-                ) {
-                    // All Permissions Granted
-                    // traiInterface.getSMSLogs(callBackSuccessFunction, mJsonParams);
-                } else {
-
-                    // Permission Denied
-                    String TYPE = "PERMISSION";
-//                    openDialog(getResources().getString(R.string.permission_required),
-//                            getResources().getString(R.string.denied_sms_and_phone_permission_help_text_read_sms),
-//                            getResources().getString(R.string.open_settings),
-//                            getResources().getString(R.string.cancel),
-//                            TYPE);
-
-                    try {
-                        JSONObject object = new JSONObject();
-                        object.put("status", "f");
-                        object.put("message", "permission_denied");
-                        //sendBase64Logs(object.toString());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-                return;
-            }
-            case Constants.PERMISSIONS_READ_SMS_LOGS_COMMON_METHOD_TRAI: {
-
-                Map<String, Integer> perms = new HashMap<String, Integer>();
-                // Initial
-                perms.put(Manifest.permission.READ_SMS, PackageManager.PERMISSION_GRANTED);
-                perms.put(Manifest.permission.READ_PHONE_STATE, PackageManager.PERMISSION_GRANTED);
-                perms.put(Manifest.permission.READ_CONTACTS, PackageManager.PERMISSION_GRANTED);
-                // Fill with results
-                for (int i = 0; i < permissions.length; i++)
-                    perms.put(permissions[i], grantResults[i]);
-                // Check for ACCESS_FINE_LOCATION
-                if (perms.get(Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED
-                        && perms.get(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED
-                        && perms.get(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED
-                ) {
-                    // All Permissions Granted
-                    //traiInterface.getSMSLogDetail(callBackSuccessFunction, mJsonParams);
-                } else {
-                    // Permission Denied
-                    String TYPE = "PERMISSION";
-//                    openDialog(getResources().getString(R.string.permission_required),
-//                            getResources().getString(R.string.denied_sms_contact_and_phone_permission_help_text_read_sms),
-//                            getResources().getString(R.string.open_settings),
-//                            getResources().getString(R.string.cancel),
-//                            TYPE);
-                    try {
-                        JSONObject object = new JSONObject();
-                        object.put("status", "f");
-                        object.put("message", "permission_denied");
-                        //sendBase64Logs(object.toString());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-                return;
-            }
-            case Constants.MY_PERMISSIONS_SMS_AND_PHONE: {
-
-                Map<String, Integer> perms = new HashMap<String, Integer>();
-                // Initial
-                perms.put(Manifest.permission.SEND_SMS, PackageManager.PERMISSION_GRANTED);
-                perms.put(Manifest.permission.READ_PHONE_STATE, PackageManager.PERMISSION_GRANTED);
-                // Fill with results
-                for (int i = 0; i < permissions.length; i++)
-                    perms.put(permissions[i], grantResults[i]);
-                // Check for ACCESS_FINE_LOCATION
-                if (perms.get(Manifest.permission.SEND_SMS) == PackageManager.PERMISSION_GRANTED
-                        && perms.get(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED
-                ) {
-                    // All Permissions Granted
-                    //traiInterface.sendSMS(callBackSuccessFunction, mJsonParams);
-                } else {
-                    // Permission Denied
-                    String TYPE = "PERMISSION";
-//                    openDialog(getResources().getString(R.string.permission_required),
-//                            getResources().getString(R.string.denied_sms_and_phone_permission_help_text),
-//                            getResources().getString(R.string.open_settings),
-//                            getResources().getString(R.string.cancel),
-//                            TYPE);
-                    try {
-                        JSONObject object = new JSONObject();
-                        object.put("status", "f");
-                        object.put("message", "permission_denied");
-                        sendLogs(object.toString());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-                return;
-            }
-            /*
-             * This case will check permission is granted and call sendSMS to send message in baclground
-             */
-            case Constants.PERMISSIONS_SEND_SMS_COMMON_METHOD: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    //traiInterface.sendSMS(callBackSuccessFunction, mJsonParams);
-                } else {
-                    Log.d(TAG, "Permission denied........................................");
-                    // Permission Denied
-                    String TYPE = "PERMISSION";
-//                    openDialog(getResources().getString(R.string.permission_required),
-//                            getResources().getString(R.string.denied_send_sms_permission_help_text),
-//                            getResources().getString(R.string.open_settings),
-//                            getResources().getString(R.string.cancel),
-//                            TYPE);
-                    try {
-                        JSONObject object = new JSONObject();
-                        object.put("status", "f");
-                        object.put("message", "permission_denied");
-                        sendLogs(object.toString());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-                return;
-            }
-            case Constants.PERMISSIONS_READ_SMS_TRAI_METHOD: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    //traiInterface.hasOTPReadPermission(callBackSuccessFunction);
-                } else {
-                    Log.d(TAG, "Permission denied........................................");
-                    // Permission Denied
-                    String TYPE = "PERMISSION";
-//                    openDialog(getResources().getString(R.string.permission_required),
-//                            getResources().getString(R.string.allow_sms_and_phone_permission_help_text),
-//                            getResources().getString(R.string.open_settings),
-//                            getResources().getString(R.string.cancel),
-//                            TYPE);
-                    try {
-                        JSONObject object = new JSONObject();
-                        object.put("status", "f");
-                        object.put("message", "permission_denied");
-                        sendLogs(object.toString());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-                return;
-            }
-            case Constants.PERMISSIONS_READ_SMS_OTP_TRAI_METHOD: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    //traiInterface.startOTPAutoRead(callBackSuccessFunction, mJsonParams);
-                } else {
-                    Log.d(TAG, "Permission denied........................................");
-
-                    // Permission Denied
-                    String TYPE = "PERMISSION";
-//                    openDialog(getResources().getString(R.string.permission_required),
-//                            getResources().getString(R.string.denied_read_otp_permission_help_text),
-//                            getResources().getString(R.string.open_settings),
-//                            getResources().getString(R.string.cancel),
-//                            TYPE);
-
-                    try {
-                        JSONObject object = new JSONObject();
-                        object.put("status", "f");
-                        object.put("message", "permission_denied");
-                        sendLogs(object.toString());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-                return;
-            }
-            case Constants.PERMISSIONS_READ_PHONE_STATE_METHOD2: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    //traiInterface.startOTPAutoRead(callBackSuccessFunction, mJsonParams);
-                } else {
-                    Log.d(TAG, "Permission denied........................................");
-
-                    // Permission Denied
-                    String TYPE = "PERMISSION";
-//                    openDialog(getResources().getString(R.string.permission_required),
-//                            getResources().getString(R.string.denied_read_otp_permission_help_text),
-//                            getResources().getString(R.string.open_settings),
-//                            getResources().getString(R.string.cancel),
-//                            TYPE);
-
-                    try {
-                        JSONObject object = new JSONObject();
-                        object.put("status", "f");
-                        object.put("message", "permission_denied");
-                        sendLogs(object.toString());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-                return;
-            }
-            case Constants.PERMISSIONS_READ_PHONE_STATE_METHOD: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    //traiInterface.getOperatorList(callBackSuccessFunction);
-
-                } else {
-                    Log.d(TAG, "Permission denied........................................");
-
-                    // Permission Denied
-                    String TYPE = "PERMISSION";
-//                    openDialog(getResources().getString(R.string.permission_required),
-//                            getResources().getString(R.string.denied_phone_state_permission_help_text),
-//                            getResources().getString(R.string.open_settings),
-//                            getResources().getString(R.string.cancel),
-//                            TYPE);
-
-
-                    try {
-                        JSONObject object = new JSONObject();
-                        object.put("status", "f");
-                        object.put("message", "permission_denied");
-                        sendLogs(object.toString());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-                return;
-            }
-
-            case Constants.PERMISSIONS_CHECK_REGISTERED_NUMBRE: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    // traiInterface.checkRegisteredNumber(callBackSuccessFunction);
-
-                } else {
-                    Log.d(TAG, "Permission denied........................................");
-
-                    // Permission Denied
-                    String TYPE = "PERMISSION";
-//                    openDialog(getResources().getString(R.string.permission_required),
-//                            getResources().getString(R.string.denied_phone_state_permission_help_text),
-//                            getResources().getString(R.string.open_settings),
-//                            getResources().getString(R.string.cancel),
-//                            TYPE);
-                    try {
-                        JSONObject object = new JSONObject();
-                        object.put("status", "f");
-                        object.put("message", "permission_denied");
-                        sendLogs(object.toString());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-                return;
-            }
             case Constants.PERMISSIONS_WRITE_EXTERNAL_STORATE_FOR_NDL_DELETE: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -2123,38 +1771,6 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                             getResources().getString(R.string.cancel),
                             TYPE);
                 }
-                return;
-            }
-            case Constants.PERMISSIONS_MY_CALL_ENABLE: {
-
-                Map<String, Integer> perms = new HashMap<String, Integer>();
-                // Initial
-                perms.put(Manifest.permission.READ_CALL_LOG, PackageManager.PERMISSION_GRANTED);
-                perms.put(Manifest.permission.READ_CONTACTS, PackageManager.PERMISSION_GRANTED);
-                perms.put(Manifest.permission.READ_PHONE_STATE, PackageManager.PERMISSION_GRANTED);
-                // Fill with results
-                for (int i = 0; i < permissions.length; i++)
-                    perms.put(permissions[i], grantResults[i]);
-                // Check for ACCESS_FINE_LOCATION
-                if (perms.get(Manifest.permission.READ_CALL_LOG) == PackageManager.PERMISSION_GRANTED
-                        && perms.get(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED
-                        && perms.get(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
-                } else {
-
-                    Log.d(TAG, "Permission denied........................................");
-
-                    // Permission Denied
-                    String TYPE = "PERMISSION";
-                    try {
-                        JSONObject object = new JSONObject();
-                        object.put("status", "f");
-                        object.put("message", "permission_denied");
-                        sendLogs(object.toString());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-
                 return;
             }
             case Constants.MY_PERMISSIONS_WRITE_EXTERNAL_STORATE_DIGILOCKER: {

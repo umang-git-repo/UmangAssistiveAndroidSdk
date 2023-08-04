@@ -60,33 +60,4 @@
     <string name="other">Other</string>
     <string name="bio_other_device_txt2">Please contact your device manufacturer for more information.</string>
     <string name="select_your_biometric_device">Select your Biometric Device</string>
-
-<!--    <string name="privacy_text">Your Privacy is important to us. To identify SPAM calls and SMS, App reqires following permissions:</string>-->
-<!--    <string name="contacts_text">Contacts:</string>-->
-<!--    <string name="contact_desc">To ignore calls and SMS received from the numbers in your contact list and process the rest.</string>-->
-<!--    <string name="call_logs_text">Call Logs:</string>-->
-<!--    <string name="call_log_desc">To identify SPAM calls from unknown numbers.</string>-->
-<!--    <string name="make_and_manage">Make and Manage Phone calls:</string>-->
-<!--    <string name="make_manage_des">To detect the sim information in phone.</string>-->
-<!--    <string name="sms_logs">SMS Logs:</string>-->
-<!--    <string name="sms_log_text">To identify SPAM SMS from unknown numbers and telemarketes.</string>-->
-<!--    <string name="deny_text">Deny</string>-->
-<!--    <string name="allow_text">Allow</string>-->
-<!--    <string name="about_url">●This application is uploading the user\'s Primary Account information to https://apigw.umangapp.in</string>-->
-
-
-    <string name="privacy_text">Your Privacy is important to us. To identify SPAM calls and SMS, the App collecting the following permissions:</string>
-    <string name="contacts_text">Contacts:</string>
-    <string name="contact_desc">Ignore calls and SMS received from the numbers in your contact list and process the rest.</string>
-    <string name="call_logs_text">Call Logs:</string>
-    <string name="call_log_desc">To identify SPAM calls from unknown numbers.</string>
-    <string name="make_and_manage">Make and Manage Phone calls:</string>
-    <string name="make_manage_des">To detect the sim information in the phone.</string>
-    <string name="sms_logs">SMS Logs:</string>
-    <string name="sms_log_text">To identify SPAM SMS from unknown numbers and telemarketers.</string>
-    <string name="deny_text">Deny</string>
-    <string name="allow_text">Allow</string>
-    <!--    <string name="trai_text">We need to send user information to the TRAI department if users avail of these above features.</string>-->
-    <string name="trai_new_text">To identify SPAM calls and SMS we required your primary account information like mobile number, email address which we need to send to the TRAI department if you would like to avail of any of the above-mentioned features.</string>
-
 </resources>
