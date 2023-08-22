@@ -678,16 +678,17 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
         mAgentWeb.getAgentWebSettings().getWebSettings().setLoadWithOverviewMode(true);
         mAgentWeb.getAgentWebSettings().getWebSettings().setUseWideViewPort(true);
 
-        mAgentWeb.getAgentWebSettings().getWebSettings().setAppCacheEnabled(true);
-        mAgentWeb.getAgentWebSettings().getWebSettings().setAppCachePath(
-                this.getCacheDir().getAbsolutePath());
+        /*deprecated*/
+//        mAgentWeb.getAgentWebSettings().getWebSettings().setAppCacheEnabled(true);
+//        mAgentWeb.getAgentWebSettings().getWebSettings().setAppCachePath(
+//                this.getCacheDir().getAbsolutePath());
 
 
-        mAgentWeb.getAgentWebSettings().getWebSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+        mAgentWeb.getAgentWebSettings().getWebSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
 
 
         if (!Utils.isNetworkConnected(this)) {
-            mAgentWeb.getAgentWebSettings().getWebSettings().setCacheMode(WebSettings.LOAD_CACHE_ONLY);
+            mAgentWeb.getAgentWebSettings().getWebSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
         }
 
         AgentWebConfig.debug();

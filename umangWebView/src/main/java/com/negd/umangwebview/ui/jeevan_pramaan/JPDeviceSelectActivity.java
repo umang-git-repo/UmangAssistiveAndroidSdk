@@ -57,7 +57,7 @@ public class JPDeviceSelectActivity extends AppCompatActivity implements Recycle
         request.setVer("140");
         request.setAcc("");
         request.setClid("");
-        request.setPeml(DeviceUtils.getEmail(this));
+        request.setPeml("");
         request.setDid(DeviceUtils.getDeviceId(this));
         request.setImei("");
         request.setLac("");
