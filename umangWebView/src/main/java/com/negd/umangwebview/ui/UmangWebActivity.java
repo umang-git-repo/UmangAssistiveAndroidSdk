@@ -1,5 +1,6 @@
 package com.negd.umangwebview.ui;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -62,6 +63,8 @@ import android.webkit.WebView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.canhub.cropper.CropImageContractOptions;
+import com.canhub.cropper.CropImageOptions;
 import com.google.android.gms.location.LocationRequest;
 import com.google.gson.Gson;
 import com.just.agentweb.AgentWeb;
@@ -92,8 +95,8 @@ import com.negd.umangwebview.utils.ImageSelect;
 import com.negd.umangwebview.utils.ImageUtils;
 import com.negd.umangwebview.utils.Utils;
 import com.negd.umangwebview.utils.VideoRecord;
-import com.theartofdev.edmodo.cropper.CropImage;
-import com.theartofdev.edmodo.cropper.CropImageView;
+//import com.theartofdev.edmodo.cropper.CropImage;
+//import com.theartofdev.edmodo.cropper.CropImageView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -142,6 +145,8 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
 import id.zelory.compressor.Compressor;
+
+import com.canhub.cropper.CropImageContract;
 
 
 public class UmangWebActivity extends AppCompatActivity implements CustomDialog.DialogButtonClickListener {
@@ -212,6 +217,15 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
     public DownloadInterface downloadInterface;
     public MHAInterface mhaInterface;
 
+    private ActivityResultLauncher<CropImageContractOptions> cropImageLauncher =
+            registerForActivityResult(new CropImageContract(),  result ->{
+                if(result.isSuccessful()) {
+                    handleCropActivityResult(result, RESULT_OK);
+                } else {
+                    handleCropActivityResult(result, RESULT_FIRST_USER);
+
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -1894,13 +1908,13 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
             handleImageResultForUri(intent);
 
-        } else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+//        } else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
 
             //crop activity result
-            final CropImage.ActivityResult result = CropImage.getActivityResult(intent);
+//            final CropImage.ActivityResult result = CropImage.getActivityResult(intent);
 
             //method to handle crop activity result and send the result to web
-            handleCropActivityResult(result, resultCode);
+//            handleCropActivityResult(result, resultCode);
         } else if (requestCode == 1001 && resultCode == RESULT_OK) {
             try {
                 //TODO need to check
@@ -2370,11 +2384,12 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                         }
                     } else {
                         String tempUri = pref.getString(Constants.PREF_CAMERA_IMAGE_URI, imageSelectedPath);
-                        CropImage.activity(Uri.parse(tempUri))
+                        startImageCropping(Uri.parse(tempUri), true, true, 500, 500, 0);
+                        /*CropImage.activity(Uri.parse(tempUri))
                                 .setAspectRatio(500, 500)
                                 .setFixAspectRatio(true)
                                 .setGuidelines(CropImageView.Guidelines.ON)
-                                .start(UmangWebActivity.this);
+                                .start(UmangWebActivity.this);*/
                     }
 
                 }
@@ -2451,11 +2466,12 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                             //Log.e(e.toString());
                         }
                     } else {
-                        CropImage.activity(Uri.parse(uri.toString()))
+                        startImageCropping(uri, true, true, 500, 500, 0);
+                       /* CropImage.activity(Uri.parse(uri.toString()))
                                 .setAspectRatio(500, 500)
                                 .setFixAspectRatio(true)
                                 .setGuidelines(CropImageView.Guidelines.ON)
-                                .start(UmangWebActivity.this);
+                                .start(UmangWebActivity.this);*/
                     }
                 }
             });
@@ -2472,6 +2488,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
      * @param result
      * @param resultCode
      */
+/*
     public void handleCropActivityResult(final CropImage.ActivityResult result, int resultCode) {
         if (resultCode == RESULT_OK) {
 
@@ -2689,6 +2706,247 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                 });
             }
         } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+            Exception error = result.getError();
+            if (!isFinishing()) {
+                // loadurl on UI main thread
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mAgentWeb.getWebCreator().getWebView().loadUrl("javascript:" + callBackFailureFunction + "(\"Action cancelled\")");
+                    }
+                });
+            }
+        } else {
+            if (!isFinishing()) {
+                // loadurl on UI main thread
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mAgentWeb.getWebCreator().getWebView().loadUrl("javascript:" + callBackFailureFunction + "(\"Action cancelled\")");
+                    }
+                });
+            }
+        }
+
+    }
+*/
+    public void handleCropActivityResult(final com.canhub.cropper.CropImageView.CropResult result, int resultCode) {
+        if (resultCode == RESULT_OK) {
+
+            if (!isFinishing()) {
+                // loadurl on UI main thread
+                runOnUiThread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        Uri resultUri = result.getUriContent();
+                        if (CropImageId == 1) {
+                            CropImageId = 0;
+
+                            Bitmap bitma = null;
+                            try {
+
+                                String name = String.format("Pan1-%s.jpg", Calendar.getInstance().getTimeInMillis());
+                                File outputDir = new File(getFilesDir(), "Pan");
+                                if (!outputDir.exists()) {
+                                    outputDir.mkdirs(); // should succeed
+                                }
+                                File outputFile = new File(outputDir, name);
+
+                                Bitmap bmp = BitmapFactory.decodeFile(resultUri.getPath(), null);
+
+                                boolean isWidthMax = false;
+                                if (bmp != null) {
+                                    int height = bmp.getHeight();
+                                    int width = bmp.getWidth();
+
+                                    if (height > width) {
+                                        isWidthMax = false;
+                                    } else {
+                                        isWidthMax = true;
+                                    }
+                                }
+                                int maxHeight = 842;
+                                int maxWidth = 595;
+
+                                if (isWidthMax) {
+                                    maxHeight = 595;
+                                    maxWidth = 842;
+                                }
+
+                                Compressor comp = new Compressor(UmangWebActivity.this)
+                                        .setMaxWidth(maxWidth)
+                                        .setMaxHeight(maxHeight)
+                                        .setQuality(60)
+                                        .setDestinationDirectoryPath(Environment.getExternalStoragePublicDirectory(
+                                                Environment.DIRECTORY_PICTURES).getAbsolutePath());
+
+                                File file = comp.compressToFile(FileUtils.from(UmangWebActivity.this, resultUri));
+
+                                byte[] b = new byte[(int) file.length()];
+                                try {
+                                    FileInputStream fileInputStream = new FileInputStream(file);
+                                    fileInputStream.read(b);
+                                    for (int i = 0; i < b.length; i++) {
+                                        System.out.print((char) b[i]);
+                                    }
+                                } catch (FileNotFoundException e) {
+                                    System.out.println("File Not Found.");
+                                    e.printStackTrace();
+                                } catch (IOException e1) {
+                                    System.out.println("Error Reading The File.");
+                                    e1.printStackTrace();
+                                }
+
+                                String encoded = Base64.encodeToString(b, Base64.DEFAULT);
+                                callWebService(encoded, "JPG");
+                            } catch (IOException e) {
+                                //Log.e(e.toString());
+                            }
+
+                            return;
+                        } else if (CropImageId == 2) {
+                            CropImageId = 0;
+                            Bitmap bitma = null;
+                            try {
+
+                                String name = String.format("Pan1-%s.jpg", Calendar.getInstance().getTimeInMillis());
+                                File outputDir = new File(getFilesDir(), "Pan");
+                                if (!outputDir.exists()) {
+                                    outputDir.mkdirs(); // should succeed
+                                }
+                                File outputFile = new File(outputDir, name);
+
+                                File OutDir = new File(getFilesDir(), "Pan");
+
+                                Compressor comp = new Compressor(UmangWebActivity.this)
+                                        .setMaxWidth(213)
+                                        .setMaxHeight(213)
+                                        .setQuality(60)
+//                                            .setCompressFormat(Bitmap.CompressFormat.WEBP)
+                                        .setDestinationDirectoryPath(OutDir.getAbsolutePath());
+
+                                File uriFile = FileUtils.from(UmangWebActivity.this, resultUri);
+
+                                File file = comp.compressToFile(FileUtils.from(UmangWebActivity.this, resultUri));
+
+                                byte[] b = new byte[(int) file.length()];
+                                try {
+                                    FileInputStream fileInputStream = new FileInputStream(file);
+                                    fileInputStream.read(b);
+                                    for (int i = 0; i < b.length; i++) {
+                                        System.out.print((char) b[i]);
+                                    }
+                                } catch (FileNotFoundException e) {
+                                    System.out.println("File Not Found.");
+                                    e.printStackTrace();
+                                } catch (IOException e1) {
+                                    System.out.println("Error Reading The File.");
+                                    e1.printStackTrace();
+                                }
+
+                                String encoded = Base64.encodeToString(b, Base64.DEFAULT);
+
+                                callWebService(encoded, "JPG");
+
+                            } catch (IOException e) {
+                                //Log.e(e.toString());
+                                mAgentWeb.getWebCreator().getWebView().loadUrl("javascript:" + callBackFailureFunction + "(\"" + Constants.IO_EXCEPTION + "\")");
+                            } catch (OutOfMemoryError e) {
+                                //Log.e(e.toString());
+                                mAgentWeb.getWebCreator().getWebView().loadUrl("javascript:" + callBackFailureFunction + "(\"" + Constants.IMAGE_SIZE_EXCEEDED + "\")");
+
+                            }
+
+                            return;
+                        } else if (CropImageId == 3) {
+                            CropImageId = 0;
+
+                            byte[] imgArray = compressDocumentImage(resultUri, 0, 60);
+
+                            //Log.e("Sizeee before sig", "" + imgArray.length);
+                            imgArray = setDpi(imgArray, 600);
+                            //Log.e("Sizeee after sig", "" + imgArray.length);
+                            if (isSizeGood(imgArray, 60)) {
+
+                                Bitmap blackAndWhite = createBlackAndWhite(BitmapFactory.decodeByteArray(imgArray, 0, imgArray.length));
+                                String encodedStr = ImageUtils.encodeImage(blackAndWhite);
+                                String mimetype = getMineType(resultUri);
+
+
+                                callWebService(encodedStr, mimetype);
+                            } else {
+                                mAgentWeb.getWebCreator().getWebView().loadUrl("javascript:" + callBackFailureFunction + "(\"" + Constants.IMAGE_SIZE_EXCEEDED + "\")");
+                            }
+                            return;
+                        } else if (CropImageId == 4) {
+                            CropImageId = 0;
+                            BitmapFactory.Options o = new BitmapFactory.Options();
+                            o.inJustDecodeBounds = true;
+                            try {
+                                Bitmap bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(resultUri), null, o);
+                                if (bitmap != null) {
+                                    //Log.e("Bitmap", bitmap.getHeight() + "");
+                                } else {
+                                    //Log.e("Bitmap", "Bitmap is nulll ");
+                                }
+                            } catch (FileNotFoundException e) {
+                                e.printStackTrace();
+                            }
+
+                            return;
+                        } else if (CropImageId == 5) {
+                            CropImageId = 0;
+                            //byte[] imageArray = compressDocumentImage(resultUri, 500, Integer.parseInt(activity.MaxSize));
+                            byte[] imageArray = new byte[0];
+                            try {
+                                imageArray = ImageUtils.getBytesFromUri(resultUri, UmangWebActivity.this);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                            //ImageUtils.showImageBitmapInDialog(imageArray,activity);
+
+                            //Log.e("Sizeee", "" + imageArray.length);
+                            try {
+                                if (isSizeGood(imageArray, Integer.valueOf(MaxSize))) {
+                                    String encodedStr = Base64.encodeToString(imageArray, Base64.DEFAULT);
+                                    String mimetype = getMineType(resultUri);
+                                    callWebService(encodedStr, mimetype);
+                                } else {
+                                    mAgentWeb.getWebCreator().getWebView().loadUrl("javascript:" + callBackFailureFunction + "(\"" + Constants.IMAGE_SIZE_EXCEEDED + "\")");
+                                }
+                            } catch (NumberFormatException e) {
+                                mAgentWeb.getWebCreator().getWebView().loadUrl("javascript:" + callBackFailureFunction + "(\"" + Constants.IO_EXCEPTION + "\")");
+                            } catch (Exception e) {
+                                mAgentWeb.getWebCreator().getWebView().loadUrl("javascript:" + callBackFailureFunction + "(\"" + Constants.IO_EXCEPTION + "\")");
+                            }
+
+                            return;
+                        }
+
+                        imageSelectedPath = resultUri.toString();
+                        try {
+
+                            Bitmap bitmap = ImageUtils.rescaleImage(UmangWebActivity.this, resultUri, 500);
+                            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, 70, stream);
+                            final InputStream imageStream = new ByteArrayInputStream(stream.toByteArray());
+                            //final InputStream imageStream = getContentResolver().openInputStream(resultUri);
+                            final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+                            String encodedStr = ImageUtils.encodeImage(selectedImage);
+
+                            mAgentWeb.getWebCreator().getWebView().loadUrl("javascript:" + callBackSuccessFunction + "(\"data:image/png;base64," + encodedStr + "\")");
+
+                        } catch (IOException e) {
+                            mAgentWeb.getWebCreator().getWebView().loadUrl("javascript:" + callBackFailureFunction + "(\"" + Constants.IO_EXCEPTION + "\")");
+                            //Log.e(e.toString());
+                        }
+
+                    }
+                });
+            }
+        } else if (resultCode == 1) {
             Exception error = result.getError();
             if (!isFinishing()) {
                 // loadurl on UI main thread
@@ -3022,9 +3280,10 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                 Bitmap orignalBitmap = decodeSampledBitmapFromInputStream(inputStream, inputStream2, 500, 500);
 
                 CropImageId = 1;
-                CropImage.activity(getImageUri(this, orignalBitmap))
+                startImageCropping(getImageUri(this, orignalBitmap), true);
+              /*  CropImage.activity(getImageUri(this, orignalBitmap))
                         .setGuidelines(CropImageView.Guidelines.ON)
-                        .start(this);
+                        .start(this);*/
             }
 
         } catch (FileNotFoundException e) {
@@ -3112,7 +3371,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
      */
 
     public Uri getImageUri(Context inContext, Bitmap inImage) throws Exception {
-        if (ContextCompat.checkSelfPermission(this,
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU || ContextCompat.checkSelfPermission(this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED) {
 
@@ -3209,11 +3468,12 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
             final InputStream imageStream2 = getContentResolver().openInputStream(imageUri);
             CropImageId = 2;
-            CropImage.activity(imageUri)
+            startImageCropping(imageUri, true, true, 0, 0, 70);
+           /* CropImage.activity(imageUri)
                     .setFixAspectRatio(true)
                     .setOutputCompressQuality(70)
                     .setGuidelines(CropImageView.Guidelines.ON)
-                    .start(this);
+                    .start(this);*/
 
         } catch (FileNotFoundException e) {
             mAgentWeb.getWebCreator().getWebView().loadUrl("javascript:" + callBackFailureFunction + "(\"" + Constants.FILE_NOT_FOUND + "\")");
@@ -3259,18 +3519,28 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                         aspectRatio = false;
                     }
                     CropImageId = 5;
-                    CropImage.ActivityBuilder builder = CropImage.activity(getImageUri(UmangWebActivity.this, orignalBitmap));
+//                    CropImage.ActivityBuilder builder = CropImage.activity(getImageUri(UmangWebActivity.this, orignalBitmap));
 
                     if (mCropType.equalsIgnoreCase("aspect")) {
-                        builder.setAspectRatio(mCropHeight, mCropWidth);
-                        builder.setFixAspectRatio(aspectRatio);
+//                        builder.setAspectRatio(mCropHeight, mCropWidth);
+//                        builder.setFixAspectRatio(aspectRatio);
+                        startImageCropping(getImageUri(UmangWebActivity.this, orignalBitmap),
+                                true, aspectRatio,
+                                mCropHeight,
+                                mCropWidth,
+                                0);
 
                     } else if (mCropType.equalsIgnoreCase("pixel")) {
-                        builder.setMinCropResultSize(mCropWidth, mCropHeight);
-
+//                        builder.setMinCropResultSize(mCropWidth, mCropHeight);
+                        startImageCropping(getImageUri(UmangWebActivity.this, orignalBitmap),
+                                true,
+                                false, 0, 0,
+                                0, 0, 0,
+                                mCropWidth, mCropHeight
+                        );
                     }
-                    builder.setGuidelines(CropImageView.Guidelines.ON)
-                            .start(UmangWebActivity.this);
+//                    builder.setGuidelines(CropImageView.Guidelines.ON)
+//                            .start(UmangWebActivity.this);
                 } else {
                     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
@@ -3316,13 +3586,20 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             final InputStream imageStream2 = getContentResolver().openInputStream(imageUri);
             Bitmap orignalBitmap = decodeSampledBitmapFromInputStream(imageStream, imageStream2, 500, 500);
             CropImageId = 4;
-            CropImage.activity(getImageUri(this, orignalBitmap))
+            startImageCropping(getImageUri(this, orignalBitmap),
+                    true,
+                    true,
+                    135, 145,
+                    70,
+                    600, 600,
+                    0,0);
+           /* CropImage.activity(getImageUri(this, orignalBitmap))
                     .setAspectRatio(135, 145)
                     .setFixAspectRatio(true)
                     .setMaxCropResultSize(600, 600)
                     .setOutputCompressQuality(70)
                     .setGuidelines(CropImageView.Guidelines.ON)
-                    .start(this);
+                    .start(this);*/
 
         } catch (FileNotFoundException e) {
             //Log.e(e.toString());
@@ -3362,10 +3639,12 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             final InputStream imageStream2 = getContentResolver().openInputStream(imageUri);
             Bitmap orignalBitmap = decodeSampledBitmapFromInputStream(imageStream, imageStream2, 400, 300);
             CropImageId = 3;
-            CropImage.activity(getImageUri(this, orignalBitmap))
+            startImageCropping(getImageUri(this, orignalBitmap), true);
+
+           /* CropImage.activity(getImageUri(this, orignalBitmap))
                     .setOutputCompressQuality(70)
                     .setGuidelines(CropImageView.Guidelines.ON)
-                    .start(this);
+                    .start(this);*/
         } catch (FileNotFoundException e) {
             mAgentWeb.getWebCreator().getWebView().loadUrl("javascript:" + callBackFailureFunction + "(\"" + Constants.FILE_NOT_FOUND + "\")");
             //Log.e(e.toString());
@@ -3437,18 +3716,26 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                                 aspectRatio = false;
                             }
                             CropImageId = 5;
-                            CropImage.ActivityBuilder builder = CropImage.activity(getImageUri(UmangWebActivity.this, bitmap));
+//                            CropImage.ActivityBuilder builder = CropImage.activity(getImageUri(UmangWebActivity.this, bitmap));
 
                             if (mCropType.equalsIgnoreCase("aspect")) {
-                                builder.setAspectRatio(mCropHeight, mCropWidth);
-                                builder.setFixAspectRatio(aspectRatio);
+//                                builder.setAspectRatio(mCropHeight, mCropWidth);
+//                                builder.setFixAspectRatio(aspectRatio);
+                                startImageCropping(getImageUri(UmangWebActivity.this, bitmap),
+                                        true,
+                                        aspectRatio, mCropHeight, mCropWidth, 0);
 
                             } else if (mCropType.equalsIgnoreCase("pixel")) {
-                                builder.setMinCropResultSize(mCropWidth, mCropHeight);
+//                                builder.setMinCropResultSize(mCropWidth, mCropHeight);
+                                startImageCropping(getImageUri(UmangWebActivity.this, bitmap),
+                                        true,
+                                        false, 0, 0, 0,
+                                        0, 0,
+                                        mCropWidth, mCropHeight);
 
                             }
-                            builder.setGuidelines(CropImageView.Guidelines.ON)
-                                    .start(UmangWebActivity.this);
+//                            builder.setGuidelines(CropImageView.Guidelines.ON)
+//                                    .start(UmangWebActivity.this);
                         } else {
                             ByteArrayOutputStream stream = new ByteArrayOutputStream();
                             bitmap.compress(Bitmap.CompressFormat.JPEG, 70, stream);
@@ -3512,20 +3799,32 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                             aspectRatio = false;
                         }
                         CropImageId = 5;
-                        CropImage.ActivityBuilder builder = CropImage.activity(uri);
+//                        CropImage.ActivityBuilder builder = CropImage.activity(uri);
 
                         if (mCropType.equalsIgnoreCase("aspect")) {
-                            builder.setAspectRatio(mCropHeight, mCropWidth);
-                            builder.setFixAspectRatio(aspectRatio);
+//                            builder.setAspectRatio(mCropHeight, mCropWidth);
+//                            builder.setFixAspectRatio(aspectRatio);
+                            startImageCropping(uri,
+                                    true,
+                                    aspectRatio, mCropHeight, mCropWidth,
+                                    0,
+                                    2000, 2000,
+                                    0, 0);
 
                         } else if (mCropType.equalsIgnoreCase("pixel")) {
-                            builder.setMinCropResultSize(mCropWidth, mCropHeight);
+//                            builder.setMinCropResultSize(mCropWidth, mCropHeight);
+                            startImageCropping(uri,
+                                    true,
+                                    false, 0, 0,
+                                    0,
+                                    2000, 2000,
+                                    mCropWidth, mCropWidth);
 
                         }
 
-                        builder.setMaxCropResultSize(2000, 2000);
-                        builder.setGuidelines(CropImageView.Guidelines.ON)
-                                .start(UmangWebActivity.this);
+//                        builder.setMaxCropResultSize(2000, 2000);
+//                        builder.setGuidelines(CropImageView.Guidelines.ON)
+//                                .start(UmangWebActivity.this);
                     } else {
                         String mimetype = getMineType(uri);
                         ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -4141,5 +4440,45 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             return "";
         }
         return myval;
+    }
+
+    private void startImageCropping(Uri uri, boolean guidelines) {
+        startImageCropping(uri, guidelines, false, 0, 0, 0);
+    }
+    private void startImageCropping(Uri uri, boolean guidelines, boolean fixAspectRatio, int aspectRatioX, int aspectRatioY, int compressQuality) {
+        startImageCropping(uri, guidelines, fixAspectRatio, aspectRatioX, aspectRatioY, compressQuality, 0, 0, 0, 0);
+    }
+    private void startImageCropping(Uri uri, boolean guidelines, boolean fixAspectRatio, int aspectRatioX, int aspectRatioY, int compressQuality,
+                                    int maxCropResultWidth, int maxCropResultHeight, int minCropResultWidth, int minCropResultHeight) {
+        CropImageOptions options = new CropImageOptions();
+        if(guidelines) {
+            options.guidelines = com.canhub.cropper.CropImageView.Guidelines.ON;
+        }
+        if(fixAspectRatio) {
+            options.fixAspectRatio = true;
+        }
+        if(aspectRatioX > 0 ) {
+            options.aspectRatioX = aspectRatioX;
+        }
+        if(aspectRatioY > 0 ) {
+            options.aspectRatioY = aspectRatioY;
+        }
+        if(compressQuality>0) {
+            options.outputCompressQuality = compressQuality;
+        }
+        if(maxCropResultWidth > 0 ) {
+            options.maxCropResultWidth = maxCropResultWidth;
+        }
+        if(maxCropResultHeight > 0 ) {
+            options.maxCropResultHeight = maxCropResultHeight;
+        }
+        if(minCropResultWidth > 0 ) {
+            options.minCropResultWidth = minCropResultWidth;
+        }
+        if(minCropResultHeight > 0 ) {
+            options.minCropResultHeight = minCropResultHeight;
+        }
+        cropImageLauncher.launch(new CropImageContractOptions(uri, options));
+
     }
 }

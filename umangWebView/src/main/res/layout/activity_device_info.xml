@@ -287,7 +287,6 @@
             android:gravity="center"
             android:background="@color/colorPrimary"
             android:text="@string/next"
-            android:onClick=""
             android:focusable="true"
             android:foreground="?attr/selectableItemBackgroundBorderless"
             android:textColor="@color/white"

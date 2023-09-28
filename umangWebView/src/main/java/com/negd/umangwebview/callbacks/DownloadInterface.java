@@ -75,7 +75,7 @@ public class DownloadInterface {
         digiUrl = url;
         digiJson = jsonString;
 
-        if (ContextCompat.checkSelfPermission(mAct,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(mAct,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -100,7 +100,7 @@ public class DownloadInterface {
         digiUrl = url;
         digiJson = jsonString;
 
-        if (ContextCompat.checkSelfPermission(mAct,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(mAct,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -143,7 +143,7 @@ public class DownloadInterface {
         this.chapterId = chapterId;
 
 
-        if (ContextCompat.checkSelfPermission(mAct,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(mAct,
                 Manifest.permission.READ_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -358,7 +358,7 @@ public class DownloadInterface {
         this.json=json;
         panCallbackMethod = callbackMethod;
 
-        if (ContextCompat.checkSelfPermission(mAct,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(mAct,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -411,7 +411,7 @@ public class DownloadInterface {
         panCallbackMethod = callbackMethod;
         mFoldername = foldername;
 
-        if (ContextCompat.checkSelfPermission(mAct,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(mAct,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -525,7 +525,7 @@ public class DownloadInterface {
         mFileURL = url;
 
 
-        if (ContextCompat.checkSelfPermission(mAct,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(mAct,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 

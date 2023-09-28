@@ -40,6 +40,7 @@ import com.negd.umangwebview.ui.BarCodeScannerActivity;
 import com.negd.umangwebview.ui.DatePickerFragmentDepartment;
 import com.negd.umangwebview.ui.OnDatePicker;
 import com.negd.umangwebview.ui.UmangWebActivity;
+import com.negd.umangwebview.utils.CommonUtils;
 import com.negd.umangwebview.utils.Constants;
 import com.negd.umangwebview.utils.Utils;
 
@@ -144,7 +145,7 @@ public class CommonInterface implements OnDatePicker {
         jp_successCallback = successCallback;
         jp_failureCallback = failureCallback;
 
-        if (ContextCompat.checkSelfPermission(act,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(act,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -194,7 +195,7 @@ public class CommonInterface implements OnDatePicker {
         nps_fileData = fileData;
         nps_fileName = fileName;
 
-        if (ContextCompat.checkSelfPermission(act,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(act,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -230,7 +231,7 @@ public class CommonInterface implements OnDatePicker {
         nps_fileData = fileData;
         nps_fileName = fileName;
 
-        if (ContextCompat.checkSelfPermission(act,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(act,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -269,7 +270,7 @@ public class CommonInterface implements OnDatePicker {
         nps_fileData = fileData;
         nps_fileName = fileName;
 
-        if (ContextCompat.checkSelfPermission(act,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(act,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -302,7 +303,7 @@ public class CommonInterface implements OnDatePicker {
         nps_fileData_bytes = fileBytes;
         nps_fileName = filename;
 
-        if (ContextCompat.checkSelfPermission(act,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(act,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
             Utils.openPermissionSettingsDialog(act, act.getResources().getString(R.string.allow_write_storage_permission_help_text));
@@ -495,7 +496,7 @@ public class CommonInterface implements OnDatePicker {
         share_fileData = fileData;
         share_fileName = fileName;
 
-        if (ContextCompat.checkSelfPermission(act,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(act,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -528,7 +529,7 @@ public class CommonInterface implements OnDatePicker {
         act.callBackSuccessFunction = imageSuccessCallBack;
         act.callBackFailureFunction = imageFailCallBack;
 
-        if (ContextCompat.checkSelfPermission(act,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(act,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -570,7 +571,7 @@ public class CommonInterface implements OnDatePicker {
     public void getPhotoFile(String imageSuccessCallBack, String imageFailCallBack) {
         act.callBackSuccessFunction = imageSuccessCallBack;
         act.callBackFailureFunction = imageFailCallBack;
-        if (ContextCompat.checkSelfPermission(act,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(act,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -608,7 +609,7 @@ public class CommonInterface implements OnDatePicker {
         act.callBackSuccessFunction = successCallBack;
         act.callBackFailureFunction = failCallBack;
         act.fileSizeStr = fileSizeStr;
-        if (ContextCompat.checkSelfPermission(act,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(act,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -639,7 +640,7 @@ public class CommonInterface implements OnDatePicker {
         act.callBackSuccessFunction = imageSuccessCallBack;
         act.callBackFailureFunction = imageFailCallBack;
 
-        if (ContextCompat.checkSelfPermission(act,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(act,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -693,7 +694,7 @@ public class CommonInterface implements OnDatePicker {
     public void getPassportPhoto(String imageSuccessCallBack, String imageFailCallBack) {
         act.callBackSuccessFunction = imageSuccessCallBack;
         act.callBackFailureFunction = imageFailCallBack;
-        if (ContextCompat.checkSelfPermission(act,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(act,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -773,7 +774,11 @@ public class CommonInterface implements OnDatePicker {
             public void onClick(View view) {
                 dialog.dismiss();
 
-                checkCameraPermission(act);
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    checkCameraPermissionForSDK33(act);
+                } else {
+                    checkCameraPermission(act);
+                }
             }
         });
 
@@ -816,6 +821,43 @@ public class CommonInterface implements OnDatePicker {
                     permissionsList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
                 }
             }
+
+            if (permissionAskedEarlier > 0) {
+                //show dialog
+                Utils.openPermissionSettingsDialog(act, act.getResources().getString(R.string.allow_read_storage_permission_help_text));
+                final String type = "WRITE_PERMISSION";
+                //act.openDialog("",act.getResources().getString(R.string.allow_read_storage_permission_help_text),"OK","CANCEL",type);
+
+            } else if (permissionsList.size() > 0) {
+                ActivityCompat.requestPermissions(act, permissionsList.toArray(new String[permissionsList.size()]),
+                        Constants.MY_PERMISSIONS_CAMERA_AND_STORAGE);
+            }
+        } else {
+
+            openCameraIntent();
+
+        }
+
+    }
+    private void checkCameraPermissionForSDK33(final UmangWebActivity act) {
+
+        if (ContextCompat.checkSelfPermission(act, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+
+            final List<String> permissionsList = new ArrayList<String>();
+
+            int permissionAskedEarlier = 0;
+
+            if (ContextCompat.checkSelfPermission(act, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+
+                // Check for Rationale Option
+                if (ActivityCompat.shouldShowRequestPermissionRationale(act, Manifest.permission.CAMERA)) {
+                    permissionAskedEarlier++;
+                } else {
+                    permissionsList.add(Manifest.permission.CAMERA);
+                }
+            }
+
+
 
             if (permissionAskedEarlier > 0) {
                 //show dialog
@@ -879,7 +921,7 @@ public class CommonInterface implements OnDatePicker {
     }
 
     private void checkGalleryPermissions(final UmangWebActivity act) {
-        if (ContextCompat.checkSelfPermission(act,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(act,
                 Manifest.permission.READ_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -904,7 +946,7 @@ public class CommonInterface implements OnDatePicker {
     public void openGalleryIntent() {
 
         if (act.mTypes.contains("pdf")) {
-            if (ContextCompat.checkSelfPermission(act,
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(act,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     != PackageManager.PERMISSION_GRANTED) {
 
