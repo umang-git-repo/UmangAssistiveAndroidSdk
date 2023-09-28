@@ -387,7 +387,10 @@ public class CommonInterface implements OnDatePicker {
     public void startRecordVideo(String videoSuccessCallBack, String videoFailCallBack) {
         this.m4agriVideoSuccessCallback = videoSuccessCallBack;
         this.m4agriVideoFailureCallback = videoFailCallBack;
-        if (ContextCompat.checkSelfPermission(act, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
+        if(checkCameraPermissionCameraStorage(act)) {
+            ((UmangWebActivity) act).startRecordVideo();
+        }
+        /*if (ContextCompat.checkSelfPermission(act, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
                 || ContextCompat.checkSelfPermission(act, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
 
             final List<String> permissionsList = new ArrayList<String>();
@@ -430,7 +433,7 @@ public class CommonInterface implements OnDatePicker {
 
         } else {
             ((UmangWebActivity) act).startRecordVideo();
-        }
+        }*/
     }
 
     public static String m4agriImageSuccessCallback;
@@ -440,7 +443,10 @@ public class CommonInterface implements OnDatePicker {
     public void selectImage(String imageSuccessCallBack, String imageFailCallBack) {
         this.m4agriImageSuccessCallback = imageSuccessCallBack;
         this.m4agriImageFailureCallback = imageFailCallBack;
-
+        if(checkCameraPermissionCameraStorage(act)) {
+            ((UmangWebActivity) act).selectImages();
+        }
+        /*
         if (ContextCompat.checkSelfPermission(act, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
                 || ContextCompat.checkSelfPermission(act, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
 
@@ -484,7 +490,7 @@ public class CommonInterface implements OnDatePicker {
 
         } else {
             ((UmangWebActivity) act).selectImages();
-        }
+        }*/
     }
 
     public static String share_fileData;
@@ -1169,6 +1175,72 @@ public class CommonInterface implements OnDatePicker {
             editor.commit();
             act.startActivity(intent);
         } catch (Exception e) {
+        }
+    }
+
+    private boolean checkCameraPermissionCameraStorage(final UmangWebActivity act) {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(act, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                final List<String> permissionsList = new ArrayList<String>();
+                int permissionAskedEarlier = 0;
+                if (ContextCompat.checkSelfPermission(act, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                    // Check for Rationale Option
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(act, Manifest.permission.CAMERA)) {
+                        permissionAskedEarlier++;
+                    } else {
+                        permissionsList.add(Manifest.permission.CAMERA);
+                    }
+                }
+                if (permissionAskedEarlier > 0) {
+                    //show dialog
+                    Utils.openPermissionSettingsDialog(act, act.getResources().getString(R.string.allow_read_storage_permission_help_text));
+                    final String type = "WRITE_PERMISSION";
+                    //act.openDialog("",act.getResources().getString(R.string.allow_read_storage_permission_help_text),"OK","CANCEL",type);
+                } else if (permissionsList.size() > 0) {
+                    ActivityCompat.requestPermissions(act, permissionsList.toArray(new String[permissionsList.size()]),
+                            Constants.MY_PERMISSIONS_CAMERA_AND_STORAGE);
+                }
+                return false;
+            } else  {
+                return true;
+            }
+        } else {
+            if (ContextCompat.checkSelfPermission(act, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
+                    || ContextCompat.checkSelfPermission(act, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                final List<String> permissionsList = new ArrayList<String>();
+                int permissionAskedEarlier = 0;
+                if (ContextCompat.checkSelfPermission(act, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                    // Check for Rationale Option
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(act, Manifest.permission.CAMERA)) {
+                        permissionAskedEarlier++;
+                    } else {
+                        permissionsList.add(Manifest.permission.CAMERA);
+                    }
+                }
+
+                if (ContextCompat.checkSelfPermission(act, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    // Check for Rationale Option
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(act, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                        permissionAskedEarlier++;
+                    } else {
+                        permissionsList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                    }
+                }
+
+                if (permissionAskedEarlier > 0) {
+                    ((UmangWebActivity) act).sendImagesFailToWeb();
+                    //show dialog
+                    Utils.openPermissionSettingsDialog(act, act.getResources().getString(R.string.allow_camera_and_storage_permission_help_text));
+                    final String type = "WRITE_PERMISSION";
+                    //((CommonWebViewActivity)act).openDialog("",act.getResources().getString(R.string.allow_camera_and_storage_permission_help_text),"OK","CANCEL",type);
+                } else if (permissionsList.size() > 0) {
+                    ActivityCompat.requestPermissions(act, permissionsList.toArray(new String[permissionsList.size()]),
+                            Constants.MY_PERMISSIONS_SELECT_IMAGES);
+                }
+                return false;
+            } else  {
+                return true;
+            }
         }
     }
 }
