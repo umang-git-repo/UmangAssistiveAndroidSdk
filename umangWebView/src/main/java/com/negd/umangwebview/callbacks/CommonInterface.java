@@ -387,7 +387,7 @@ public class CommonInterface implements OnDatePicker {
     public void startRecordVideo(String videoSuccessCallBack, String videoFailCallBack) {
         this.m4agriVideoSuccessCallback = videoSuccessCallBack;
         this.m4agriVideoFailureCallback = videoFailCallBack;
-        if(checkCameraPermissionCameraStorage(act)) {
+        if(checkCameraPermissionCameraStorage(act, false)) {
             ((UmangWebActivity) act).startRecordVideo();
         }
         /*if (ContextCompat.checkSelfPermission(act, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
@@ -443,7 +443,7 @@ public class CommonInterface implements OnDatePicker {
     public void selectImage(String imageSuccessCallBack, String imageFailCallBack) {
         this.m4agriImageSuccessCallback = imageSuccessCallBack;
         this.m4agriImageFailureCallback = imageFailCallBack;
-        if(checkCameraPermissionCameraStorage(act)) {
+        if(checkCameraPermissionCameraStorage(act, true)) {
             ((UmangWebActivity) act).selectImages();
         }
         /*
@@ -1178,7 +1178,7 @@ public class CommonInterface implements OnDatePicker {
         }
     }
 
-    private boolean checkCameraPermissionCameraStorage(final UmangWebActivity act) {
+    private boolean checkCameraPermissionCameraStorage(final UmangWebActivity act, boolean isImage) {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(act, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 final List<String> permissionsList = new ArrayList<String>();
@@ -1228,7 +1228,11 @@ public class CommonInterface implements OnDatePicker {
                 }
 
                 if (permissionAskedEarlier > 0) {
-                    ((UmangWebActivity) act).sendImagesFailToWeb();
+                    if(isImage) {
+                        ((UmangWebActivity) act).sendImagesFailToWeb();
+                    } else {
+                        ((UmangWebActivity) act).sendVideoFailToWeb("");
+                    }
                     //show dialog
                     Utils.openPermissionSettingsDialog(act, act.getResources().getString(R.string.allow_camera_and_storage_permission_help_text));
                     final String type = "WRITE_PERMISSION";
