@@ -13,6 +13,8 @@ public class Constants {
    public static final String LOADER_COLOR="loaderColor";
    public static final String SWIPE_LOADER_COLOR="swipeLoaderColor";
    public static final String DEVICE_TOKEN = "token";
+   public static final String DEVICE_DATKN = "device_datkn";
+   public static final String DEVICE_DRTKN = "device_darkn";
 
    //choose document codes
    public static final int REQUEST_IDENTITY_PROOF = 666;

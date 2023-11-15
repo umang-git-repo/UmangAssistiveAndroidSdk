@@ -1178,6 +1178,38 @@ public class CommonInterface implements OnDatePicker {
         }
     }
 
+    @JavascriptInterface
+    public void assistiveLoginResponse(String loginResponse) {
+        try {
+            JSONObject job = new JSONObject(loginResponse);
+            SharedPreferences.Editor editor = getSharedPreferencesEditor();
+            editor.putString(Constants.DEVICE_DATKN, job.getString("datkn"));
+            editor.putString(Constants.DEVICE_DRTKN, job.getString("drtkn"));
+            editor.commit();
+        } catch (Exception e) {
+        }
+    }
+
+    @JavascriptInterface
+    public String getDigilockerToken() {
+        return getSharedPreferences(Constants.DEVICE_DATKN, "");
+    }
+    private String getSharedPreferences(String key, String defaultValue) {
+        return getSharedPreferences().getString(key, defaultValue);
+    }
+    private void writeSharedPreferences(String key, String value) {
+        SharedPreferences.Editor editor = getSharedPreferencesEditor();
+        editor.putString(key, value);
+        editor.commit();
+    }
+    private SharedPreferences getSharedPreferences() {
+        return act.getApplicationContext().getSharedPreferences("UmangSdkPref", 0);
+    }
+
+    private SharedPreferences.Editor getSharedPreferencesEditor() {
+        return getSharedPreferences().edit();
+    }
+
     private boolean checkCameraPermissionCameraStorage(final UmangWebActivity act, boolean isImage) {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(act, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {

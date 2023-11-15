@@ -240,8 +240,11 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 //        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         try {
-            assert getSupportActionBar() != null;
-            getSupportActionBar().hide();
+            if(getSupportActionBar()!=null) {
+                getSupportActionBar().hide();
+            }
+//            assert getSupportActionBar() != null;
+//            getSupportActionBar().hide();
         } catch (Exception e) {
             e.printStackTrace();
         }
