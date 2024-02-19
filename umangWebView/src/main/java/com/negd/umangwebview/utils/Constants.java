@@ -15,6 +15,7 @@ public class Constants {
    public static final String DEVICE_TOKEN = "token";
    public static final String DEVICE_DATKN = "device_datkn";
    public static final String DEVICE_DRTKN = "device_darkn";
+   public static final String DEVICE_CALLBACK_RESPONSE = "device_callback_response";
 
    //choose document codes
    public static final int REQUEST_IDENTITY_PROOF = 666;

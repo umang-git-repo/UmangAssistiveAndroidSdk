@@ -1,5 +1,7 @@
 package com.negd.umangwebview.callbacks;
 
+import static com.negd.umangwebview.utils.Constants.DEVICE_CALLBACK_RESPONSE;
+
 import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
@@ -42,6 +44,7 @@ import com.negd.umangwebview.ui.OnDatePicker;
 import com.negd.umangwebview.ui.UmangWebActivity;
 import com.negd.umangwebview.utils.CommonUtils;
 import com.negd.umangwebview.utils.Constants;
+import com.negd.umangwebview.utils.DeviceUtils;
 import com.negd.umangwebview.utils.Utils;
 
 import org.json.JSONException;
@@ -1186,6 +1189,7 @@ public class CommonInterface implements OnDatePicker {
             editor.putString(Constants.DEVICE_DATKN, job.getString("datkn"));
             editor.putString(Constants.DEVICE_DRTKN, job.getString("drtkn"));
             editor.commit();
+            saveCallbackResponse(loginResponse);
         } catch (Exception e) {
         }
     }
@@ -1194,6 +1198,12 @@ public class CommonInterface implements OnDatePicker {
     public String getDigilockerToken() {
         return getSharedPreferences(Constants.DEVICE_DATKN, "");
     }
+
+    @JavascriptInterface
+    public String getUserProfile() {
+        return getUserProfileData();
+    }
+
     private String getSharedPreferences(String key, String defaultValue) {
         return getSharedPreferences().getString(key, defaultValue);
     }
@@ -1208,6 +1218,35 @@ public class CommonInterface implements OnDatePicker {
 
     private SharedPreferences.Editor getSharedPreferencesEditor() {
         return getSharedPreferences().edit();
+    }
+
+    private void saveCallbackResponse(String loginResponse) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            JSONObject userInfo = new JSONObject(loginResponse);
+            jsonObject.put("userinfo", userInfo);
+            jsonObject.put("mno", userInfo.getString("mno"));
+            jsonObject.put("tkn", userInfo.getString("tkn"));
+            jsonObject.put("did", DeviceUtils.getDeviceId(act));
+            jsonObject.put("hmk", DeviceUtils.getDeviceMake());
+            jsonObject.put("hmd", DeviceUtils.getDeviceModel());
+            jsonObject.put("osver", DeviceUtils.getMobileOSVersion());
+            jsonObject.put("ver", "160");
+            writeSharedPreferences(DEVICE_CALLBACK_RESPONSE, jsonObject.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String getUserProfileData() {
+        try {
+//            JSONObject jsonObject =new JSONObject(getSharedPreferences().getString(DEVICE_CALLBACK_RESPONSE, ""));
+            return getSharedPreferences().getString(DEVICE_CALLBACK_RESPONSE, "");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+
     }
 
     private boolean checkCameraPermissionCameraStorage(final UmangWebActivity act, boolean isImage) {
