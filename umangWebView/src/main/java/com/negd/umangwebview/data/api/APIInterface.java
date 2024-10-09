@@ -13,6 +13,7 @@ public  interface APIInterface {
             "Content-Type: application/json",
             "x-api-key: VKE9PnbY5k1ZYapR5PyYQ33I26sXTX569Ed7eqyg"
     })
-    @POST("coreapi/2.0/openbiolist")
+//    @POST("coreapi/2.0/openbiolist")
+    @POST("https://apigw.umangapp.in/core-encv1/ws1/biolist")
     Call<DeviceListResponse> getDeviceList(@Body RdDeviceRequest deviceRequest);
 }

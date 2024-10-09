@@ -2,13 +2,21 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
-<androidx.appcompat.widget.LinearLayoutCompat
+<RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".ui.UmangWebActivity">
 
-    <androidx.appcompat.widget.Toolbar
+    <!--    Headers View-->
+    <LinearLayout
+        android:id="@+id/ll_header"
+        android:orientation="vertical"
+        android:layout_alignParentTop="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <!--    Toolbar-->
+        <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolBar"
         android:visibility="gone"
         android:layout_width="match_parent"
@@ -55,68 +63,83 @@
         </LinearLayout>
 
     </androidx.appcompat.widget.Toolbar>
+        <!--    Layout to add dynamic views-->
+        <FrameLayout
+            android:id="@+id/fl_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:id="@+id/main">
-
-
-
-    <FrameLayout
-        android:id="@+id/customViewContainer"
+<!--    Layout to show WebView-->
+    <LinearLayout
+        android:id="@+id/main"
+        android:layout_below="@id/ll_header"
+        android:layout_above="@+id/ll_footer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white"
-        android:visibility="gone"/>
+        android:orientation="vertical">
+        <!--    Layout to show custom views from webview -->
+        <FrameLayout
+            android:id="@+id/customViewContainer"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:background="@color/black"
+            android:visibility="gone"
+            />
+    </LinearLayout>
 
-
-
-
-    </RelativeLayout>
-
-    <androidx.appcompat.widget.LinearLayoutCompat
+    <!--    Footers View-->
+    <LinearLayout
+        android:id="@+id/ll_footer"
+        android:orientation="vertical"
+        android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/bottomVersion"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true">
+        <!--    Layout to add dynamic views-->
+        <FrameLayout
+            android:id="@+id/fl_footer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/txtVersion"
+        <!--    Layout to add version-->
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/bottomVersion"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/txtVersion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/margin_4dp"
+                    android:text="Version: "/>
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/bottomVersion2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="@dimen/margin_4dp"
-                android:text="Version: "/>
+                android:layout_alignParentEnd="true"
+                android:gravity="end"
+                android:layout_alignParentBottom="true">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/txtVersion2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/margin_4dp"
+                    android:text="Version: "/>
+            </androidx.appcompat.widget.LinearLayoutCompat>
         </androidx.appcompat.widget.LinearLayoutCompat>
+    </LinearLayout>
 
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/bottomVersion2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:gravity="end"
-            android:layout_alignParentBottom="true">
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/txtVersion2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/margin_4dp"
-                android:text="Version: "/>
-        </androidx.appcompat.widget.LinearLayoutCompat>
-    </androidx.appcompat.widget.LinearLayoutCompat>
-
-
-
-
-
-
-
-</androidx.appcompat.widget.LinearLayoutCompat>
+</RelativeLayout>
 </layout>

@@ -1,5 +1,6 @@
 package com.negd.umangwebview.callbacks;
 
+import static com.negd.umangwebview.utils.Constants.DEVICE_CALLBACK_PDL_RESPONSE;
 import static com.negd.umangwebview.utils.Constants.DEVICE_CALLBACK_RESPONSE;
 
 import android.Manifest;
@@ -36,8 +37,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
+import com.negd.umangwebview.BuildConfig;
 import com.negd.umangwebview.R;
 import com.negd.umangwebview.UmangAssistiveAndroidSdk;
+import com.negd.umangwebview.listeners.ICommonCallbackListener;
 import com.negd.umangwebview.ui.BarCodeScannerActivity;
 import com.negd.umangwebview.ui.DatePickerFragmentDepartment;
 import com.negd.umangwebview.ui.OnDatePicker;
@@ -47,6 +50,7 @@ import com.negd.umangwebview.utils.Constants;
 import com.negd.umangwebview.utils.DeviceUtils;
 import com.negd.umangwebview.utils.Utils;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -60,10 +64,12 @@ public class CommonInterface implements OnDatePicker {
 
     private UmangWebActivity act;
     public boolean isCalled = true;
+    public ICommonCallbackListener callbackListener;
 
 
     public CommonInterface(UmangWebActivity activity) {
         this.act = activity;
+        callbackListener = activity;
     }
 
     /**
@@ -335,18 +341,18 @@ public class CommonInterface implements OnDatePicker {
 
     @JavascriptInterface
     public void saveWebKeyValue(String jsonStr) {
-
-        SharedPreferences pref = act.getApplicationContext().getSharedPreferences("UmangSdkPref", 0); // 0 - for private mode
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putString(Constants.PREF_WEB_KEY_VALUE, jsonStr);
-        editor.commit();
+        callbackListener.setSharedPreferencesValue(Constants.PREF_WEB_KEY_VALUE, jsonStr);
+//        SharedPreferences pref = act.getApplicationContext().getSharedPreferences("UmangSdkPref", 0); // 0 - for private mode
+//        SharedPreferences.Editor editor = pref.edit();
+//        editor.putString(Constants.PREF_WEB_KEY_VALUE, jsonStr);
+//        editor.commit();
     }
 
     @JavascriptInterface
     public String getWebKeyValue() {
-
-        SharedPreferences pref = act.getApplicationContext().getSharedPreferences("UmangSdkPref", 0); // 0 - for private mode
-        return pref.getString(Constants.PREF_WEB_KEY_VALUE, "");
+        return callbackListener.getSharedPreferencesValue(Constants.PREF_WEB_KEY_VALUE, "");
+//        SharedPreferences pref = act.getApplicationContext().getSharedPreferences("UmangSdkPref", 0); // 0 - for private mode
+//        return pref.getString(Constants.PREF_WEB_KEY_VALUE, "");
     }
 
     public static String m4agriAudioSuccessCallback;
@@ -910,11 +916,11 @@ public class CommonInterface implements OnDatePicker {
                     act.getPackageName() + ".fileprovider",
                     file);
             act.imageSelectedPath = capturedImageURI.toString();
-
-            SharedPreferences pref = act.getApplicationContext().getSharedPreferences("UmangSdkPref", 0); // 0 - for private mode
-            SharedPreferences.Editor editor = pref.edit();
-            editor.putString(Constants.PREF_CAMERA_IMAGE_URI, capturedImageURI.toString());
-            editor.commit();
+            callbackListener.setSharedPreferencesValue(Constants.PREF_CAMERA_IMAGE_URI, capturedImageURI.toString());
+//            SharedPreferences pref = act.getApplicationContext().getSharedPreferences("UmangSdkPref", 0); // 0 - for private mode
+//            SharedPreferences.Editor editor = pref.edit();
+//            editor.putString(Constants.PREF_CAMERA_IMAGE_URI, capturedImageURI.toString());
+//            editor.commit();
 
             // Camera capture image intent
             final Intent captureIntent = new Intent(
@@ -1172,10 +1178,11 @@ public class CommonInterface implements OnDatePicker {
             intent.putExtra(Constants.DEPT_URL, job.getString("url"));
             intent.putExtra(Constants.DEPT_ID, job.getString("id"));
             intent.putExtra(Constants.DEPT_NAME, job.getString("name"));
-            SharedPreferences pref = act.getApplicationContext().getSharedPreferences("UmangSdkPref", 0); // 0 - for private mode
-            SharedPreferences.Editor editor = pref.edit();
-            editor.putString(Constants.DEVICE_TOKEN, job.getString("tkn"));
-            editor.commit();
+            callbackListener.setSharedPreferencesValue(Constants.DEVICE_TOKEN, job.getString("tkn"));
+//            SharedPreferences pref = act.getApplicationContext().getSharedPreferences("UmangSdkPref", 0); // 0 - for private mode
+//            SharedPreferences.Editor editor = pref.edit();
+//            editor.putString(Constants.DEVICE_TOKEN, job.getString("tkn"));
+//            editor.commit();
             act.startActivity(intent);
         } catch (Exception e) {
         }
@@ -1185,10 +1192,12 @@ public class CommonInterface implements OnDatePicker {
     public void assistiveLoginResponse(String loginResponse) {
         try {
             JSONObject job = new JSONObject(loginResponse);
-            SharedPreferences.Editor editor = getSharedPreferencesEditor();
-            editor.putString(Constants.DEVICE_DATKN, job.getString("datkn"));
-            editor.putString(Constants.DEVICE_DRTKN, job.getString("drtkn"));
-            editor.commit();
+            callbackListener.setSharedPreferencesValue(Constants.DEVICE_DATKN, job.getString("datkn"));
+            callbackListener.setSharedPreferencesValue(Constants.DEVICE_DRTKN, job.getString("drtkn"));
+//            SharedPreferences.Editor editor = getSharedPreferencesEditor();
+//            editor.putString(Constants.DEVICE_DATKN, job.getString("datkn"));
+//            editor.putString(Constants.DEVICE_DRTKN, job.getString("drtkn"));
+//            editor.commit();
             saveCallbackResponse(loginResponse);
         } catch (Exception e) {
         }
@@ -1196,7 +1205,7 @@ public class CommonInterface implements OnDatePicker {
 
     @JavascriptInterface
     public String getDigilockerToken() {
-        return getSharedPreferences(Constants.DEVICE_DATKN, "");
+        return callbackListener.getSharedPreferencesValue(Constants.DEVICE_DATKN, "");
     }
 
     @JavascriptInterface
@@ -1204,7 +1213,37 @@ public class CommonInterface implements OnDatePicker {
         return getUserProfileData();
     }
 
-    private String getSharedPreferences(String key, String defaultValue) {
+    @JavascriptInterface
+    public String getNssoPayload() {
+        if(callbackListener==null) {
+            return "";
+        }
+        return callbackListener.getNssoPayload();
+    }
+
+    @JavascriptInterface
+    public void addUserConsentPDL(String json) {
+        try {
+            callbackListener.setSharedPreferencesValue(DEVICE_CALLBACK_PDL_RESPONSE, json);
+        } catch (Exception e){
+        }
+    }
+
+    @JavascriptInterface
+    public void downloadBase64ForImageShare(String json) {
+        try {
+            JSONObject jsonObject = new JSONObject(json);
+            String shareText = jsonObject.getString("shareText");
+            String base64 = jsonObject.getString("imagebase64");
+//            callbackListener.shareBase64(base64.split(",")[1], shareText);
+            callbackListener.shareBase64(base64, shareText);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
+  /*  private String getSharedPreferences(String key, String defaultValue) {
         return getSharedPreferences().getString(key, defaultValue);
     }
     private void writeSharedPreferences(String key, String value) {
@@ -1219,6 +1258,7 @@ public class CommonInterface implements OnDatePicker {
     private SharedPreferences.Editor getSharedPreferencesEditor() {
         return getSharedPreferences().edit();
     }
+    */
 
     private void saveCallbackResponse(String loginResponse) {
         JSONObject jsonObject = new JSONObject();
@@ -1231,20 +1271,27 @@ public class CommonInterface implements OnDatePicker {
             jsonObject.put("hmk", DeviceUtils.getDeviceMake());
             jsonObject.put("hmd", DeviceUtils.getDeviceModel());
             jsonObject.put("osver", DeviceUtils.getMobileOSVersion());
+            jsonObject.put("isSDK",true);
+            jsonObject.put("sdkVersion", BuildConfig.VERSION_CODE);
             jsonObject.put("ver", "160");
-            writeSharedPreferences(DEVICE_CALLBACK_RESPONSE, jsonObject.toString());
+            callbackListener.setSharedPreferencesValue(DEVICE_CALLBACK_RESPONSE, jsonObject.toString());
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     private String getUserProfileData() {
+        JSONObject jsonObject = new JSONObject();
         try {
-//            JSONObject jsonObject =new JSONObject(getSharedPreferences().getString(DEVICE_CALLBACK_RESPONSE, ""));
-            return getSharedPreferences().getString(DEVICE_CALLBACK_RESPONSE, "");
+            jsonObject =new JSONObject(callbackListener.getSharedPreferencesValue(DEVICE_CALLBACK_RESPONSE, ""));
+            if(!callbackListener.getSharedPreferencesValue(DEVICE_CALLBACK_PDL_RESPONSE, "").isEmpty()) {
+                JSONArray pdl = new JSONArray(callbackListener.getSharedPreferencesValue(DEVICE_CALLBACK_PDL_RESPONSE, ""));
+                jsonObject.put("pdl", pdl);
+            }
+            return jsonObject.toString();
         } catch (Exception e) {
             e.printStackTrace();
-            return "";
+            return jsonObject.toString();
         }
 
     }

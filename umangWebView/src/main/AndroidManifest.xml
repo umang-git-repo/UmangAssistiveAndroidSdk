@@ -17,6 +17,7 @@
         <package android:name="com.acpl.registersdk" />
         <package android:name="com.tatvik.bio.tmf20" />
         <package android:name="com.google.android.apps.maps" />
+        <package android:name="in.gov.uidai.facerd"/>
         <package android:name="QUERY_ALL_PACKAGES" />
     </queries>
 
@@ -44,6 +45,9 @@
             android:exported="false" />
 <!--        android:theme="@style/AppTheme"-->
         <activity
+            android:launchMode="standard"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"
             android:name=".ui.UmangWebActivity"
             android:exported="false"
 
