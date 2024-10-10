@@ -18,6 +18,7 @@ public class Constants {
    public static final String DEVICE_CALLBACK_RESPONSE = "device_callback_response";
    public static final String DEVICE_CALLBACK_PDL_RESPONSE = "device_callback_pdl_response";
    public static final String NSSO_PAYLOAD = "nsso_payload";
+   public static final String NSSO_JWT_TOKEN = "nsso_jwt_token";
    public static final String CUSTOM_HEADER_LAYOUT_ID = "custom_header_layout_id";
    public static final String CUSTOM_HEADER_VIEW_CLICK_ID = "custom_header_view_click_id";
    public static final String CUSTOM_HEADER_CLOSE_SDK_ON_CLICK = "custom_header_close_sdk_on_click";

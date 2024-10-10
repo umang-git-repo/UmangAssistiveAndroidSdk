@@ -39,7 +39,6 @@ import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.location.Location;
 import android.location.LocationManager;
-import android.net.MailTo;
 import android.net.Uri;
 import android.net.http.SslCertificate;
 import android.net.http.SslError;
@@ -202,7 +201,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
     public String mTypes = "";
     public String mCropType;
     public String mJsonParams;
-
+    private String nssoPayload = "";
 
     /**
      * File upload callback for platform versions prior to Android 5.0
@@ -267,7 +266,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             @Override
             public void onClick(View view) {
                 if (UmangAssistiveAndroidSdk.assistiveListener != null) {
-                    UmangAssistiveAndroidSdk.assistiveListener.onHeaderClickAction();
+                    UmangAssistiveAndroidSdk.assistiveListener.onHeaderClickAction(UmangWebActivity.this);
                 }
                 onBackPressed();
             }
@@ -397,7 +396,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                             @Override
                             public void onClick(View view) {
                                 if (UmangAssistiveAndroidSdk.assistiveListener != null) {
-                                    UmangAssistiveAndroidSdk.assistiveListener.onHeaderClickAction();
+                                    UmangAssistiveAndroidSdk.assistiveListener.onHeaderClickAction(UmangWebActivity.this);
                                     if(closeSdkOnClick) {
                                         finish();
                                     }
@@ -409,7 +408,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                             @Override
                             public void onClick(View view) {
                                 if (UmangAssistiveAndroidSdk.assistiveListener != null) {
-                                    UmangAssistiveAndroidSdk.assistiveListener.onHeaderClickAction();
+                                    UmangAssistiveAndroidSdk.assistiveListener.onHeaderClickAction(UmangWebActivity.this);
                                     if (closeSdkOnClick) {
                                         finish();
                                     }
@@ -448,7 +447,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                             @Override
                             public void onClick(View view) {
                                 if (UmangAssistiveAndroidSdk.assistiveListener != null) {
-                                    UmangAssistiveAndroidSdk.assistiveListener.onFooterClickAction();
+                                    UmangAssistiveAndroidSdk.assistiveListener.onFooterClickAction(UmangWebActivity.this);
                                     if(closeSdkOnClick) {
                                         finish();
                                     }
@@ -460,7 +459,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                             @Override
                             public void onClick(View view) {
                                 if (UmangAssistiveAndroidSdk.assistiveListener != null) {
-                                    UmangAssistiveAndroidSdk.assistiveListener.onFooterClickAction();
+                                    UmangAssistiveAndroidSdk.assistiveListener.onFooterClickAction(UmangWebActivity.this);
                                     if(closeSdkOnClick) {
                                         finish();
                                     }
@@ -468,6 +467,27 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                             }
                         });
                     }
+                }
+            }
+            if(intent.hasExtra(Constants.NSSO_PAYLOAD) && !intent.getStringExtra(Constants.NSSO_PAYLOAD).isEmpty()) {
+                nssoPayload = intent.getStringExtra(Constants.NSSO_PAYLOAD);
+                binding.llVersion.setVisibility(View.GONE);
+            }
+            if(intent.hasExtra(Constants.NSSO_JWT_TOKEN) && !intent.getStringExtra(Constants.NSSO_JWT_TOKEN).isEmpty()) {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    try {
+                        Pair<Boolean, String> result = new JwtUtil().verifyJWTAndGetPayload(intent.getStringExtra(Constants.NSSO_JWT_TOKEN));
+                        if(result.first) {
+                            nssoPayload = result.second;
+                            binding.llVersion.setVisibility(View.GONE);
+                        } else {
+                            UmangAssistiveAndroidSdk.assistiveListener.onSdkInitializationError("JWT Sign Verification Failed");
+                        }
+                    } catch (Exception e) {
+                        UmangAssistiveAndroidSdk.assistiveListener.onSdkInitializationError(e.toString());
+                    }
+                } else {
+                    UmangAssistiveAndroidSdk.assistiveListener.onSdkInitializationError("JWT Sign requires minimum Android 26");
                 }
             }
 
@@ -4197,11 +4217,10 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
     @Override
     public String getNssoPayload() {
-        Intent intent = getIntent();
-        if (intent.hasExtra(Constants.NSSO_PAYLOAD)) {
-            return intent.getStringExtra(Constants.NSSO_PAYLOAD);
-        } else  {
+        if(nssoPayload == null) {
             return "";
+        } else {
+            return nssoPayload;
         }
     }
 

@@ -22,6 +22,7 @@ public class UmangAssistiveAndroidSdk {
    private final String loaderColor;
    private final String swipeLoaderColor;
    private final String nssoPayload;
+   private final String nssoJwtToken;
    private final int customHeaderLayoutId;
    private final int customHeaderClickViewId;
    private final boolean customHeaderSdkCloseOnCick;
@@ -50,6 +51,7 @@ public class UmangAssistiveAndroidSdk {
       this.customFooterLayoutId = builder.customFooterLayoutId;
       this.customFooterClickViewId = builder.customFooterClickViewId;
       this.customFooterSdkCloseOnCick = builder.customFooterSdkCloseOnClick;
+      this.nssoJwtToken = builder.nssoJwtToken;
       UmangAssistiveAndroidSdk.assistiveListener =  builder.umangAssistiveListener;
    }
 
@@ -93,6 +95,9 @@ public class UmangAssistiveAndroidSdk {
          if(nssoPayload!=null && !nssoPayload.trim().isEmpty()){
             intent.putExtra(Constants.NSSO_PAYLOAD,nssoPayload);
          }
+         if(nssoJwtToken!=null && !nssoJwtToken.trim().isEmpty()){
+            intent.putExtra(Constants.NSSO_JWT_TOKEN,nssoJwtToken);
+         }
          if(customHeaderLayoutId != 0){
             intent.putExtra(Constants.CUSTOM_HEADER_LAYOUT_ID, customHeaderLayoutId);
             intent.putExtra(Constants.CUSTOM_HEADER_CLOSE_SDK_ON_CLICK, customHeaderSdkCloseOnCick);
@@ -125,6 +130,7 @@ public class UmangAssistiveAndroidSdk {
       private String loaderColor;
       private String swipeLoaderColor;
       private String nssoPayload;
+      private String nssoJwtToken;
       private int customHeaderLayoutId;
       private int customHeaderClickViewId;
       private boolean customHeaderSdkCloseOnClick;
@@ -186,6 +192,11 @@ public class UmangAssistiveAndroidSdk {
 
       public Builder setNssoPayload(String nssoPayload) {
          this.nssoPayload = nssoPayload;
+         return this;
+      }
+
+      public Builder setNssoJwtToken(String nssoJwtToken) {
+         this.nssoJwtToken = nssoJwtToken;
          return this;
       }
 
