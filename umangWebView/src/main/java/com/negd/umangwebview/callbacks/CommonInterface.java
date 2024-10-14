@@ -2,6 +2,7 @@ package com.negd.umangwebview.callbacks;
 
 import static com.negd.umangwebview.utils.Constants.DEVICE_CALLBACK_PDL_RESPONSE;
 import static com.negd.umangwebview.utils.Constants.DEVICE_CALLBACK_RESPONSE;
+import static com.negd.umangwebview.utils.Constants.DEVICE_TKN_RESPONSE;
 
 import android.Manifest;
 import android.app.Dialog;
@@ -1275,6 +1276,7 @@ public class CommonInterface implements OnDatePicker {
             jsonObject.put("sdkVersion", BuildConfig.VERSION_CODE);
             jsonObject.put("ver", "160");
             callbackListener.setSharedPreferencesValue(DEVICE_CALLBACK_RESPONSE, jsonObject.toString());
+            callbackListener.setSharedPreferencesValue(DEVICE_TKN_RESPONSE, userInfo.getString("tkn"));
         } catch (Exception e) {
             e.printStackTrace();
         }

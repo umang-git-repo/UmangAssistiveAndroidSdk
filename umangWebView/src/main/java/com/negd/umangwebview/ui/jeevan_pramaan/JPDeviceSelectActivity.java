@@ -1,6 +1,9 @@
 package com.negd.umangwebview.ui.jeevan_pramaan;
 
+import static com.negd.umangwebview.utils.Constants.DEVICE_TKN_RESPONSE;
+
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.view.WindowManager;
@@ -14,15 +17,21 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 import com.negd.umangwebview.R;
+import com.negd.umangwebview.data.AppSharedPreferences;
 import com.negd.umangwebview.data.adapter.RecyclerViewAdapter;
 import com.negd.umangwebview.data.api.APIClient;
 import com.negd.umangwebview.data.api.APIInterface;
 import com.negd.umangwebview.data.model.biomodel.DeviceData;
 import com.negd.umangwebview.data.model.biomodel.DeviceListResponse;
 import com.negd.umangwebview.data.model.biomodel.RdDeviceRequest;
+import com.negd.umangwebview.utils.CommonUtils;
 import com.negd.umangwebview.utils.DeviceUtils;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,27 +49,40 @@ public class JPDeviceSelectActivity extends AppCompatActivity implements Recycle
             helpDes = "", email = "", phone = "", userManual = "";
     private ImageView image_back;
     private TextView tv_header;
+    EncryptionDecryptionHelper encryptionDecryptionHelper = new EncryptionDecryptionHelper();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_j_p_device_select);
         mRecyclerView = findViewById(R.id.rv_devices);
         image_back = findViewById(R.id.img_logo);
         tv_header = findViewById(R.id.header_txt);
+        try {
+            if(getSupportActionBar()!=null) {
+                getSupportActionBar().hide();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-
+        AppSharedPreferences appSharedPreferences = null;
+        try {
+            appSharedPreferences = AppSharedPreferences.getInstance(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         RdDeviceRequest request = new RdDeviceRequest();
         request.setLang("en");
-        request.setVer("140");
+        request.setVer("160");
         request.setAcc("");
-        request.setClid("");
+        request.setClid(DeviceUtils.getCellId(this));
         request.setPeml("");
         request.setDid(DeviceUtils.getDeviceId(this));
         request.setImei("");
-        request.setLac("");
+        request.setLac(DeviceUtils.getLAC(this));
         request.setLat("");
         request.setLon("");
         request.setHmk(DeviceUtils.getDeviceMake());
@@ -70,24 +92,51 @@ public class JPDeviceSelectActivity extends AppCompatActivity implements Recycle
         request.setOs(DeviceUtils.getMobileOS());
         request.setRot("no");
         request.setMod("app");
+        request.setDeviceOsVersion(DeviceUtils.getMobileOSVersion());
+        request.setDeviceImsi("");
+        request.setUserAadhar("");
+        request.setNode("");
+        request.setAppPackage("in.gov.umang.negd.g2c");
+        request.setTkn(appSharedPreferences.getStringPreference(DEVICE_TKN_RESPONSE, ""));
+        String requestString = new Gson().toJson(request);
 
-        APIInterface apiInterface = APIClient.getClient().create(APIInterface.class);
-        Call<DeviceListResponse> call = apiInterface.getDeviceList(request);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
-        call.enqueue(new Callback<DeviceListResponse>() {
-            @Override
-            public void onResponse(Call<DeviceListResponse> call, Response<DeviceListResponse> response) {
-                rdResponsesList = response.body().getPd().getDeviceList();
-                mRecyclerView.setAdapter(new RecyclerViewAdapter(JPDeviceSelectActivity.this, rdResponsesList, JPDeviceSelectActivity.this));
+            try {
+                APIInterface apiInterface = APIClient.getClient().create(APIInterface.class);
+                Call<String> call = apiInterface.getDeviceList(
+                        encryptionDecryptionHelper.getMD5(requestString),
+                        encryptionDecryptionHelper.encryptAes(requestString));
+                mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+                mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+
+                call.enqueue(new Callback<String>() {
+                    @Override
+                    public void onResponse(Call<String> call, Response<String> response) {
+                        try {
+                            DeviceListResponse deviceListResponse = encryptionDecryptionHelper.getDecryptedObject(response.body(), DeviceListResponse.class);
+                            if(deviceListResponse!=null) {
+                                if(deviceListResponse.getPd()!=null) {
+                                    rdResponsesList = deviceListResponse.getPd().getDeviceList();
+                                    mRecyclerView.setAdapter(new RecyclerViewAdapter(JPDeviceSelectActivity.this, rdResponsesList, JPDeviceSelectActivity.this));
+                                }
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+//                    rdResponsesList = response.body().getPd().getDeviceList();
+//                    mRecyclerView.setAdapter(new RecyclerViewAdapter(JPDeviceSelectActivity.this, rdResponsesList, JPDeviceSelectActivity.this));
+                    }
+
+                    @Override
+                    public void onFailure(Call<String> call, Throwable t) {
+                        Toast.makeText(JPDeviceSelectActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
+            } catch (Exception e) {
             }
-
-            @Override
-            public void onFailure(Call<DeviceListResponse> call, Throwable t) {
-                Toast.makeText(JPDeviceSelectActivity.this,t.getMessage(),Toast.LENGTH_LONG).show();
-            }
-        });
+        }
         tv_header.setText(getResources().getString(R.string.select_your_biometric_device));
         image_back.setOnClickListener(view -> {
             finish();

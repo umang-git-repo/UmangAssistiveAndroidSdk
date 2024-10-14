@@ -58,6 +58,13 @@ public class DeviceInfoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device_info);
         binding = ActivityDeviceInfoBinding.inflate(getLayoutInflater());
+        try {
+            if(getSupportActionBar()!=null) {
+                getSupportActionBar().hide();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         View view = binding.getRoot();
         setContentView(view);
         mProgressDialog = new ProgressDialog(DeviceInfoActivity.this);

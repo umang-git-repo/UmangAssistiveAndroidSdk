@@ -16,6 +16,7 @@ public class Constants {
    public static final String DEVICE_DATKN = "device_datkn";
    public static final String DEVICE_DRTKN = "device_darkn";
    public static final String DEVICE_CALLBACK_RESPONSE = "device_callback_response";
+   public static final String DEVICE_TKN_RESPONSE = "device_tkn_response";
    public static final String DEVICE_CALLBACK_PDL_RESPONSE = "device_callback_pdl_response";
    public static final String NSSO_PAYLOAD = "nsso_payload";
    public static final String NSSO_JWT_TOKEN = "nsso_jwt_token";

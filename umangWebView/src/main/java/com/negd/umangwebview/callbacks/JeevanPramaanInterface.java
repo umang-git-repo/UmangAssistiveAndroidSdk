@@ -193,7 +193,7 @@ public class JeevanPramaanInterface {
     @JavascriptInterface
     public void startFaceScannerRD() {
         AppLogger.d(TAG, "startFaceScannerRD");
-        startFaceRdScanIntent(faceScanXMLRequestLauncher);
+        startFaceRdScanIntent(faceScanRequestLauncher);
     }
 
     /**
@@ -202,7 +202,7 @@ public class JeevanPramaanInterface {
     @JavascriptInterface
     public void startFaceScannerRDForXml() {
         AppLogger.d(TAG, "startFaceScannerRDForXml");
-        startFaceRdScanIntent(faceScanRequestLauncher);
+        startFaceRdScanIntent(faceScanXMLRequestLauncher);
     }
 
     /**
@@ -921,7 +921,7 @@ public class JeevanPramaanInterface {
 
         Gson gson = new Gson();
         String strWithEscape = gson.toJson(dataJson);
-        listener.loadWebUrl("javascript:scanResult($strWithEscape)");
+        listener.loadWebUrl("javascript:scanResult(" + strWithEscape + ")");
     }
 
     private void handleJeevanPramaanResult(ActivityResult result, int requestCode) {
