@@ -42,5 +42,7 @@ public interface ICommonCallbackListener {
 
     void shareBase64(String base64, String shareText);
 
+    void showDepartmentHeader(String headerName);
+
 
 }

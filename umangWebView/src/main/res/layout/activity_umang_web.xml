@@ -12,6 +12,8 @@
     <LinearLayout
         android:id="@+id/ll_header"
         android:orientation="vertical"
+        android:visibility="gone"
+        tools:visibility="visible"
         android:layout_alignParentTop="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -29,6 +31,7 @@
         android:contentInsetEnd="0dp"
         app:contentInsetRight="0dp"
         app:contentInsetEnd="0dp"
+            tools:visibility="visible"
         android:background="@color/white">
 
         <LinearLayout
@@ -70,10 +73,30 @@
             android:layout_height="wrap_content" />
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/ll_dept_header"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:paddingVertical="@dimen/margin_8dp"
+        android:paddingHorizontal="@dimen/margin_18dp"
+        android:layout_below="@id/ll_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_dept_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/umangBlue"
+            android:textSize="@dimen/text_14sp"
+            android:fontFamily="@font/noto_sans_bold"
+            tools:text="Department Name "/>
+    </LinearLayout>
+
 <!--    Layout to show WebView-->
     <LinearLayout
         android:id="@+id/main"
-        android:layout_below="@id/ll_header"
+        android:layout_below="@id/ll_dept_header"
         android:layout_above="@+id/ll_footer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

@@ -381,9 +381,11 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             }
 
             if (intent.hasExtra(Constants.DEPT_NAME)) {
+                showHideHeaderFooters(true);
                 binding.toolBar.setVisibility(View.VISIBLE);
                 binding.headerTxt.setText(intent.getStringExtra(Constants.DEPT_NAME));
             } else if(intent.hasExtra(Constants.CUSTOM_HEADER_LAYOUT_ID)) {
+                showHideHeaderFooters(true);
                 int layoutId = getIntent().getIntExtra(Constants.CUSTOM_HEADER_LAYOUT_ID, 0);
                 int viewId = getIntent().getIntExtra(Constants.CUSTOM_HEADER_VIEW_CLICK_ID, 0);
                 boolean closeSdkOnClick = getIntent().getBooleanExtra(Constants.CUSTOM_HEADER_CLOSE_SDK_ON_CLICK, false);
@@ -499,6 +501,9 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
     private void showHideHeaderFooters(boolean isVisible) {
         binding.llFooter.setVisibility(isVisible? View.VISIBLE: View.GONE);
         binding.llHeader.setVisibility(isVisible? View.VISIBLE: View.GONE);
+        if(!binding.tvDeptName.getText().toString().isEmpty()) {
+            binding.llDeptHeader.setVisibility(isVisible? View.VISIBLE: View.GONE);
+        }
         try {
             if(getSupportActionBar()!=null) {
                 getSupportActionBar().hide();
@@ -4313,6 +4318,21 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
      public void shareBase64(String base64, String shareText) {
         CommonUtils.shareImageViaShareIntent(this, CommonUtils.imageBase64ToUri(this, base64), shareText);
      }
+
+    @Override
+    public void showDepartmentHeader(String headerName) {
+        runOnUiThread(() -> {
+            binding.tvDeptName.setText(headerName);
+            if (headerName.isEmpty()) {
+                binding.llDeptHeader.setVisibility(View.GONE);
+            } else {
+                // Used a handler to delay the visibility change if the headerName is not empty
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    binding.llDeptHeader.setVisibility(View.VISIBLE);
+                }, 1000);
+            }
+        });
+    }
 
 
     class CustomWebChromeClient extends WebChromeClient {

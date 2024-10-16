@@ -6,6 +6,8 @@ import static com.negd.umangwebview.utils.Constants.DEVICE_TKN_RESPONSE;
 
 import android.Manifest;
 import android.app.Dialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -1243,6 +1245,31 @@ public class CommonInterface implements OnDatePicker {
         }
     }
 
+    @JavascriptInterface
+    public void copyToClipboard(String data) {
+        ClipboardManager clipboard = (ClipboardManager) act.getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("simple text", data);
+        clipboard.setPrimaryClip(clip);
+    }
+
+    @JavascriptInterface
+    public void setDepartmentHeader(String json) {
+        try {
+            if(json!=null) {
+                JSONObject jsonObject = new JSONObject(json);
+                String name = jsonObject.getString("deptName");
+                if(name==null) {
+                    name = "";
+                }
+                callbackListener.showDepartmentHeader(name);
+            } else  {
+                callbackListener.showDepartmentHeader("");
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+            callbackListener.showDepartmentHeader("");
+        }
+    }
 
   /*  private String getSharedPreferences(String key, String defaultValue) {
         return getSharedPreferences().getString(key, defaultValue);

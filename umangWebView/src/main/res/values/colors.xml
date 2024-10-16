@@ -124,4 +124,5 @@
     <dimen name="scanPadding">16dp</dimen>
 
     <color name="text_color_new">#302F2F</color>
+    <color name="umangBlue">#00599f</color>
 </resources>
