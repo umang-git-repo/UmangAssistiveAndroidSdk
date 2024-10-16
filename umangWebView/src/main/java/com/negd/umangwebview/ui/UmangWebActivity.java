@@ -2,6 +2,7 @@ package com.negd.umangwebview.ui;
 
 import static com.negd.umangwebview.utils.Constants.FACE_SCAN_REQUEST_CODE;
 import static com.negd.umangwebview.utils.Constants.FACE_SCAN_XML_REQUEST_CODE;
+import static com.negd.umangwebview.utils.Constants.ENABLE_DEPT_HEADER;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
@@ -380,10 +381,14 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                 this.serviceId = intent.getStringExtra(Constants.DEPT_ID);
             }
 
-            if (intent.hasExtra(Constants.DEPT_NAME)) {
+            if (intent.getBooleanExtra(ENABLE_DEPT_HEADER, false) || intent.hasExtra(Constants.DEPT_NAME)) {
+                String departmentTitle = intent.getStringExtra(Constants.DEPT_NAME);
+                if(departmentTitle==null) {
+                    departmentTitle = "";
+                }
                 showHideHeaderFooters(true);
                 binding.toolBar.setVisibility(View.VISIBLE);
-                binding.headerTxt.setText(intent.getStringExtra(Constants.DEPT_NAME));
+                binding.headerTxt.setText(departmentTitle);
             } else if(intent.hasExtra(Constants.CUSTOM_HEADER_LAYOUT_ID)) {
                 showHideHeaderFooters(true);
                 int layoutId = getIntent().getIntExtra(Constants.CUSTOM_HEADER_LAYOUT_ID, 0);

@@ -14,6 +14,7 @@ public class UmangAssistiveAndroidSdk {
 
    private final String deptUrl;
    private final String deptHeader;
+   private final boolean enableDeptHeader;
    private final String deptId;
    private final String serviceId;
    private final String backButtonColor;
@@ -37,6 +38,7 @@ public class UmangAssistiveAndroidSdk {
    {
       this.deptUrl=builder.deptUrl;
       this.deptHeader=builder.deptHeader;
+      this.enableDeptHeader=builder.enableDeptHeader;
       this.deptId=builder.deptId;
       this.serviceId=builder.serviceId;
       this.backButtonColor=builder.backButtonColor;
@@ -76,7 +78,7 @@ public class UmangAssistiveAndroidSdk {
          if(deptHeader!=null && deptHeader.trim().length()>0){
             intent.putExtra(Constants.DEPT_NAME,deptHeader);
          }
-
+         intent.putExtra(Constants.ENABLE_DEPT_HEADER, enableDeptHeader);
          if(backButtonColor!=null && backButtonColor.trim().length()>0){
             intent.putExtra(Constants.BACK_BUTTON_COLOR,backButtonColor);
          }
@@ -122,6 +124,7 @@ public class UmangAssistiveAndroidSdk {
    public static class Builder{
       private String deptUrl;
       private String deptHeader;
+      private boolean enableDeptHeader;
       private String deptId;
       private String serviceId;
       private String backButtonColor;
@@ -152,6 +155,10 @@ public class UmangAssistiveAndroidSdk {
 
       public Builder setDeptHeader(String deptHeader) {
          this.deptHeader = deptHeader;
+         return this;
+      }
+      public Builder enableDeptHeader(boolean enableDeptHeader) {
+         this.enableDeptHeader = enableDeptHeader;
          return this;
       }
 

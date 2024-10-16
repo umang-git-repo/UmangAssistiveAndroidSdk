@@ -6,6 +6,7 @@ public class Constants {
    public static final String DEPT_URL="url";
    public static final String DEPT_NAME="name";
    public static final String DEPT_ID="deptId";
+   public static final String ENABLE_DEPT_HEADER="enabledept_header";
    public static final String SERVICE_ID="serviceId";
    public static final String BACK_BUTTON_COLOR="backButtonColor";
    public static final String HEADER_TEXT_COLOR="headerTextColor";
