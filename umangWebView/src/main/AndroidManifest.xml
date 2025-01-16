@@ -54,14 +54,21 @@
             />
 
         <activity
+            android:exported="false"
             android:name="com.canhub.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />
 
-        <activity android:name=".ui.jeevan_pramaan.JPDeviceSelectActivity"/>
+        <activity
+            android:exported="false"
+            android:name=".ui.jeevan_pramaan.JPDeviceSelectActivity"/>
 
-        <activity android:name=".ui.jeevan_pramaan.DeviceInfoActivity"/>
+        <activity
+            android:exported="false"
+            android:name=".ui.jeevan_pramaan.DeviceInfoActivity"/>
 
-        <activity android:name=".ui.jeevan_pramaan.OtherDeviceActivity"/>
+        <activity
+            android:exported="false"
+            android:name=".ui.jeevan_pramaan.OtherDeviceActivity"/>
 
         <provider
             android:name=".utils.UmangFileProvider"
