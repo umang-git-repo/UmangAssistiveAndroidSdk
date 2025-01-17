@@ -18,7 +18,7 @@ android {
 
     buildTypes.all {
         buildConfigField "String", "VERSION_NAME", "\"1.1.8\"" // Escaping quote marks to convert property to String
-        buildConfigField "int", "VERSION_CODE", "31"
+        buildConfigField "int", "VERSION_CODE", "32"
     }
 
     buildTypes {
