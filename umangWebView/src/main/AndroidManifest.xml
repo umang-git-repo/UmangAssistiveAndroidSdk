@@ -54,7 +54,6 @@
             />
 
         <activity
-            android:exported="false"
             android:name="com.canhub.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />
 
