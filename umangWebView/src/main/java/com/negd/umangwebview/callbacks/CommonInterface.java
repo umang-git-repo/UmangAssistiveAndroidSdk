@@ -1317,6 +1317,8 @@ public class CommonInterface implements OnDatePicker {
                 JSONArray pdl = new JSONArray(callbackListener.getSharedPreferencesValue(DEVICE_CALLBACK_PDL_RESPONSE, ""));
                 jsonObject.put("pdl", pdl);
             }
+            jsonObject.remove("sdkVersion");
+            jsonObject.put("sdkVersion", BuildConfig.VERSION_CODE);
             return jsonObject.toString();
         } catch (Exception e) {
             e.printStackTrace();
