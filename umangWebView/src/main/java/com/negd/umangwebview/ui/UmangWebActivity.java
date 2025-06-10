@@ -606,6 +606,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
             @Override
             public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+                String message = "SSL Certificate error. ";
 
                 try {
 
@@ -615,8 +616,30 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                         // Check if Cert-Domain equals the Uri-Domain
                         String certDomain = serverCertificate.getIssuedTo().getCName();
 
-                        Toast.makeText(UmangWebActivity.this, "URL-> " + error.getUrl(), Toast.LENGTH_LONG).show();
-                        Toast.makeText(UmangWebActivity.this, "DOMAIN-> " + certDomain, Toast.LENGTH_LONG).show();
+//                        Toast.makeText(UmangWebActivity.this, "URL-> " + error.getUrl(), Toast.LENGTH_LONG).show();
+//                        Toast.makeText(UmangWebActivity.this, "DOMAIN-> " + certDomain, Toast.LENGTH_LONG).show();
+                        switch (error.getPrimaryError()) {
+                            case SslError.SSL_UNTRUSTED:
+                                message = "The certificate authority is not trusted.";
+                                break;
+                            case SslError.SSL_EXPIRED:
+                                message = "The certificate has expired.";
+                                break;
+                            case SslError.SSL_IDMISMATCH:
+                                message = "The certificate hostname mismatch.";
+                                break;
+                            case SslError.SSL_NOTYETVALID:
+                                message = "The certificate is not yet valid.";
+                                break;
+                            case SslError.SSL_DATE_INVALID:
+                                message = "The certificate date is invalid";
+                                break;
+                            case SslError.SSL_INVALID:
+                                message = "A generic SSL error occured";
+                                break;
+                            default:
+                                message = "An unknown SSL error occurred.";
+                        }
 
 
                         Log.e("URL->", error.getUrl());
@@ -625,10 +648,11 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
+                message += " \nThe department page you are trying to open is not secure. Do you want to continue anyway?";
 
                 try {
                     final AlertDialog.Builder builder = new AlertDialog.Builder(UmangWebActivity.this);
-                    builder.setMessage("SSL Certificate error . Do you want to continue ?");
+                    builder.setMessage(message);
                     builder.setPositiveButton("continue", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -4339,6 +4363,23 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
         });
     }
 
+    @Override
+    public String getAesEncryptedMobileNumber() {
+        if(getIntent() == null || getIntent().getStringExtra(Constants.SDK_LOGGED_IN_USER_MOBILE_NUMBER) == null) {
+            return "";
+        } else {
+            return new AESUtil().aesEncryption(getIntent().getStringExtra(Constants.SDK_LOGGED_IN_USER_MOBILE_NUMBER));
+        }
+    }
+
+    @Override
+    public String getServicesViewType() {
+        if(getIntent() == null || getIntent().getStringExtra(Constants.SDK_SERVICES_VIEW_TYPE) == null) {
+            return "";
+        } else {
+            return getIntent().getStringExtra(Constants.SDK_SERVICES_VIEW_TYPE);
+        }
+    }
 
     class CustomWebChromeClient extends WebChromeClient {
 

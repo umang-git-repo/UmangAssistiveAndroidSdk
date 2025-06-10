@@ -44,5 +44,9 @@ public interface ICommonCallbackListener {
 
     void showDepartmentHeader(String headerName);
 
+    String getAesEncryptedMobileNumber();
+
+    String getServicesViewType();
+
 
 }

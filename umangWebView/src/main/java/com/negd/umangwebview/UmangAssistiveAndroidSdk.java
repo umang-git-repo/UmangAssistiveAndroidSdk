@@ -24,6 +24,8 @@ public class UmangAssistiveAndroidSdk {
    private final String swipeLoaderColor;
    private final String nssoPayload;
    private final String nssoJwtToken;
+   private final String loggedInUserNumber;
+   private final SdkServicesViewType sdkServicesViewType;
    private final int customHeaderLayoutId;
    private final int customHeaderClickViewId;
    private final boolean customHeaderSdkCloseOnCick;
@@ -33,6 +35,20 @@ public class UmangAssistiveAndroidSdk {
    public static boolean openingIntent=false;
    public static IUmangAssistiveListener assistiveListener;
 
+   public enum SdkServicesViewType {
+      TOP("top"),
+      ALL("all");
+
+      private final String label;
+
+      SdkServicesViewType(String label) {
+         this.label = label;
+      }
+
+      public String getLabel() {
+         return label;
+      }
+   }
 
    public UmangAssistiveAndroidSdk(Builder builder)
    {
@@ -54,6 +70,8 @@ public class UmangAssistiveAndroidSdk {
       this.customFooterClickViewId = builder.customFooterClickViewId;
       this.customFooterSdkCloseOnCick = builder.customFooterSdkCloseOnClick;
       this.nssoJwtToken = builder.nssoJwtToken;
+      this.loggedInUserNumber = builder.loggedInUserNumber;
+      this.sdkServicesViewType = builder.sdkServicesViewType;
       UmangAssistiveAndroidSdk.assistiveListener =  builder.umangAssistiveListener;
    }
 
@@ -114,6 +132,12 @@ public class UmangAssistiveAndroidSdk {
          if(customFooterClickViewId != 0){
             intent.putExtra(Constants.CUSTOM_FOOTER_VIEW_CLICK_ID, customFooterClickViewId);
          }
+         if(loggedInUserNumber!= null && !loggedInUserNumber.trim().isEmpty()){
+            intent.putExtra(Constants.SDK_LOGGED_IN_USER_MOBILE_NUMBER, loggedInUserNumber);
+         }
+         if(sdkServicesViewType!= null){
+            intent.putExtra(Constants.SDK_SERVICES_VIEW_TYPE, sdkServicesViewType.getLabel());
+         }
          context.startActivity(intent);
 
       }catch (Exception ex){
@@ -134,6 +158,8 @@ public class UmangAssistiveAndroidSdk {
       private String swipeLoaderColor;
       private String nssoPayload;
       private String nssoJwtToken;
+      private String loggedInUserNumber;
+      private SdkServicesViewType sdkServicesViewType;
       private int customHeaderLayoutId;
       private int customHeaderClickViewId;
       private boolean customHeaderSdkCloseOnClick;
@@ -238,7 +264,14 @@ public class UmangAssistiveAndroidSdk {
          this.umangAssistiveListener = assistiveListener;
          return this;
       }
-
+      public Builder setLoggedInMobileNumber(String loggedInUserNumber) {
+         this.loggedInUserNumber = loggedInUserNumber;
+         return this;
+      }
+      public Builder setServiceViewType(SdkServicesViewType sdkServicesViewType) {
+         this.sdkServicesViewType = sdkServicesViewType;
+         return this;
+      }
       public UmangAssistiveAndroidSdk build(){
          return new UmangAssistiveAndroidSdk(this);
       }

@@ -9,12 +9,16 @@ import com.negd.umangwebview.utils.AppLogger;
 
 import org.json.JSONObject;
 
+import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import kotlin.text.Charsets;
 
 class JwtUtil {
@@ -148,6 +152,70 @@ class JwtUtil {
         }
     }
 }
+class AESUtil {
+    private final String AES_MODE = "AES/CBC/PKCS5Padding";
+    private final int AES_KEY_SIZE = 256; // Or 256 if supported
+    private final int IV_SIZE = 16;
+    private final String KEY = "5828g691d66ee77feb0986egbc29gg91"; // 256-bit (32-byte) secret key
+    // Encrypt plain text
+    public String aesEncryption(String plainText) {
+        try {
+            // Secret key (must be 32 characters for AES-256)
+            String secretKey = KEY;
+
+            // Create IV of 16 null bytes
+            byte[] iv = new byte[IV_SIZE];
+            IvParameterSpec ivSpec = new IvParameterSpec(iv);
+
+            // Prepare secret key
+            SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8), "AES");
+
+            // Initialize Cipher
+            Cipher cipher = Cipher.getInstance(AES_MODE);
+            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivSpec);
+
+            // Encrypt data
+            byte[] encryptedBytes = cipher.doFinal(plainText.getBytes(StandardCharsets.UTF_8));
+
+            // Return Base64-encoded encrypted text
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                return Base64.getEncoder().encodeToString(encryptedBytes);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+    public String aesDecryption(String base64EncryptedText) {
+        try {
+            // Create IV of 16 null bytes
+            byte[] iv = new byte[IV_SIZE];
+            IvParameterSpec ivSpec = new IvParameterSpec(iv);
+
+            // Decode Base64 input
+            byte[] cipherBytes = new byte[0];
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                cipherBytes = Base64.getDecoder().decode(base64EncryptedText);
+            }
+
+            // Prepare AES key
+            SecretKeySpec secretKeySpec = new SecretKeySpec(KEY.getBytes(StandardCharsets.UTF_8), "AES");
+
+            // Initialize Cipher
+            Cipher cipher = Cipher.getInstance(AES_MODE);
+            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivSpec);
+
+            // Decrypt and return
+            byte[] decryptedBytes = cipher.doFinal(cipherBytes);
+            return new String(decryptedBytes, StandardCharsets.UTF_8);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+   }
 
 class Pair<T, U> {
     public final T first;

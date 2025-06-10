@@ -27,6 +27,8 @@ public class Constants {
    public static final String CUSTOM_FOOTER_LAYOUT_ID = "custom_footer_layout_id";
    public static final String CUSTOM_FOOTER_VIEW_CLICK_ID = "custom_footer_view_click_id";
    public static final String CUSTOM_FOOTER_CLOSE_SDK_ON_CLICK = "custom_footer_close_sdk_on_click";
+   public static final String SDK_LOGGED_IN_USER_MOBILE_NUMBER = "sdk_logged_in_user_mobile_number";
+   public static final String SDK_SERVICES_VIEW_TYPE = "sdk_services_view_type";
 
    //choose document codes
    public static final int REQUEST_IDENTITY_PROOF = 666;

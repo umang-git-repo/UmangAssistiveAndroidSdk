@@ -1270,7 +1270,14 @@ public class CommonInterface implements OnDatePicker {
             callbackListener.showDepartmentHeader("");
         }
     }
-
+    @JavascriptInterface
+    public String getEncryptedMobileNumber() {
+        return callbackListener.getAesEncryptedMobileNumber();
+    }
+    @JavascriptInterface
+    public String getServicesViewType() {
+        return callbackListener.getServicesViewType();
+    }
   /*  private String getSharedPreferences(String key, String defaultValue) {
         return getSharedPreferences().getString(key, defaultValue);
     }
