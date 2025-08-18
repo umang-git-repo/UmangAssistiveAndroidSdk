@@ -37,6 +37,9 @@ public class MainActivity extends AppCompatActivity implements IUmangAssistiveLi
             public void onClick(View view) {
 //                String PARTNER_URL = "https://web.umang.gov.in/assistive?tenantId=spicemoney.com&domain=spicemoney.com&token=dg96341a3738jjk64y53dbdb8815ty689c271642fde03hdd4sm10f";
                 String PARTNER_URL = "https://web.umang.gov.in/assistive_stg?tenantId=spicemoney.com&domain=spicemoney.com&token=dg96341a3738jjk64y53dbdb8815ty689c271642fde03hdd4sm10f";
+                if(binding.etSpiceStagingUrl.getText().toString()!=null && !binding.etBoiStagingUrl.getText().toString().isEmpty()) {
+                    PARTNER_URL = binding.etSpiceStagingUrl.getText().toString().trim();
+                }
                 umangAssistiveAndroidSdk = UmangAssistiveAndroidSdk.Builder.newInstance()
                         .setDeptUrl(PARTNER_URL)
                         .setAssistiveListener(MainActivity.this)
@@ -54,6 +57,9 @@ public class MainActivity extends AppCompatActivity implements IUmangAssistiveLi
             @Override
             public void onClick(View view) {
                 String PARTNER_URL= "https://web.umang.gov.in/assistive?tenantId=rnfiservices.com&domain=rnfiservices.com&token=qa96341217382y6aifnrsbyty689c23a5c50cefde03r3n1f9i4";
+                if(binding.etRnfiStagingUrl.getText().toString()!=null && !binding.etBoiStagingUrl.getText().toString().isEmpty()) {
+                    PARTNER_URL = binding.etRnfiStagingUrl.getText().toString().trim();
+                }
                 umangAssistiveAndroidSdk = UmangAssistiveAndroidSdk.Builder.newInstance()
                         .setDeptUrl(PARTNER_URL)
                         .setAssistiveListener(MainActivity.this)
@@ -67,10 +73,12 @@ public class MainActivity extends AppCompatActivity implements IUmangAssistiveLi
         binding.btStartNsso.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String PARTNER_URL = "https://web.umang.gov.in/assistive_stg?tenantId=digilocker.gov.in&domain=digilocker.gov.in&token=18482b912a60126bb232240a0e47ff6eefaca1c97e6d2e0f29c13128a8dc58f8";
-//            String PARTNER_URL= "https://web.umang.gov.in/assistive?tenantId=digilocker.gov.in&domain=digilocker.gov.in&token=18482b912a60126bb232240a0e47ff6eefaca1c97e6d2e0f29c13128a8dc58f8";
+//                String PARTNER_URL = "https://web.umang.gov.in/assistive_stg?tenantId=digilocker.gov.in&domain=digilocker.gov.in&token=18482b912a60126bb232240a0e47ff6eefaca1c97e6d2e0f29c13128a8dc58f8";
+            String PARTNER_URL= "https://web.umang.gov.in/assistive?tenantId=digilocker.gov.in&domain=digilocker.gov.in&token=18482b912a60126bb232240a0e47ff6eefaca1c97e6d2e0f29c13128a8dc58f8";
 //            String PARTNER_URL= "https://web.umang.gov.in/assistive_stg?tenantId=digilocker.gov.in&domain=digilocker.gov.in&token=18482b912a60126bb232240a0e47ff6eefaca1c97e6d2e0f29c13128a8dc58f8";
-
+                if(binding.etNssoStagingUrl.getText().toString()!=null && !binding.etNssoStagingUrl.getText().toString().isEmpty()) {
+                    PARTNER_URL = binding.etNssoStagingUrl.getText().toString().trim();
+                }
                 umangAssistiveAndroidSdk = UmangAssistiveAndroidSdk.Builder.newInstance()
                         .setDeptUrl(PARTNER_URL)
                         .setNssoPayload(binding.etPayload.getText().toString().trim())
@@ -91,8 +99,11 @@ public class MainActivity extends AppCompatActivity implements IUmangAssistiveLi
             public void onClick(View view) {
                 String PARTNER_URL = "https://web.umang.gov.in/assistive?tenantId=bankofindia.co.in&domain=bankofindia.co.in&token=98339e543c8c16a58061d615d26aa46f5c43d1e9c9a8e2db509845de278a6f24";
                 String STAGING_PARTNER_URL = "https://web.umang.gov.in/assistive_stg?tenantId=bankofindia.co.in&domain=bankofindia.co.in&token=98339e543c8c16a58061d615d26aa46f5c43d1e9c9a8e2db509845de278a6f24";
+                if(binding.etBoiStagingUrl.getText().toString()!=null && !binding.etBoiStagingUrl.getText().toString().isEmpty()) {
+                    PARTNER_URL = binding.etBoiStagingUrl.getText().toString().trim();
+                }
                 umangAssistiveAndroidSdk = UmangAssistiveAndroidSdk.Builder.newInstance()
-                        .setDeptUrl(STAGING_PARTNER_URL)
+                        .setDeptUrl(PARTNER_URL)
                         .setLoggedInMobileNumber(binding.etBoiMobile.getText().toString().trim())
                         .setServiceViewType(UmangAssistiveAndroidSdk.SdkServicesViewType.ALL)
                         .setAssistiveListener(MainActivity.this)
@@ -111,8 +122,11 @@ public class MainActivity extends AppCompatActivity implements IUmangAssistiveLi
             public void onClick(View view) {
                 String PARTNER_URL = "https://web.umang.gov.in/assistive?tenantId=bankofindia.co.in&domain=bankofindia.co.in&token=98339e543c8c16a58061d615d26aa46f5c43d1e9c9a8e2db509845de278a6f24";
                 String STAGING_PARTNER_URL = "https://web.umang.gov.in/assistive_stg?tenantId=bankofindia.co.in&domain=bankofindia.co.in&token=98339e543c8c16a58061d615d26aa46f5c43d1e9c9a8e2db509845de278a6f24";
+                if(binding.etBoiStagingUrl.getText().toString()!=null && !binding.etBoiStagingUrl.getText().toString().isEmpty()) {
+                    PARTNER_URL = binding.etBoiStagingUrl.getText().toString().trim();
+                }
                 umangAssistiveAndroidSdk = UmangAssistiveAndroidSdk.Builder.newInstance()
-                        .setDeptUrl(STAGING_PARTNER_URL)
+                        .setDeptUrl(PARTNER_URL)
                         .setLoggedInMobileNumber(binding.etBoiMobile.getText().toString().trim()).
                         setServiceViewType(UmangAssistiveAndroidSdk.SdkServicesViewType.TOP)
                         .setAssistiveListener(MainActivity.this)
@@ -126,6 +140,19 @@ public class MainActivity extends AppCompatActivity implements IUmangAssistiveLi
                 umangAssistiveAndroidSdk.startUmangWebview(MainActivity.this);
             }
         });
+        binding.btLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                umangAssistiveAndroidSdk.logoutUser(MainActivity.this);
+            }
+        });
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                handleNssoDeepLink(binding.etJwt);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)

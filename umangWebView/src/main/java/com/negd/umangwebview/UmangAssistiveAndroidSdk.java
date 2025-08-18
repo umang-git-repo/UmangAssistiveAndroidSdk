@@ -1,14 +1,29 @@
 package com.negd.umangwebview;
 
+import static com.negd.umangwebview.utils.Constants.DEVICE_TKN_RESPONSE;
+
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.util.Log;
+import android.webkit.WebStorage;
 
 import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
 
+import com.google.gson.Gson;
+import com.negd.umangwebview.data.AppSharedPreferences;
+import com.negd.umangwebview.data.api.APIClient;
+import com.negd.umangwebview.data.api.APIInterface;
+import com.negd.umangwebview.data.model.biomodel.RdDeviceRequest;
 import com.negd.umangwebview.ui.UmangWebActivity;
+import com.negd.umangwebview.ui.jeevan_pramaan.EncryptionDecryptionHelper;
 import com.negd.umangwebview.utils.Constants;
+import com.negd.umangwebview.utils.DeviceUtils;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class UmangAssistiveAndroidSdk {
 
@@ -145,6 +160,14 @@ public class UmangAssistiveAndroidSdk {
       }
    }
 
+   public void logoutUser(Context context){
+      try {
+         logoutAndClear(context);
+      } catch (Exception ex){
+
+      }
+   }
+
    public static class Builder{
       private String deptUrl;
       private String deptHeader;
@@ -277,6 +300,65 @@ public class UmangAssistiveAndroidSdk {
       }
 
 
+
+   }
+   private void logoutAndClear(Context context) {
+      // Clearing WebStorage
+      WebStorage.getInstance().deleteAllData();
+      EncryptionDecryptionHelper encryptionDecryptionHelper = new EncryptionDecryptionHelper();
+      AppSharedPreferences appSharedPreferences = null;
+      try {
+         appSharedPreferences = AppSharedPreferences.getInstance(context);
+         String token = appSharedPreferences.getStringPreference(DEVICE_TKN_RESPONSE, "");
+         // Clearing AppSharedPreferences
+         appSharedPreferences.deleteAllPreference();
+         // Clearing user session by logging out user
+         RdDeviceRequest request = new RdDeviceRequest();
+         request.setLang("en");
+         request.setVer("160");
+         request.setAcc("");
+         request.setClid(DeviceUtils.getCellId(context));
+         request.setPeml("");
+         request.setDid(DeviceUtils.getDeviceId(context));
+         request.setImei("");
+         request.setLac(DeviceUtils.getLAC(context));
+         request.setLat("");
+         request.setLon("");
+         request.setHmk(DeviceUtils.getDeviceMake());
+         request.setMcc(DeviceUtils.getMCC(context));
+         request.setMnc(DeviceUtils.getMNC(context));
+         request.setHmd(DeviceUtils.getDeviceModel());
+         request.setOs(DeviceUtils.getMobileOS());
+         request.setRot("no");
+         request.setMod("app");
+         request.setDeviceOsVersion(DeviceUtils.getMobileOSVersion());
+         request.setDeviceImsi("");
+         request.setUserAadhar("");
+         request.setNode("");
+         request.setAppPackage("in.gov.umang.negd.g2c");
+          request.setTkn(token);
+         String requestString = new Gson().toJson(request);
+         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            try {
+               APIInterface apiInterface = APIClient.getClient().create(APIInterface.class);
+               Call<String> call = apiInterface.logoutUser(
+                       encryptionDecryptionHelper.getMD5(requestString),
+                       encryptionDecryptionHelper.encryptAes(requestString));
+               call.enqueue(new Callback<String>() {
+                  @Override
+                  public void onResponse(Call<String> call, Response<String> response) {
+                  }
+                  @Override
+                  public void onFailure(Call<String> call, Throwable t) {
+                  }
+               });
+            } catch (Exception e) {
+               e.printStackTrace();
+            }
+         }
+      } catch (Exception e) {
+         e.printStackTrace();
+      }
 
    }
 }

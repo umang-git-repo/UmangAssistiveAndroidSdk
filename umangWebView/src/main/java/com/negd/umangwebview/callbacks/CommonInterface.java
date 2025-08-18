@@ -1275,6 +1275,10 @@ public class CommonInterface implements OnDatePicker {
         return callbackListener.getAesEncryptedMobileNumber();
     }
     @JavascriptInterface
+    public String getMobileNumber() {
+        return callbackListener.getMobileNumber();
+    }
+    @JavascriptInterface
     public String getServicesViewType() {
         return callbackListener.getServicesViewType();
     }

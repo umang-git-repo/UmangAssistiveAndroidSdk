@@ -1,4 +1,6 @@
 package com.negd.umangwebview.data.api;
+import static com.negd.umangwebview.utils.AppConstants.LOGOUT_API_ENDPOINT;
+
 import com.negd.umangwebview.data.model.biomodel.DeviceListResponse;
 import com.negd.umangwebview.data.model.biomodel.RdDeviceRequest;
 
@@ -20,4 +22,8 @@ public  interface APIInterface {
     @POST("core-encv1/ws1/biolist")
     Call<String> getDeviceList(@Header("X-REQUEST-VALUE") String requestValue,
                                @Body String deviceRequest);
+
+    @POST(LOGOUT_API_ENDPOINT)
+    Call<String> logoutUser(@Header("X-REQUEST-VALUE") String requestValue, @Body String requestBody);
+
 }

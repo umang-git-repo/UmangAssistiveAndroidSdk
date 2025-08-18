@@ -46,6 +46,8 @@ public interface ICommonCallbackListener {
 
     String getAesEncryptedMobileNumber();
 
+    String getMobileNumber();
+
     String getServicesViewType();
 
 

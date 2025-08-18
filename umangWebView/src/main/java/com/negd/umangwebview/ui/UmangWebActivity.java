@@ -4373,6 +4373,15 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
     }
 
     @Override
+    public String getMobileNumber() {
+        if(getIntent() == null || getIntent().getStringExtra(Constants.SDK_LOGGED_IN_USER_MOBILE_NUMBER) == null) {
+            return "";
+        } else {
+            return getIntent().getStringExtra(Constants.SDK_LOGGED_IN_USER_MOBILE_NUMBER);
+        }
+    }
+
+    @Override
     public String getServicesViewType() {
         if(getIntent() == null || getIntent().getStringExtra(Constants.SDK_SERVICES_VIEW_TYPE) == null) {
             return "";
