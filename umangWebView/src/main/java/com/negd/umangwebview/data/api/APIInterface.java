@@ -1,4 +1,5 @@
 package com.negd.umangwebview.data.api;
+import static com.negd.umangwebview.utils.AppConstants.JEEVAN_PRAMAAN_BIOMETRIC_LIST_API_ENDPOINT;
 import static com.negd.umangwebview.utils.AppConstants.LOGOUT_API_ENDPOINT;
 
 import com.negd.umangwebview.data.model.biomodel.DeviceListResponse;
@@ -19,7 +20,7 @@ public  interface APIInterface {
 //    @POST("coreapi/2.0/openbiolist")
 //    @POST("https://apigw.umangapp.in/core-encv1/ws1/biolist")
 //    Call<DeviceListResponse> getDeviceList(@Body RdDeviceRequest deviceRequest);
-    @POST("core-encv1/ws1/biolist")
+    @POST(JEEVAN_PRAMAAN_BIOMETRIC_LIST_API_ENDPOINT)
     Call<String> getDeviceList(@Header("X-REQUEST-VALUE") String requestValue,
                                @Body String deviceRequest);
 

@@ -319,6 +319,7 @@ public final class AppConstants {
     public static final float FONT_NORMAL = 1.0f;
     public static final float FONT_LARGE = 1.15f;
     public static final String LOGOUT_API_ENDPOINT = "core-profile/ws1/logout";
+    public static final String JEEVAN_PRAMAAN_BIOMETRIC_LIST_API_ENDPOINT = "core-profile/ws1/biolist";
 
 
 }
