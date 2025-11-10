@@ -164,7 +164,7 @@ public class DeviceInfoActivity extends AppCompatActivity {
             }
         });
         //add layout
-        addLayout();
+//        addLayout();
     }
     @Override
     protected void onResume() {

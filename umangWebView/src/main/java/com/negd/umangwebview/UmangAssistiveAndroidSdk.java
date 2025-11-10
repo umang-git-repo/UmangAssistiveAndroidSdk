@@ -40,7 +40,7 @@ public class UmangAssistiveAndroidSdk {
    private final String nssoPayload;
    private final String nssoJwtToken;
    private final String loggedInUserNumber;
-   private final SdkServicesViewType sdkServicesViewType;
+   private SdkServicesViewType sdkServicesViewType;
    private final int customHeaderLayoutId;
    private final int customHeaderClickViewId;
    private final boolean customHeaderSdkCloseOnCick;
@@ -98,7 +98,7 @@ public class UmangAssistiveAndroidSdk {
          if(deptUrl!=null && deptUrl.trim().length()>0){
             intent.putExtra(Constants.DEPT_URL,deptUrl);
          }else{
-            Log.e("Dept Url Error","Department url not set");
+//            Log.e("Dept Url Error","Department url not set");
             return;
          }
 
@@ -156,6 +156,13 @@ public class UmangAssistiveAndroidSdk {
          context.startActivity(intent);
 
       }catch (Exception ex){
+
+      }
+   }
+   public void setSdkServicesViewType(SdkServicesViewType sdkServicesViewType){
+      try {
+         this.sdkServicesViewType = sdkServicesViewType;
+      } catch (Exception ex){
 
       }
    }
