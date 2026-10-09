@@ -75,7 +75,7 @@ public class DownloadInterface {
         digiUrl = url;
         digiJson = jsonString;
 
-        if (ContextCompat.checkSelfPermission(mAct,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(mAct,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -100,7 +100,7 @@ public class DownloadInterface {
         digiUrl = url;
         digiJson = jsonString;
 
-        if (ContextCompat.checkSelfPermission(mAct,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(mAct,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -143,7 +143,7 @@ public class DownloadInterface {
         this.chapterId = chapterId;
 
 
-        if (ContextCompat.checkSelfPermission(mAct,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(mAct,
                 Manifest.permission.READ_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -358,7 +358,7 @@ public class DownloadInterface {
         this.json=json;
         panCallbackMethod = callbackMethod;
 
-        if (ContextCompat.checkSelfPermission(mAct,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(mAct,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -411,7 +411,7 @@ public class DownloadInterface {
         panCallbackMethod = callbackMethod;
         mFoldername = foldername;
 
-        if (ContextCompat.checkSelfPermission(mAct,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(mAct,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -525,7 +525,7 @@ public class DownloadInterface {
         mFileURL = url;
 
 
-        if (ContextCompat.checkSelfPermission(mAct,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(mAct,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -812,8 +812,13 @@ public class DownloadInterface {
             }
             request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, toFilename + ".pdf");
 
-            mAct.registerReceiver(attachmentDownloadCompleteReceive, new IntentFilter(
-                    DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                mAct.registerReceiver(attachmentDownloadCompleteReceive, new IntentFilter(
+                        DownloadManager.ACTION_DOWNLOAD_COMPLETE), Context.RECEIVER_EXPORTED);
+            } else {
+                mAct.registerReceiver(attachmentDownloadCompleteReceive, new IntentFilter(
+                        DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+            }
 
             final DownloadManager dm = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
 

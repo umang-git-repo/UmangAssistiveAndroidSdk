@@ -1,11 +1,18 @@
 package com.negd.umangwebview.callbacks;
 
+import static com.negd.umangwebview.utils.Constants.DEVICE_CALLBACK_PDL_RESPONSE;
+import static com.negd.umangwebview.utils.Constants.DEVICE_CALLBACK_RESPONSE;
+import static com.negd.umangwebview.utils.Constants.DEVICE_TKN_RESPONSE;
+
 import android.Manifest;
 import android.app.Dialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.ColorDrawable;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.net.ConnectivityManager;
@@ -20,8 +27,11 @@ import android.print.PrintManager;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
@@ -30,15 +40,20 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
+import com.negd.umangwebview.BuildConfig;
 import com.negd.umangwebview.R;
 import com.negd.umangwebview.UmangAssistiveAndroidSdk;
+import com.negd.umangwebview.listeners.ICommonCallbackListener;
 import com.negd.umangwebview.ui.BarCodeScannerActivity;
 import com.negd.umangwebview.ui.DatePickerFragmentDepartment;
 import com.negd.umangwebview.ui.OnDatePicker;
 import com.negd.umangwebview.ui.UmangWebActivity;
+import com.negd.umangwebview.utils.CommonUtils;
 import com.negd.umangwebview.utils.Constants;
+import com.negd.umangwebview.utils.DeviceUtils;
 import com.negd.umangwebview.utils.Utils;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -51,10 +66,13 @@ import java.util.List;
 public class CommonInterface implements OnDatePicker {
 
     private UmangWebActivity act;
+    public boolean isCalled = true;
+    public ICommonCallbackListener callbackListener;
 
 
     public CommonInterface(UmangWebActivity activity) {
         this.act = activity;
+        callbackListener = activity;
     }
 
     /**
@@ -87,6 +105,8 @@ public class CommonInterface implements OnDatePicker {
     public void openWebView(String url, String title) {
         Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         act.startActivity(i);
+
+
     }
 
     /**
@@ -137,7 +157,7 @@ public class CommonInterface implements OnDatePicker {
         jp_successCallback = successCallback;
         jp_failureCallback = failureCallback;
 
-        if (ContextCompat.checkSelfPermission(act,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(act,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -146,7 +166,7 @@ public class CommonInterface implements OnDatePicker {
 
                 //show dialog
                 Utils.openPermissionSettingsDialog(act, act.getResources().getString(R.string.allow_write_storage_permission_help_text));
-                final String type="JEEVAN_PRAMAAN_PERMISSION";
+                final String type = "JEEVAN_PRAMAAN_PERMISSION";
 
             } else {
                 ActivityCompat.requestPermissions(act,
@@ -187,7 +207,7 @@ public class CommonInterface implements OnDatePicker {
         nps_fileData = fileData;
         nps_fileName = fileName;
 
-        if (ContextCompat.checkSelfPermission(act,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(act,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -196,7 +216,7 @@ public class CommonInterface implements OnDatePicker {
 
                 //show dialog
                 Utils.openPermissionSettingsDialog(act, act.getResources().getString(R.string.allow_write_storage_permission_help_text));
-                final String type="WRITE_PERMISSION";
+                final String type = "WRITE_PERMISSION";
                 //   ((CommonWebViewActivity)act).openDialog("",act.getResources().getString(R.string.allow_write_storage_permission_help_text),"OK","CANCEL",type);
 
             } else {
@@ -223,7 +243,7 @@ public class CommonInterface implements OnDatePicker {
         nps_fileData = fileData;
         nps_fileName = fileName;
 
-        if (ContextCompat.checkSelfPermission(act,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(act,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -232,7 +252,7 @@ public class CommonInterface implements OnDatePicker {
 
                 //show dialog
                 Utils.openPermissionSettingsDialog(act, act.getResources().getString(R.string.allow_write_storage_permission_help_text));
-                final String type="WRITE_PERMISSION";
+                final String type = "WRITE_PERMISSION";
                 // ((CommonWebViewActivity)act).openDialog("",act.getResources().getString(R.string.allow_write_storage_permission_help_text),"OK","CANCEL",type);
 
             } else {
@@ -262,7 +282,7 @@ public class CommonInterface implements OnDatePicker {
         nps_fileData = fileData;
         nps_fileName = fileName;
 
-        if (ContextCompat.checkSelfPermission(act,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(act,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -271,7 +291,7 @@ public class CommonInterface implements OnDatePicker {
 
                 //show dialog
                 Utils.openPermissionSettingsDialog(act, act.getResources().getString(R.string.allow_write_storage_permission_help_text));
-                final String type="WRITE_PERMISSION";
+                final String type = "WRITE_PERMISSION";
                 //((CommonWebViewActivity)act).openDialog("",act.getResources().getString(R.string.allow_write_storage_permission_help_text),"OK","CANCEL",type);
 
             } else {
@@ -295,7 +315,7 @@ public class CommonInterface implements OnDatePicker {
         nps_fileData_bytes = fileBytes;
         nps_fileName = filename;
 
-        if (ContextCompat.checkSelfPermission(act,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(act,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
             Utils.openPermissionSettingsDialog(act, act.getResources().getString(R.string.allow_write_storage_permission_help_text));
@@ -303,7 +323,7 @@ public class CommonInterface implements OnDatePicker {
                     Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 
                 //show dialog
-                final String type="WRITE_PERMISSION";
+                final String type = "WRITE_PERMISSION";
                 Utils.openPermissionSettingsDialog(act, act.getResources().getString(R.string.allow_write_storage_permission_help_text));
                 // ((CommonWebViewActivity)act).openDialog("",act.getResources().getString(R.string.allow_write_storage_permission_help_text),"OK","CANCEL",type);
             } else {
@@ -318,24 +338,24 @@ public class CommonInterface implements OnDatePicker {
 
     @JavascriptInterface
     public void forceLogoutUser() {
-        Toast.makeText(act.getApplicationContext(),"You are logged out",Toast.LENGTH_LONG).show();
+        Toast.makeText(act.getApplicationContext(), "You are logged out", Toast.LENGTH_LONG).show();
         act.finish();
     }
 
     @JavascriptInterface
     public void saveWebKeyValue(String jsonStr) {
-
-        SharedPreferences pref = act.getApplicationContext().getSharedPreferences("UmangSdkPref", 0); // 0 - for private mode
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putString(Constants.PREF_WEB_KEY_VALUE,jsonStr);
-        editor.commit();
+        callbackListener.setSharedPreferencesValue(Constants.PREF_WEB_KEY_VALUE, jsonStr);
+//        SharedPreferences pref = act.getApplicationContext().getSharedPreferences("UmangSdkPref", 0); // 0 - for private mode
+//        SharedPreferences.Editor editor = pref.edit();
+//        editor.putString(Constants.PREF_WEB_KEY_VALUE, jsonStr);
+//        editor.commit();
     }
 
     @JavascriptInterface
     public String getWebKeyValue() {
-
-        SharedPreferences pref = act.getApplicationContext().getSharedPreferences("UmangSdkPref", 0); // 0 - for private mode
-        return pref.getString(Constants.PREF_WEB_KEY_VALUE,"");
+        return callbackListener.getSharedPreferencesValue(Constants.PREF_WEB_KEY_VALUE, "");
+//        SharedPreferences pref = act.getApplicationContext().getSharedPreferences("UmangSdkPref", 0); // 0 - for private mode
+//        return pref.getString(Constants.PREF_WEB_KEY_VALUE, "");
     }
 
     public static String m4agriAudioSuccessCallback;
@@ -359,7 +379,7 @@ public class CommonInterface implements OnDatePicker {
 
                 //show dialog
                 Utils.openPermissionSettingsDialog(act, act.getResources().getString(R.string.allow_write_storage_permission_help_text));
-                final String type="WRITE_PERMISSION";
+                final String type = "WRITE_PERMISSION";
                 // ((CommonWebViewActivity)act).openDialog("",act.getResources().getString(R.string.allow_write_storage_permission_help_text),"OK","CANCEL",type);
 
             } else {
@@ -379,7 +399,10 @@ public class CommonInterface implements OnDatePicker {
     public void startRecordVideo(String videoSuccessCallBack, String videoFailCallBack) {
         this.m4agriVideoSuccessCallback = videoSuccessCallBack;
         this.m4agriVideoFailureCallback = videoFailCallBack;
-        if (ContextCompat.checkSelfPermission(act, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
+        if(checkCameraPermissionCameraStorage(act, false)) {
+            ((UmangWebActivity) act).startRecordVideo();
+        }
+        /*if (ContextCompat.checkSelfPermission(act, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
                 || ContextCompat.checkSelfPermission(act, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
 
             final List<String> permissionsList = new ArrayList<String>();
@@ -412,7 +435,7 @@ public class CommonInterface implements OnDatePicker {
 
                 //show dialog
                 Utils.openPermissionSettingsDialog(act, act.getResources().getString(R.string.allow_camera_and_storage_permission_help_text));
-                final String type="WRITE_PERMISSION";
+                final String type = "WRITE_PERMISSION";
                 //((CommonWebViewActivity)act).openDialog("",act.getResources().getString(R.string.allow_camera_and_storage_permission_help_text),"OK","CANCEL",type);
 
             } else if (permissionsList.size() > 0) {
@@ -422,7 +445,7 @@ public class CommonInterface implements OnDatePicker {
 
         } else {
             ((UmangWebActivity) act).startRecordVideo();
-        }
+        }*/
     }
 
     public static String m4agriImageSuccessCallback;
@@ -432,7 +455,10 @@ public class CommonInterface implements OnDatePicker {
     public void selectImage(String imageSuccessCallBack, String imageFailCallBack) {
         this.m4agriImageSuccessCallback = imageSuccessCallBack;
         this.m4agriImageFailureCallback = imageFailCallBack;
-
+        if(checkCameraPermissionCameraStorage(act, true)) {
+            ((UmangWebActivity) act).selectImages();
+        }
+        /*
         if (ContextCompat.checkSelfPermission(act, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
                 || ContextCompat.checkSelfPermission(act, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
 
@@ -466,7 +492,7 @@ public class CommonInterface implements OnDatePicker {
 
                 //show dialog
                 Utils.openPermissionSettingsDialog(act, act.getResources().getString(R.string.allow_camera_and_storage_permission_help_text));
-                final String type="WRITE_PERMISSION";
+                final String type = "WRITE_PERMISSION";
                 //((CommonWebViewActivity)act).openDialog("",act.getResources().getString(R.string.allow_camera_and_storage_permission_help_text),"OK","CANCEL",type);
 
             } else if (permissionsList.size() > 0) {
@@ -476,7 +502,7 @@ public class CommonInterface implements OnDatePicker {
 
         } else {
             ((UmangWebActivity) act).selectImages();
-        }
+        }*/
     }
 
     public static String share_fileData;
@@ -488,7 +514,7 @@ public class CommonInterface implements OnDatePicker {
         share_fileData = fileData;
         share_fileName = fileName;
 
-        if (ContextCompat.checkSelfPermission(act,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(act,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -497,7 +523,7 @@ public class CommonInterface implements OnDatePicker {
 
                 //show dialog
                 Utils.openPermissionSettingsDialog(act, act.getResources().getString(R.string.allow_write_storage_permission_help_text));
-                final String type="WRITE_PERMISSION";
+                final String type = "WRITE_PERMISSION";
                 //((CommonWebViewActivity)act).openDialog("",act.getResources().getString(R.string.allow_write_storage_permission_help_text),"OK","CANCEL",type);
 
             } else {
@@ -521,7 +547,7 @@ public class CommonInterface implements OnDatePicker {
         act.callBackSuccessFunction = imageSuccessCallBack;
         act.callBackFailureFunction = imageFailCallBack;
 
-        if (ContextCompat.checkSelfPermission(act,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(act,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -530,7 +556,7 @@ public class CommonInterface implements OnDatePicker {
 
                 //show dialog
                 Utils.openPermissionSettingsDialog(act, act.getResources().getString(R.string.allow_read_storage_permission_help_text));
-                final String type="WRITE_PERMISSION";
+                final String type = "WRITE_PERMISSION";
                 //act.openDialog("",act.getResources().getString(R.string.allow_read_storage_permission_help_text),"OK","CANCEL",type);
             } else {
                 ActivityCompat.requestPermissions(act,
@@ -563,7 +589,7 @@ public class CommonInterface implements OnDatePicker {
     public void getPhotoFile(String imageSuccessCallBack, String imageFailCallBack) {
         act.callBackSuccessFunction = imageSuccessCallBack;
         act.callBackFailureFunction = imageFailCallBack;
-        if (ContextCompat.checkSelfPermission(act,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(act,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -572,7 +598,7 @@ public class CommonInterface implements OnDatePicker {
 
                 //show dialog
                 Utils.openPermissionSettingsDialog(act, act.getResources().getString(R.string.allow_read_storage_permission_help_text));
-                final String type="WRITE_PERMISSION";
+                final String type = "WRITE_PERMISSION";
                 //act.openDialog("",act.getResources().getString(R.string.allow_read_storage_permission_help_text),"OK","CANCEL",type);
             } else {
                 ActivityCompat.requestPermissions(act,
@@ -601,7 +627,7 @@ public class CommonInterface implements OnDatePicker {
         act.callBackSuccessFunction = successCallBack;
         act.callBackFailureFunction = failCallBack;
         act.fileSizeStr = fileSizeStr;
-        if (ContextCompat.checkSelfPermission(act,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(act,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -609,7 +635,7 @@ public class CommonInterface implements OnDatePicker {
                     Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                 //show dialog
                 Utils.openPermissionSettingsDialog(act, act.getResources().getString(R.string.allow_read_storage_permission_help_text));
-                final String type="WRITE_PERMISSION";
+                final String type = "WRITE_PERMISSION";
                 //act.openDialog("",act.getResources().getString(R.string.allow_read_storage_permission_help_text),"OK","CANCEL",type);
 
             } else {
@@ -632,7 +658,7 @@ public class CommonInterface implements OnDatePicker {
         act.callBackSuccessFunction = imageSuccessCallBack;
         act.callBackFailureFunction = imageFailCallBack;
 
-        if (ContextCompat.checkSelfPermission(act,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(act,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -641,7 +667,7 @@ public class CommonInterface implements OnDatePicker {
 
                 //show dialog
                 Utils.openPermissionSettingsDialog(act, act.getResources().getString(R.string.allow_read_storage_permission_help_text));
-                final String type="WRITE_PERMISSION";
+                final String type = "WRITE_PERMISSION";
                 //act.openDialog("",act.getResources().getString(R.string.allow_read_storage_permission_help_text),"OK","CANCEL",type);
             } else {
                 ActivityCompat.requestPermissions(act,
@@ -686,7 +712,7 @@ public class CommonInterface implements OnDatePicker {
     public void getPassportPhoto(String imageSuccessCallBack, String imageFailCallBack) {
         act.callBackSuccessFunction = imageSuccessCallBack;
         act.callBackFailureFunction = imageFailCallBack;
-        if (ContextCompat.checkSelfPermission(act,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(act,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -695,7 +721,7 @@ public class CommonInterface implements OnDatePicker {
 
                 //show dialog
                 Utils.openPermissionSettingsDialog(act, act.getResources().getString(R.string.allow_read_storage_permission_help_text));
-                final String type="WRITE_PERMISSION";
+                final String type = "WRITE_PERMISSION";
                 //act.openDialog("",act.getResources().getString(R.string.allow_read_storage_permission_help_text),"OK","CANCEL",type);
 
             } else {
@@ -766,7 +792,11 @@ public class CommonInterface implements OnDatePicker {
             public void onClick(View view) {
                 dialog.dismiss();
 
-                checkCameraPermission(act);
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    checkCameraPermissionForSDK33(act);
+                } else {
+                    checkCameraPermission(act);
+                }
             }
         });
 
@@ -813,7 +843,44 @@ public class CommonInterface implements OnDatePicker {
             if (permissionAskedEarlier > 0) {
                 //show dialog
                 Utils.openPermissionSettingsDialog(act, act.getResources().getString(R.string.allow_read_storage_permission_help_text));
-                final String type="WRITE_PERMISSION";
+                final String type = "WRITE_PERMISSION";
+                //act.openDialog("",act.getResources().getString(R.string.allow_read_storage_permission_help_text),"OK","CANCEL",type);
+
+            } else if (permissionsList.size() > 0) {
+                ActivityCompat.requestPermissions(act, permissionsList.toArray(new String[permissionsList.size()]),
+                        Constants.MY_PERMISSIONS_CAMERA_AND_STORAGE);
+            }
+        } else {
+
+            openCameraIntent();
+
+        }
+
+    }
+    private void checkCameraPermissionForSDK33(final UmangWebActivity act) {
+
+        if (ContextCompat.checkSelfPermission(act, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+
+            final List<String> permissionsList = new ArrayList<String>();
+
+            int permissionAskedEarlier = 0;
+
+            if (ContextCompat.checkSelfPermission(act, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+
+                // Check for Rationale Option
+                if (ActivityCompat.shouldShowRequestPermissionRationale(act, Manifest.permission.CAMERA)) {
+                    permissionAskedEarlier++;
+                } else {
+                    permissionsList.add(Manifest.permission.CAMERA);
+                }
+            }
+
+
+
+            if (permissionAskedEarlier > 0) {
+                //show dialog
+                Utils.openPermissionSettingsDialog(act, act.getResources().getString(R.string.allow_read_storage_permission_help_text));
+                final String type = "WRITE_PERMISSION";
                 //act.openDialog("",act.getResources().getString(R.string.allow_read_storage_permission_help_text),"OK","CANCEL",type);
 
             } else if (permissionsList.size() > 0) {
@@ -852,11 +919,11 @@ public class CommonInterface implements OnDatePicker {
                     act.getPackageName() + ".fileprovider",
                     file);
             act.imageSelectedPath = capturedImageURI.toString();
-
-            SharedPreferences pref = act.getApplicationContext().getSharedPreferences("UmangSdkPref", 0); // 0 - for private mode
-            SharedPreferences.Editor editor = pref.edit();
-            editor.putString(Constants.PREF_CAMERA_IMAGE_URI,capturedImageURI.toString());
-            editor.commit();
+            callbackListener.setSharedPreferencesValue(Constants.PREF_CAMERA_IMAGE_URI, capturedImageURI.toString());
+//            SharedPreferences pref = act.getApplicationContext().getSharedPreferences("UmangSdkPref", 0); // 0 - for private mode
+//            SharedPreferences.Editor editor = pref.edit();
+//            editor.putString(Constants.PREF_CAMERA_IMAGE_URI, capturedImageURI.toString());
+//            editor.commit();
 
             // Camera capture image intent
             final Intent captureIntent = new Intent(
@@ -872,7 +939,7 @@ public class CommonInterface implements OnDatePicker {
     }
 
     private void checkGalleryPermissions(final UmangWebActivity act) {
-        if (ContextCompat.checkSelfPermission(act,
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(act,
                 Manifest.permission.READ_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -880,7 +947,7 @@ public class CommonInterface implements OnDatePicker {
                     Manifest.permission.READ_EXTERNAL_STORAGE)) {
                 //show dialog
                 Utils.openPermissionSettingsDialog(act, act.getResources().getString(R.string.allow_read_storage_permission_help_text));
-                final String type="WRITE_PERMISSION";
+                final String type = "WRITE_PERMISSION";
                 //act.openDialog("",act.getResources().getString(R.string.allow_read_storage_permission_help_text),"OK","CANCEL",type);
 
             } else {
@@ -897,7 +964,7 @@ public class CommonInterface implements OnDatePicker {
     public void openGalleryIntent() {
 
         if (act.mTypes.contains("pdf")) {
-            if (ContextCompat.checkSelfPermission(act,
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(act,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     != PackageManager.PERMISSION_GRANTED) {
 
@@ -905,7 +972,7 @@ public class CommonInterface implements OnDatePicker {
                         Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                     //show dialog
                     Utils.openPermissionSettingsDialog(act, act.getResources().getString(R.string.allow_write_storage_permission_help_text));
-                    final String type="WRITE_PERMISSION";
+                    final String type = "WRITE_PERMISSION";
                     //act.openDialog("",act.getResources().getString(R.string.allow_read_storage_permission_help_text),"OK","CANCEL",type);
                 } else {
                     ActivityCompat.requestPermissions(act,
@@ -1037,8 +1104,8 @@ public class CommonInterface implements OnDatePicker {
     @JavascriptInterface
     public void openDialog(String msg) {
         //show dialog
-        final String type="INFO";
-        Utils.showInfoDialog(act,msg);
+        final String type = "INFO";
+        Utils.showInfoDialog(act, msg);
     }
 
 
@@ -1058,7 +1125,7 @@ public class CommonInterface implements OnDatePicker {
     }
 
     @JavascriptInterface
-    public void openPlayStoreForUpdate(String link){
+    public void openPlayStoreForUpdate(String link) {
         try {
             act.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + "in.gov.umang.negd.g2c")));
         } catch (android.content.ActivityNotFoundException anfe) {
@@ -1067,11 +1134,11 @@ public class CommonInterface implements OnDatePicker {
     }
 
     @JavascriptInterface
-    public void printScreen(){
+    public void printScreen() {
 
-        Context context=act;
+        Context context = act;
 
-        WebView webView=act.mAgentWeb.getWebCreator().getWebView();
+        WebView webView = act.mAgentWeb.getWebCreator().getWebView();
 
         webView.post(new Runnable() {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -1091,36 +1158,253 @@ public class CommonInterface implements OnDatePicker {
                         new PrintAttributes.Builder().build());
 
                 // Save the job object for later status checking
-                if(printJob.isCompleted()){
+                if (printJob.isCompleted()) {
                     Toast.makeText(act, "Complete", Toast.LENGTH_LONG).show();
-                }
-                else if(printJob.isFailed()){
-                    Toast.makeText(act,R.string.failed, Toast.LENGTH_LONG).show();
+                } else if (printJob.isFailed()) {
+                    Toast.makeText(act, R.string.failed, Toast.LENGTH_LONG).show();
                 }
             }
         });
     }
 
     @JavascriptInterface
-    public void deptLogout(String deptId){
-        Toast.makeText(act.getApplicationContext(),"You are logged out",Toast.LENGTH_LONG).show();
+    public void deptLogout(String deptId) {
+        Toast.makeText(act.getApplicationContext(), "You are logged out", Toast.LENGTH_LONG).show();
         act.finish();
     }
 
     @JavascriptInterface
-    public void sendJPStatus(String deptData){
+    public void sendJPStatus(String deptData) {
         try {
             JSONObject job = new JSONObject(deptData);
-            Intent intent = new Intent(act,UmangWebActivity.class);
-            intent.putExtra(Constants.DEPT_URL,job.getString("url"));
-            intent.putExtra(Constants.DEPT_ID,job.getString("id"));
-            intent.putExtra(Constants.DEPT_NAME,job.getString("name"));
-            SharedPreferences pref = act.getApplicationContext().getSharedPreferences("UmangSdkPref", 0); // 0 - for private mode
-            SharedPreferences.Editor editor = pref.edit();
-            editor.putString(Constants.DEVICE_TOKEN,job.getString("tkn"));
-            editor.commit();
+            Intent intent = new Intent(act, UmangWebActivity.class);
+            intent.putExtra(Constants.DEPT_URL, job.getString("url"));
+            intent.putExtra(Constants.DEPT_ID, job.getString("id"));
+            intent.putExtra(Constants.DEPT_NAME, job.getString("name"));
+            callbackListener.setSharedPreferencesValue(Constants.DEVICE_TOKEN, job.getString("tkn"));
+//            SharedPreferences pref = act.getApplicationContext().getSharedPreferences("UmangSdkPref", 0); // 0 - for private mode
+//            SharedPreferences.Editor editor = pref.edit();
+//            editor.putString(Constants.DEVICE_TOKEN, job.getString("tkn"));
+//            editor.commit();
             act.startActivity(intent);
         } catch (Exception e) {
+        }
+    }
+
+    @JavascriptInterface
+    public void assistiveLoginResponse(String loginResponse) {
+        try {
+            JSONObject job = new JSONObject(loginResponse);
+            callbackListener.setSharedPreferencesValue(Constants.DEVICE_DATKN, job.getString("datkn"));
+            callbackListener.setSharedPreferencesValue(Constants.DEVICE_DRTKN, job.getString("drtkn"));
+//            SharedPreferences.Editor editor = getSharedPreferencesEditor();
+//            editor.putString(Constants.DEVICE_DATKN, job.getString("datkn"));
+//            editor.putString(Constants.DEVICE_DRTKN, job.getString("drtkn"));
+//            editor.commit();
+            saveCallbackResponse(loginResponse);
+        } catch (Exception e) {
+        }
+    }
+
+    @JavascriptInterface
+    public String getDigilockerToken() {
+        return callbackListener.getSharedPreferencesValue(Constants.DEVICE_DATKN, "");
+    }
+
+    @JavascriptInterface
+    public String getUserProfile() {
+        return getUserProfileData();
+    }
+
+    @JavascriptInterface
+    public String getNssoPayload() {
+        if(callbackListener==null) {
+            return "";
+        }
+        return callbackListener.getNssoPayload();
+    }
+
+    @JavascriptInterface
+    public void addUserConsentPDL(String json) {
+        try {
+            callbackListener.setSharedPreferencesValue(DEVICE_CALLBACK_PDL_RESPONSE, json);
+        } catch (Exception e){
+        }
+    }
+
+    @JavascriptInterface
+    public void downloadBase64ForImageShare(String json) {
+        try {
+            JSONObject jsonObject = new JSONObject(json);
+            String shareText = jsonObject.getString("shareText");
+            String base64 = jsonObject.getString("imagebase64");
+//            callbackListener.shareBase64(base64.split(",")[1], shareText);
+            callbackListener.shareBase64(base64, shareText);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    @JavascriptInterface
+    public void copyToClipboard(String data) {
+        ClipboardManager clipboard = (ClipboardManager) act.getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("simple text", data);
+        clipboard.setPrimaryClip(clip);
+    }
+
+    @JavascriptInterface
+    public void setDepartmentHeader(String json) {
+        try {
+            if(json!=null) {
+                JSONObject jsonObject = new JSONObject(json);
+                String name = jsonObject.getString("deptName");
+                if(name==null) {
+                    name = "";
+                }
+                callbackListener.showDepartmentHeader(name);
+            } else  {
+                callbackListener.showDepartmentHeader("");
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+            callbackListener.showDepartmentHeader("");
+        }
+    }
+    @JavascriptInterface
+    public String getEncryptedMobileNumber() {
+        return callbackListener.getAesEncryptedMobileNumber();
+    }
+    @JavascriptInterface
+    public String getMobileNumber() {
+        return callbackListener.getMobileNumber();
+    }
+    @JavascriptInterface
+    public String getServicesViewType() {
+        return callbackListener.getServicesViewType();
+    }
+  /*  private String getSharedPreferences(String key, String defaultValue) {
+        return getSharedPreferences().getString(key, defaultValue);
+    }
+    private void writeSharedPreferences(String key, String value) {
+        SharedPreferences.Editor editor = getSharedPreferencesEditor();
+        editor.putString(key, value);
+        editor.commit();
+    }
+    private SharedPreferences getSharedPreferences() {
+        return act.getApplicationContext().getSharedPreferences("UmangSdkPref", 0);
+    }
+
+    private SharedPreferences.Editor getSharedPreferencesEditor() {
+        return getSharedPreferences().edit();
+    }
+    */
+
+    private void saveCallbackResponse(String loginResponse) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            JSONObject userInfo = new JSONObject(loginResponse);
+            jsonObject.put("userinfo", userInfo);
+            jsonObject.put("mno", userInfo.getString("mno"));
+            jsonObject.put("tkn", userInfo.getString("tkn"));
+            jsonObject.put("did", DeviceUtils.getDeviceId(act));
+            jsonObject.put("hmk", DeviceUtils.getDeviceMake());
+            jsonObject.put("hmd", DeviceUtils.getDeviceModel());
+            jsonObject.put("osver", DeviceUtils.getMobileOSVersion());
+            jsonObject.put("isSDK",true);
+            jsonObject.put("sdkVersion", BuildConfig.VERSION_CODE);
+            jsonObject.put("ver", "160");
+            callbackListener.setSharedPreferencesValue(DEVICE_CALLBACK_RESPONSE, jsonObject.toString());
+            callbackListener.setSharedPreferencesValue(DEVICE_TKN_RESPONSE, userInfo.getString("tkn"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String getUserProfileData() {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject =new JSONObject(callbackListener.getSharedPreferencesValue(DEVICE_CALLBACK_RESPONSE, ""));
+            if(!callbackListener.getSharedPreferencesValue(DEVICE_CALLBACK_PDL_RESPONSE, "").isEmpty()) {
+                JSONArray pdl = new JSONArray(callbackListener.getSharedPreferencesValue(DEVICE_CALLBACK_PDL_RESPONSE, ""));
+                jsonObject.put("pdl", pdl);
+            }
+            jsonObject.remove("sdkVersion");
+            jsonObject.put("sdkVersion", BuildConfig.VERSION_CODE);
+            return jsonObject.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return jsonObject.toString();
+        }
+
+    }
+
+    private boolean checkCameraPermissionCameraStorage(final UmangWebActivity act, boolean isImage) {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(act, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                final List<String> permissionsList = new ArrayList<String>();
+                int permissionAskedEarlier = 0;
+                if (ContextCompat.checkSelfPermission(act, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                    // Check for Rationale Option
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(act, Manifest.permission.CAMERA)) {
+                        permissionAskedEarlier++;
+                    } else {
+                        permissionsList.add(Manifest.permission.CAMERA);
+                    }
+                }
+                if (permissionAskedEarlier > 0) {
+                    //show dialog
+                    Utils.openPermissionSettingsDialog(act, act.getResources().getString(R.string.allow_read_storage_permission_help_text));
+                    final String type = "WRITE_PERMISSION";
+                    //act.openDialog("",act.getResources().getString(R.string.allow_read_storage_permission_help_text),"OK","CANCEL",type);
+                } else if (permissionsList.size() > 0) {
+                    ActivityCompat.requestPermissions(act, permissionsList.toArray(new String[permissionsList.size()]),
+                            Constants.MY_PERMISSIONS_CAMERA_AND_STORAGE);
+                }
+                return false;
+            } else  {
+                return true;
+            }
+        } else {
+            if (ContextCompat.checkSelfPermission(act, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
+                    || ContextCompat.checkSelfPermission(act, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                final List<String> permissionsList = new ArrayList<String>();
+                int permissionAskedEarlier = 0;
+                if (ContextCompat.checkSelfPermission(act, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                    // Check for Rationale Option
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(act, Manifest.permission.CAMERA)) {
+                        permissionAskedEarlier++;
+                    } else {
+                        permissionsList.add(Manifest.permission.CAMERA);
+                    }
+                }
+
+                if (ContextCompat.checkSelfPermission(act, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    // Check for Rationale Option
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(act, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                        permissionAskedEarlier++;
+                    } else {
+                        permissionsList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                    }
+                }
+
+                if (permissionAskedEarlier > 0) {
+                    if(isImage) {
+                        ((UmangWebActivity) act).sendImagesFailToWeb();
+                    } else {
+                        ((UmangWebActivity) act).sendVideoFailToWeb("");
+                    }
+                    //show dialog
+                    Utils.openPermissionSettingsDialog(act, act.getResources().getString(R.string.allow_camera_and_storage_permission_help_text));
+                    final String type = "WRITE_PERMISSION";
+                    //((CommonWebViewActivity)act).openDialog("",act.getResources().getString(R.string.allow_camera_and_storage_permission_help_text),"OK","CANCEL",type);
+                } else if (permissionsList.size() > 0) {
+                    ActivityCompat.requestPermissions(act, permissionsList.toArray(new String[permissionsList.size()]),
+                            Constants.MY_PERMISSIONS_SELECT_IMAGES);
+                }
+                return false;
+            } else  {
+                return true;
+            }
         }
     }
 }

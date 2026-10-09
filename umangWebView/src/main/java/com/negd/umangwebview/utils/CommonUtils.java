@@ -3,6 +3,7 @@ package com.negd.umangwebview.utils;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -12,10 +13,15 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.provider.Settings;
+import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.transition.Slide;
+import android.util.Base64;
 import android.util.Patterns;
 import android.view.View;
 import android.view.Window;
@@ -23,6 +29,7 @@ import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatTextView;
@@ -30,10 +37,13 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 
 import com.negd.umangwebview.R;
+import com.negd.umangwebview.ui.CustomDialog;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.SecureRandom;
@@ -112,7 +122,30 @@ public final class CommonUtils {
 
         }
     }
+    public static void showInfoDialog(Context context, String msg, String type, CustomDialog.DialogButtonClickListener clickListener) {
 
+        try {
+            Dialog dialog = new Dialog(context);
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dialog.setContentView(R.layout.dialog_info);
+            dialog.setCancelable(false);
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.show();
+            AppCompatTextView dialogTxt = dialog.findViewById(R.id.dialogTxt);
+            dialogTxt.setText(msg);
+            Button btnOK = dialog.findViewById(R.id.btnOk);
+            btnOK.setOnClickListener(view -> {
+                if (dialog.isShowing()) {
+                    dialog.dismiss();
+                    dialog.cancel();
+                    clickListener.onOkClick(type);
+                }
+            });
+        } catch (Exception ex) {
+
+        }
+
+    }
     public static String getUniqueNumber() {
         String str = "";
         str = "" + System.currentTimeMillis();
@@ -215,53 +248,53 @@ public final class CommonUtils {
 //
 //    }
 
-//    public static void showInfoDialogHtml(Context context, String msg) {
-//        Dialog dialog = new Dialog(context);
-//        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-//        dialog.setContentView(R.layout.dialog_info);
-//        dialog.setCancelable(false);
-//        dialog.setCanceledOnTouchOutside(false);
-//        dialog.show();
-//        AppCompatTextView dialogTxt = dialog.findViewById(R.id.dialogTxt);
-//        dialogTxt.setText(Html.fromHtml(msg));
-//        CustomButtonView btnOK = dialog.findViewById(R.id.btnOk);
-//        btnOK.setOnClickListener(view -> {
-//            dialog.cancel();
-//        });
-//    }
+    public static void showInfoDialogHtml(Context context, String msg) {
+        Dialog dialog = new Dialog(context);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_info);
+        dialog.setCancelable(false);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+        AppCompatTextView dialogTxt = dialog.findViewById(R.id.dialogTxt);
+        dialogTxt.setText(Html.fromHtml(msg));
+        Button btnOK = dialog.findViewById(R.id.btnOk);
+        btnOK.setOnClickListener(view -> {
+            dialog.cancel();
+        });
+    }
 
-//    public static void openPermissionSettingsDialog(final Context mContext, String msg) {
-//        final Dialog d = new Dialog(mContext);
-//        d.requestWindowFeature(d.getWindow().FEATURE_NO_TITLE);
-//        d.setContentView(R.layout.open_permission_settings_dialog);
-//        d.setCancelable(true);
-//
-//        TextView cancelTxt = (TextView) d.findViewById(R.id.cancelTxt);
-//        cancelTxt.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                d.dismiss();
-//            }
-//        });
-//
-//        TextView settingsTxt = (TextView) d.findViewById(R.id.settingsTxt);
-//        settingsTxt.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                d.dismiss();
-//                Intent intent = new Intent();
-//                intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-//                Uri uri = Uri.fromParts("package", mContext.getPackageName(), null);
-//                intent.setData(uri);
-//                mContext.startActivity(intent);
-//            }
-//        });
-//
-//        TextView msgTxt = (TextView) d.findViewById(R.id.msgTxt);
-//        msgTxt.setText(msg);
-//
-//        d.show();
-//    }
+    public static void openPermissionSettingsDialog(final Context mContext, String msg) {
+        final Dialog d = new Dialog(mContext);
+        d.requestWindowFeature(d.getWindow().FEATURE_NO_TITLE);
+        d.setContentView(R.layout.open_permission_settings_dialog);
+        d.setCancelable(true);
+
+        TextView cancelTxt = (TextView) d.findViewById(R.id.cancelTxt);
+        cancelTxt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                d.dismiss();
+            }
+        });
+
+        TextView settingsTxt = (TextView) d.findViewById(R.id.settingsTxt);
+        settingsTxt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                d.dismiss();
+                Intent intent = new Intent();
+                intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                Uri uri = Uri.fromParts("package", mContext.getPackageName(), null);
+                intent.setData(uri);
+                mContext.startActivity(intent);
+            }
+        });
+
+        TextView msgTxt = (TextView) d.findViewById(R.id.msgTxt);
+        msgTxt.setText(msg);
+
+        d.show();
+    }
 
 //    public static void logOutUser(Context ctx) {
 //        AppPreferencesHelper appPreferencesHelper = new AppPreferencesHelper(ctx);
@@ -1404,6 +1437,75 @@ public final class CommonUtils {
         Spannable spannable = new SpannableString(text);
         spannable.setSpan(new ForegroundColorSpan(color), 0, spannable.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         return spannable;
+    }
+
+    public static Uri imageBase64ToUri(Context context, String imageBase64String) {
+        try {
+            String[] split = imageBase64String.split(",");
+            byte[] decodedBytes = Base64.decode(split[1], Base64.DEFAULT);
+
+            if (decodedBytes != null) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    String mime = imageBase64String.substring(0, imageBase64String.indexOf(',')).split(":")[1].split(";")[0];
+
+                    ContentValues contentValues = new ContentValues();
+                    contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, System.currentTimeMillis() + ".png");
+                    contentValues.put(MediaStore.MediaColumns.MIME_TYPE, mime);
+                    contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
+
+                    Uri uri = context.getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues);
+
+                    if (uri != null) {
+                        try (OutputStream outputStream = context.getContentResolver().openOutputStream(uri)) {
+                            if (outputStream != null) {
+                                outputStream.write(decodedBytes);
+                            }
+                        }
+                        return uri;
+                    } else {
+                        return null;
+                    }
+                } else {
+                    File directory = Environment.getExternalStorageDirectory();
+                    File umangFolder = new File(directory, "UMANG");
+                    boolean directoryCreated = umangFolder.exists() || umangFolder.mkdirs();
+
+                    if (directoryCreated) {
+                        File file = new File(umangFolder, System.currentTimeMillis() + ".png");
+
+                        try (FileOutputStream fos = new FileOutputStream(file)) {
+                            fos.write(decodedBytes);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            return null;
+                        }
+                        return Uri.fromFile(file);
+                    } else {
+                        return null;
+                    }
+                }
+            } else {
+                return null;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static void shareImageViaShareIntent(Context context, Uri uri, String shareText) {
+        if (uri == null) {
+            return;
+        }
+
+        Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND);
+        shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, shareText);
+        shareIntent.setType("image/png");
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        context.startActivity(Intent.createChooser(shareIntent, "Choose App"));
     }
 
 }

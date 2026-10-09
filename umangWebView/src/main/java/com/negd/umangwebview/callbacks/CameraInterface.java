@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.webkit.JavascriptInterface;
 import android.widget.Toast;
 
+import com.negd.umangwebview.listeners.ICommonCallbackListener;
 import com.negd.umangwebview.ui.UmangWebActivity;
 import com.negd.umangwebview.utils.Constants;
 
@@ -13,9 +14,11 @@ public class CameraInterface {
 
     private UmangWebActivity activity;
     private Uri mCapturedImageURI;
+    public ICommonCallbackListener callbackListener;
 
     public CameraInterface(UmangWebActivity activity) {
         this.activity = activity;
+        callbackListener = activity;
     }
 
     @JavascriptInterface
@@ -50,11 +53,11 @@ public class CameraInterface {
         activity.callBackSuccessFunction = successCallBack;
         activity.callBackFailureFunction  = failureCallback;
         activity.requestImageFor = requestFor;
-
-        SharedPreferences pref = activity.getApplicationContext().getSharedPreferences("UmangSdkPref", 0); // 0 - for private mode
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putString(Constants.PREF_REQUEST_IMAGE_FOR,requestFor);
-        editor.commit();
+        callbackListener.setSharedPreferencesValue(Constants.PREF_REQUEST_IMAGE_FOR,requestFor);
+//        SharedPreferences pref = activity.getApplicationContext().getSharedPreferences("UmangSdkPref", 0); // 0 - for private mode
+//        SharedPreferences.Editor editor = pref.edit();
+//        editor.putString(Constants.PREF_REQUEST_IMAGE_FOR,requestFor);
+//        editor.commit();
         activity.commonInterface.createChooserDialog();
     }
 
@@ -63,10 +66,11 @@ public class CameraInterface {
         activity.callBackSuccessFunction = successCallBack;
         activity.callBackFailureFunction  = failureCallback;
         activity.requestImageFor = requestFor;
-        SharedPreferences pref = activity.getApplicationContext().getSharedPreferences("UmangSdkPref", 0); // 0 - for private mode
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putString(Constants.PREF_REQUEST_IMAGE_FOR,requestFor);
-        editor.commit();
+        callbackListener.setSharedPreferencesValue(Constants.PREF_REQUEST_IMAGE_FOR,requestFor);
+//        SharedPreferences pref = activity.getApplicationContext().getSharedPreferences("UmangSdkPref", 0); // 0 - for private mode
+//        SharedPreferences.Editor editor = pref.edit();
+//        editor.putString(Constants.PREF_REQUEST_IMAGE_FOR,requestFor);
+//        editor.commit();
         activity.MaxSize= size;
         activity.commonInterface.createChooserDialog();
     }

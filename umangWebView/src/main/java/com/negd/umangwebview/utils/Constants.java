@@ -6,6 +6,7 @@ public class Constants {
    public static final String DEPT_URL="url";
    public static final String DEPT_NAME="name";
    public static final String DEPT_ID="deptId";
+   public static final String ENABLE_DEPT_HEADER="enabledept_header";
    public static final String SERVICE_ID="serviceId";
    public static final String BACK_BUTTON_COLOR="backButtonColor";
    public static final String HEADER_TEXT_COLOR="headerTextColor";
@@ -13,6 +14,21 @@ public class Constants {
    public static final String LOADER_COLOR="loaderColor";
    public static final String SWIPE_LOADER_COLOR="swipeLoaderColor";
    public static final String DEVICE_TOKEN = "token";
+   public static final String DEVICE_DATKN = "device_datkn";
+   public static final String DEVICE_DRTKN = "device_darkn";
+   public static final String DEVICE_CALLBACK_RESPONSE = "device_callback_response";
+   public static final String DEVICE_TKN_RESPONSE = "device_tkn_response";
+   public static final String DEVICE_CALLBACK_PDL_RESPONSE = "device_callback_pdl_response";
+   public static final String NSSO_PAYLOAD = "nsso_payload";
+   public static final String NSSO_JWT_TOKEN = "nsso_jwt_token";
+   public static final String CUSTOM_HEADER_LAYOUT_ID = "custom_header_layout_id";
+   public static final String CUSTOM_HEADER_VIEW_CLICK_ID = "custom_header_view_click_id";
+   public static final String CUSTOM_HEADER_CLOSE_SDK_ON_CLICK = "custom_header_close_sdk_on_click";
+   public static final String CUSTOM_FOOTER_LAYOUT_ID = "custom_footer_layout_id";
+   public static final String CUSTOM_FOOTER_VIEW_CLICK_ID = "custom_footer_view_click_id";
+   public static final String CUSTOM_FOOTER_CLOSE_SDK_ON_CLICK = "custom_footer_close_sdk_on_click";
+   public static final String SDK_LOGGED_IN_USER_MOBILE_NUMBER = "sdk_logged_in_user_mobile_number";
+   public static final String SDK_SERVICES_VIEW_TYPE = "sdk_services_view_type";
 
    //choose document codes
    public static final int REQUEST_IDENTITY_PROOF = 666;
@@ -28,6 +44,8 @@ public class Constants {
    public static final int BIOMETRIC_DEVICE_INFO = 010102;
    public static int DIGI_AUTH_RESULT_CODE = 6000;
    public static final int BARCODE_SCAN_REQUEST_CODE = 3310;
+   public static final int FACE_SCAN_REQUEST_CODE = 780;
+   public static final int FACE_SCAN_XML_REQUEST_CODE = 782;
 
 
 

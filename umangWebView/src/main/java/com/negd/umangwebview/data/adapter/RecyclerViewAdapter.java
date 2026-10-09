@@ -44,6 +44,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         holder.textViewModel.setText(deviceList.get(position).getMake());
         Glide.with(mContext)
                 .load(deviceList.get(position).getImg())
+                .placeholder(R.drawable.fingerprint_acc_setting)
                 .centerCrop()
                 .into(holder.imgLogo);
     }

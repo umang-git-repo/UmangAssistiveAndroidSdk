@@ -1,5 +1,10 @@
 package com.negd.umangwebview.ui;
 
+import static com.negd.umangwebview.utils.Constants.FACE_SCAN_REQUEST_CODE;
+import static com.negd.umangwebview.utils.Constants.FACE_SCAN_XML_REQUEST_CODE;
+import static com.negd.umangwebview.utils.Constants.ENABLE_DEPT_HEADER;
+
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -9,6 +14,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
 import android.os.Handler;
+import android.view.LayoutInflater;
 import android.webkit.CookieManager;
 
 import android.Manifest;
@@ -34,7 +40,6 @@ import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.location.Location;
 import android.location.LocationManager;
-import android.net.MailTo;
 import android.net.Uri;
 import android.net.http.SslCertificate;
 import android.net.http.SslError;
@@ -62,6 +67,8 @@ import android.webkit.WebView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.canhub.cropper.CropImageContractOptions;
+import com.canhub.cropper.CropImageOptions;
 import com.google.android.gms.location.LocationRequest;
 import com.google.gson.Gson;
 import com.just.agentweb.AgentWeb;
@@ -74,12 +81,15 @@ import com.negd.umangwebview.R;
 import com.negd.umangwebview.UmangAssistiveAndroidSdk;
 import com.negd.umangwebview.callbacks.CameraInterface;
 import com.negd.umangwebview.callbacks.CommonInterface;
-import com.negd.umangwebview.callbacks.ContactInterface;
 import com.negd.umangwebview.callbacks.DownloadInterface;
+import com.negd.umangwebview.callbacks.JeevanPramaanInterface;
 import com.negd.umangwebview.callbacks.LocationInterface;
 import com.negd.umangwebview.callbacks.MHAInterface;
+import com.negd.umangwebview.data.AppSharedPreferences;
 import com.negd.umangwebview.databinding.ActivityUmangWebBinding;
 //import com.negd.umangwebview.ui.jeevan_pramaan.device_select_screen.JPDeviceSelectActivity;
+import com.negd.umangwebview.listeners.ICommonCallbackListener;
+import com.negd.umangwebview.listeners.IJeevanPramaanListener;
 import com.negd.umangwebview.ui.jeevan_pramaan.JPDeviceSelectActivity;
 import com.negd.umangwebview.utils.AppConstants;
 import com.negd.umangwebview.utils.AppLogger;
@@ -93,8 +103,8 @@ import com.negd.umangwebview.utils.ImageSelect;
 import com.negd.umangwebview.utils.ImageUtils;
 import com.negd.umangwebview.utils.Utils;
 import com.negd.umangwebview.utils.VideoRecord;
-import com.theartofdev.edmodo.cropper.CropImage;
-import com.theartofdev.edmodo.cropper.CropImageView;
+//import com.theartofdev.edmodo.cropper.CropImage;
+//import com.theartofdev.edmodo.cropper.CropImageView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -144,13 +154,16 @@ import javax.xml.xpath.XPathFactory;
 
 import id.zelory.compressor.Compressor;
 
+import com.canhub.cropper.CropImageContract;
+import com.negd.umangwebview.utils.WebViewUtils;
 
-public class UmangWebActivity extends AppCompatActivity implements CustomDialog.DialogButtonClickListener {
+
+public class UmangWebActivity extends AppCompatActivity implements CustomDialog.DialogButtonClickListener, ICommonCallbackListener, IJeevanPramaanListener {
 
     private static final String TAG = UmangWebActivity.class.getSimpleName();
-    private String deptUrl=null;
-    private String deptId=null;
-    private String serviceId=null;
+    private String deptUrl = null;
+    private String deptId = null;
+    private String serviceId = null;
 
     private ActivityUmangWebBinding binding;
     private ProgressDialog mProgressDialog;
@@ -164,6 +177,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
     public static String requestImageFor = "";
     public static String imageSelectedPath = "";
     public static String fileSizeStr = "200";
+    private Map<String, String> header;
 
     public String inputJson;
     public String userId;
@@ -174,8 +188,8 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
     private WebViewClient mWebViewClient;
     protected int mRequestCodeFilePicker = 51426;
 
-    private String loaderColor="#00599f";
-    private boolean isError=false;
+    private String loaderColor = "#00599f";
+    private boolean isError = false;
     private String lastURL = "";
 
 
@@ -185,10 +199,10 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
     public boolean mIsCrop;
     public int mCropHeight;
     public int mCropWidth;
-    public String mTypes="";
+    public String mTypes = "";
     public String mCropType;
     public String mJsonParams;
-
+    private String nssoPayload = "";
 
     /**
      * File upload callback for platform versions prior to Android 5.0
@@ -206,32 +220,58 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
     private Location mLastLocation;
     private LocationRequest mLocationRequest;
 
+    private AppSharedPreferences appSharedPreferences;
 
     public CommonInterface commonInterface;
     public CameraInterface cameraInterface;
     public LocationInterface locationInterface;
-    public ContactInterface contactInterface;
     public DownloadInterface downloadInterface;
     public MHAInterface mhaInterface;
+    public JeevanPramaanInterface jeevanPramaanInterface;
 
+    private ActivityResultLauncher<CropImageContractOptions> cropImageLauncher =
+            registerForActivityResult(new CropImageContract(),  result ->{
+                if(result.isSuccessful()) {
+                    handleCropActivityResult(result, RESULT_OK);
+                } else {
+                    handleCropActivityResult(result, RESULT_FIRST_USER);
+
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
 
-        binding= ActivityUmangWebBinding.inflate(getLayoutInflater());
 
+        binding = ActivityUmangWebBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         //set toolbar
 //        setSupportActionBar(binding.toolBar);
 //        getSupportActionBar().setDisplayShowTitleEnabled(false);
-        getSupportActionBar().hide();
+
+        try {
+            if(getSupportActionBar()!=null) {
+                getSupportActionBar().hide();
+            }
+//            assert getSupportActionBar() != null;
+//            getSupportActionBar().hide();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
 
         //back button listener
-        binding.imgLogo.setOnClickListener(view -> onBackPressed());
+        binding.imgLogo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (UmangAssistiveAndroidSdk.assistiveListener != null) {
+                    UmangAssistiveAndroidSdk.assistiveListener.onHeaderClickAction(UmangWebActivity.this);
+                }
+                onBackPressed();
+            }
+        });
 
         //fused location client
         //mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -242,12 +282,16 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
         setIntentValues();
 
         //custom web chrome client
-        customWebchromeClient=new CustomWebChromeClient();
+        customWebchromeClient = new CustomWebChromeClient();
 
         //adding version code
         binding.txtVersion.setText("Powered by UMANG");
 
-        binding.txtVersion2.setText("Version : "+BuildConfig.VERSION_NAME);
+        binding.txtVersion2.setText("Version : " + BuildConfig.VERSION_NAME);
+        try {
+            appSharedPreferences = AppSharedPreferences.getInstance(this);
+        } catch (Exception e) {
+        }
 
         //clear focus if activity recreating
         clearFocus();
@@ -265,9 +309,9 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
     protected void onResume() {
         super.onResume();
 
-        if(isFromGpsSettings){
-            isFromGpsSettings=false;
-            if(isLocationEnabled()){
+        if (isFromGpsSettings) {
+            isFromGpsSettings = false;
+            if (isLocationEnabled()) {
                 getLastLocation();
             }
         }
@@ -275,7 +319,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
     @Override
     public void onBackPressed() {
-        if(mAgentWeb!=null && mAgentWeb.getWebCreator()!=null) {
+        if (mAgentWeb != null && mAgentWeb.getWebCreator() != null) {
 
             mAgentWeb.getWebCreator().getWebView().requestFocus();
 
@@ -288,13 +332,13 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                     //Log.d(TAG, webView.getUrl().toString() + "====" + lastURL);
                     if (webView.isFocused() && webView.canGoBack()) {
 
-                        if (webView.getUrl().toString().equalsIgnoreCase(lastURL) || webView.getUrl().toString().equalsIgnoreCase(lastURL+"/")) {
+                        if (webView.getUrl().toString().equalsIgnoreCase(lastURL) || webView.getUrl().toString().equalsIgnoreCase(lastURL + "/")) {
                             finish();
                         } else {
 
-                            try{
-                                    webView.goBack();
-                            }catch (Exception ex){
+                            try {
+                                webView.goBack();
+                            } catch (Exception ex) {
                                 webView.goBack();
                             }
                         }
@@ -320,47 +364,159 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
     /**
      * Method to set the intent value and configuration for the UI
      */
-    private void setIntentValues(){
-        Intent intent=getIntent();
+    private void setIntentValues() {
+        Intent intent = getIntent();
 
-        if(intent!=null){
+        if (intent != null) {
 
-            if(intent.hasExtra(Constants.DEPT_URL)){
-                this.deptUrl=intent.getStringExtra(Constants.DEPT_URL);
+            if (intent.hasExtra(Constants.DEPT_URL)) {
+                this.deptUrl = intent.getStringExtra(Constants.DEPT_URL);
             }
 
-            if(intent.hasExtra(Constants.DEPT_ID)){
-                this.deptId=intent.getStringExtra(Constants.DEPT_ID);
+            if (intent.hasExtra(Constants.DEPT_ID)) {
+                this.deptId = intent.getStringExtra(Constants.DEPT_ID);
             }
 
-            if(intent.hasExtra(Constants.SERVICE_ID)){
-                this.serviceId=intent.getStringExtra(Constants.DEPT_ID);
+            if (intent.hasExtra(Constants.SERVICE_ID)) {
+                this.serviceId = intent.getStringExtra(Constants.DEPT_ID);
             }
 
-            if(intent.hasExtra(Constants.DEPT_NAME)){
+            if (intent.getBooleanExtra(ENABLE_DEPT_HEADER, false) || intent.hasExtra(Constants.DEPT_NAME)) {
+                String departmentTitle = intent.getStringExtra(Constants.DEPT_NAME);
+                if(departmentTitle==null) {
+                    departmentTitle = "";
+                }
+                showHideHeaderFooters(true);
                 binding.toolBar.setVisibility(View.VISIBLE);
-                binding.headerTxt.setText(intent.getStringExtra(Constants.DEPT_NAME));
+                binding.headerTxt.setText(departmentTitle);
+            } else if(intent.hasExtra(Constants.CUSTOM_HEADER_LAYOUT_ID)) {
+                showHideHeaderFooters(true);
+                int layoutId = getIntent().getIntExtra(Constants.CUSTOM_HEADER_LAYOUT_ID, 0);
+                int viewId = getIntent().getIntExtra(Constants.CUSTOM_HEADER_VIEW_CLICK_ID, 0);
+                boolean closeSdkOnClick = getIntent().getBooleanExtra(Constants.CUSTOM_HEADER_CLOSE_SDK_ON_CLICK, false);
+                if(layoutId >0) {
+                    // Dynamically inflate a layout
+                    View headerView = LayoutInflater.from(this).inflate(layoutId, binding.flHeader, false);
+                    binding.flHeader.addView(headerView);
+                    if(viewId > 0) {
+                        headerView.findViewById(viewId).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                if (UmangAssistiveAndroidSdk.assistiveListener != null) {
+                                    UmangAssistiveAndroidSdk.assistiveListener.onHeaderClickAction(UmangWebActivity.this);
+                                    if(closeSdkOnClick) {
+                                        finish();
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        binding.flHeader.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                if (UmangAssistiveAndroidSdk.assistiveListener != null) {
+                                    UmangAssistiveAndroidSdk.assistiveListener.onHeaderClickAction(UmangWebActivity.this);
+                                    if (closeSdkOnClick) {
+                                        finish();
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
             }
 
-            if(intent.hasExtra(Constants.BACK_BUTTON_COLOR)){
+            if (intent.hasExtra(Constants.BACK_BUTTON_COLOR)) {
                 binding.imgLogo.setColorFilter(Color.parseColor(getIntent().getStringExtra(Constants.BACK_BUTTON_COLOR)), PorterDuff.Mode.SRC_IN);
             }
 
-            if(intent.hasExtra(Constants.HEADER_TEXT_COLOR)){
+            if (intent.hasExtra(Constants.HEADER_TEXT_COLOR)) {
                 binding.headerTxt.setTextColor(Color.parseColor(getIntent().getStringExtra(Constants.HEADER_TEXT_COLOR)));
             }
 
-            if(intent.hasExtra(Constants.HEADER_COLOR)){
+            if (intent.hasExtra(Constants.HEADER_COLOR)) {
                 binding.toolBar.setBackgroundColor(Color.parseColor(getIntent().getStringExtra(Constants.HEADER_COLOR)));
             }
 
-            if(intent.hasExtra(Constants.LOADER_COLOR)){
-                loaderColor=intent.getStringExtra(Constants.LOADER_COLOR);
+            if (intent.hasExtra(Constants.LOADER_COLOR)) {
+                loaderColor = intent.getStringExtra(Constants.LOADER_COLOR);
+            }
+            if(intent.hasExtra(Constants.CUSTOM_FOOTER_LAYOUT_ID)) {
+                int layoutId = getIntent().getIntExtra(Constants.CUSTOM_FOOTER_LAYOUT_ID, 0);
+                int viewId = getIntent().getIntExtra(Constants.CUSTOM_FOOTER_VIEW_CLICK_ID, 0);
+                boolean closeSdkOnClick = getIntent().getBooleanExtra(Constants.CUSTOM_FOOTER_CLOSE_SDK_ON_CLICK, false);
+                if(layoutId >0) {
+                    // Dynamically inflate a layout
+                    View footerView = LayoutInflater.from(this).inflate(layoutId, binding.flFooter, false);
+                    binding.flFooter.addView(footerView);
+                    if(viewId > 0) {
+                        footerView.findViewById(viewId).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                if (UmangAssistiveAndroidSdk.assistiveListener != null) {
+                                    UmangAssistiveAndroidSdk.assistiveListener.onFooterClickAction(UmangWebActivity.this);
+                                    if(closeSdkOnClick) {
+                                        finish();
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        binding.flFooter.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                if (UmangAssistiveAndroidSdk.assistiveListener != null) {
+                                    UmangAssistiveAndroidSdk.assistiveListener.onFooterClickAction(UmangWebActivity.this);
+                                    if(closeSdkOnClick) {
+                                        finish();
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+            if(intent.hasExtra(Constants.NSSO_PAYLOAD) && !intent.getStringExtra(Constants.NSSO_PAYLOAD).isEmpty()) {
+                nssoPayload = intent.getStringExtra(Constants.NSSO_PAYLOAD);
+                binding.llVersion.setVisibility(View.GONE);
+            }
+            if(intent.hasExtra(Constants.NSSO_JWT_TOKEN) && !intent.getStringExtra(Constants.NSSO_JWT_TOKEN).isEmpty()) {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    try {
+                        Pair<Boolean, String> result = new JwtUtil().verifyJWTAndGetPayload(intent.getStringExtra(Constants.NSSO_JWT_TOKEN));
+                        if(result.first) {
+                            nssoPayload = result.second;
+                            binding.llVersion.setVisibility(View.GONE);
+                        } else {
+                            UmangAssistiveAndroidSdk.assistiveListener.onSdkInitializationError("JWT Sign Verification Failed");
+                        }
+                    } catch (Exception e) {
+                        UmangAssistiveAndroidSdk.assistiveListener.onSdkInitializationError(e.toString());
+                    }
+                } else {
+                    UmangAssistiveAndroidSdk.assistiveListener.onSdkInitializationError("JWT Sign requires minimum Android 26");
+                }
             }
 
+        } else {
+            Toast.makeText(this, "something went wrong !! please check your configuration .", Toast.LENGTH_LONG).show();
+        }
+    }
 
-        }else{
-            Toast.makeText(this,"something went wrong !! please check your configuration .",Toast.LENGTH_LONG).show();
+    private void showHideHeaderFooters(boolean isVisible) {
+        binding.llFooter.setVisibility(isVisible? View.VISIBLE: View.GONE);
+        binding.llHeader.setVisibility(isVisible? View.VISIBLE: View.GONE);
+        if(!binding.tvDeptName.getText().toString().isEmpty()) {
+            binding.llDeptHeader.setVisibility(isVisible? View.VISIBLE: View.GONE);
+        }
+        try {
+            if(getSupportActionBar()!=null) {
+                getSupportActionBar().hide();
+            }
+//                    assert getSupportActionBar() != null;
+//                    getSupportActionBar().hide();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -399,11 +555,11 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
     /**
      * clear webview focus
      */
-    private void clearFocus(){
-        try{
+    private void clearFocus() {
+        try {
 
-            if(mAgentWeb !=null)
-                mAgentWeb.getWebCreator().getWebView().setOnKeyListener(new View.OnKeyListener(){
+            if (mAgentWeb != null)
+                mAgentWeb.getWebCreator().getWebView().setOnKeyListener(new View.OnKeyListener() {
                     public boolean onKey(View v, int keyCode, KeyEvent event) {
                         if ((keyCode == KeyEvent.KEYCODE_BACK) && mAgentWeb.getWebCreator().getWebView().canGoBack()) {
                             mAgentWeb.getWebCreator().getWebView().clearFocus();
@@ -413,8 +569,8 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                         return false;
                     }
                 });
-        }catch (Exception ex){
-            Log.e("Error clear focus","error in clear focus");
+        } catch (Exception ex) {
+            Log.e("Error clear focus", "error in clear focus");
         }
     }
 
@@ -422,21 +578,20 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
     /**
      * Set chrome client
      */
-    private void setWebViewClient(){
-        mWebViewClient= new WebViewClient(){
+    private void setWebViewClient() {
+        mWebViewClient = new WebViewClient() {
 
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
                 super.onReceivedError(view, request, error);
-                if(error.getDescription().toString().equalsIgnoreCase("net::ERR_INTERNET_DISCONNECTED"))
-                    isError=true;
+                if (error.getDescription().toString().equalsIgnoreCase("net::ERR_INTERNET_DISCONNECTED"))
+                    isError = true;
 
 
-                else if( error.getDescription().toString().equalsIgnoreCase("net::ERR_CACHE_MISS"))
-                {
+                else if (error.getDescription().toString().equalsIgnoreCase("net::ERR_CACHE_MISS")) {
 
-                    if(Utils.isNetworkConnected(UmangWebActivity.this)) {
+                    if (Utils.isNetworkConnected(UmangWebActivity.this)) {
                         Intent intent = getIntent();
                         finish();
                         startActivity(intent);
@@ -451,6 +606,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
             @Override
             public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+                String message = "SSL Certificate error. ";
 
                 try {
 
@@ -460,34 +616,60 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                         // Check if Cert-Domain equals the Uri-Domain
                         String certDomain = serverCertificate.getIssuedTo().getCName();
 
-                        Toast.makeText(UmangWebActivity.this,"URL-> "+error.getUrl(),Toast.LENGTH_LONG).show();
-                        Toast.makeText(UmangWebActivity.this,"DOMAIN-> "+certDomain,Toast.LENGTH_LONG).show();
+//                        Toast.makeText(UmangWebActivity.this, "URL-> " + error.getUrl(), Toast.LENGTH_LONG).show();
+//                        Toast.makeText(UmangWebActivity.this, "DOMAIN-> " + certDomain, Toast.LENGTH_LONG).show();
+                        switch (error.getPrimaryError()) {
+                            case SslError.SSL_UNTRUSTED:
+                                message = "The certificate authority is not trusted.";
+                                break;
+                            case SslError.SSL_EXPIRED:
+                                message = "The certificate has expired.";
+                                break;
+                            case SslError.SSL_IDMISMATCH:
+                                message = "The certificate hostname mismatch.";
+                                break;
+                            case SslError.SSL_NOTYETVALID:
+                                message = "The certificate is not yet valid.";
+                                break;
+                            case SslError.SSL_DATE_INVALID:
+                                message = "The certificate date is invalid";
+                                break;
+                            case SslError.SSL_INVALID:
+                                message = "A generic SSL error occured";
+                                break;
+                            default:
+                                message = "An unknown SSL error occurred.";
+                        }
 
 
                         Log.e("URL->", error.getUrl());
                         Log.e("DOMAIN->", certDomain);
                     }
-                }catch (Exception ex){
-
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
+                message += " \nThe department page you are trying to open is not secure. Do you want to continue anyway?";
 
-
-                final AlertDialog.Builder builder = new AlertDialog.Builder(UmangWebActivity.this);
-                builder.setMessage("SSL Certificate error . Do you want to continue ?");
-                builder.setPositiveButton("continue", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        handler.proceed();
-                    }
-                });
-                builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        handler.cancel();
-                    }
-                });
-                final AlertDialog dialog = builder.create();
-                dialog.show();
+                try {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(UmangWebActivity.this);
+                    builder.setMessage(message);
+                    builder.setPositiveButton("continue", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            handler.proceed();
+                        }
+                    });
+                    builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            handler.cancel();
+                        }
+                    });
+                    final AlertDialog dialog = builder.create();
+                    dialog.show();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
             }
 
@@ -501,63 +683,95 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             @Override
             public boolean shouldOverrideUrlLoading(WebView webView, WebResourceRequest request) {
 
-                String url=request.getUrl().toString().trim();
-
-                if (url.contains("https://www.google.com/maps/")) {
-                    Uri IntentUri = Uri.parse(url);
-                    Intent mapIntent = new Intent(Intent.ACTION_VIEW, IntentUri);
-                    mapIntent.setPackage("com.google.android.apps.maps");
-                    startActivity(mapIntent);
-                    return true;
+                String url = request.getUrl().toString().trim();
+                if (url.contains("ras.gov.in")) {
+                    showLoading();
                 }
+                return WebViewUtils.handleWebViewCallbacks(webView, url, UmangWebActivity.this, header);
 
-                else if (url.startsWith("http:") || url.startsWith("https:")) {
-                    webView.loadUrl(url);
-                    return true;
-                }else if (url.startsWith("tel:")) {
-                    Intent tel = new Intent(Intent.ACTION_DIAL, Uri.parse(url));
-                    startActivity(tel);
-                    return true;
-                }else if (url.startsWith("mailto:")) {
-                    MailTo mt = MailTo.parse(url);
-                    Intent mail = new Intent(Intent.ACTION_SEND);
-                    mail.setType("application/octet-stream");
-                    mail.putExtra(Intent.EXTRA_EMAIL, new String[]{mt.getTo()});
-                    mail.putExtra(Intent.EXTRA_SUBJECT, mt.getSubject());
-                    mail.putExtra(Intent.EXTRA_TEXT, mt.getBody());
-                    startActivity(mail);
-                    return true;
-                }else if (url.startsWith("geo:")) {
-                    Uri gmmIntentUri = Uri.parse(url);
-                    Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-                    mapIntent.setPackage("com.google.android.apps.maps");
-                    try {
+//                if (url.contains("trai")) {
+//                    final Dialog dialog = new Dialog(UmangWebActivity.this);
+//                    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+//                    dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+//                    dialog.setCancelable(false);
+//                    dialog.setContentView(R.layout.dialog_user_agreement);
+//
+//                    Button dialogButton = (Button) dialog.findViewById(R.id.btnCancel);
+//                    Button dialogOK = (Button) dialog.findViewById(R.id.btnOk);
+//                    dialogButton.setOnClickListener(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View v) {
+//                            dialog.dismiss();
+//                            onBackPressed();
+//                        }
+//                    });
+//                    dialogOK.setOnClickListener(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View v) {
+//                            webView.loadUrl(url);
+//                            dialog.dismiss();
+//                        }
+//                    });
+//                    dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT,
+//                            WindowManager.LayoutParams.MATCH_PARENT);
+//                    dialog.show();
+//
+//                }
+
+//                else {
+
+                   /* if (url.contains("https://www.google.com/maps/")) {
+                        Uri IntentUri = Uri.parse(url);
+                        Intent mapIntent = new Intent(Intent.ACTION_VIEW, IntentUri);
+                        mapIntent.setPackage("com.google.android.apps.maps");
                         startActivity(mapIntent);
-                    } catch (Exception e) {
-                        Toast.makeText(UmangWebActivity.this, "Map app not found", Toast.LENGTH_SHORT).show();
-                        Log.e("Map exception",e.toString());
+                        return true;
+                    } else if (url.startsWith("http:") || url.startsWith("https:")) {
+                        webView.loadUrl(url);
+                        return true;
+                    } else if (url.startsWith("tel:")) {
+                        Intent tel = new Intent(Intent.ACTION_DIAL, Uri.parse(url));
+                        startActivity(tel);
+                        return true;
+                    } else if (url.startsWith("mailto:")) {
+                        MailTo mt = MailTo.parse(url);
+                        Intent mail = new Intent(Intent.ACTION_SEND);
+                        mail.setType("application/octet-stream");
+                        mail.putExtra(Intent.EXTRA_EMAIL, new String[]{mt.getTo()});
+                        mail.putExtra(Intent.EXTRA_SUBJECT, mt.getSubject());
+                        mail.putExtra(Intent.EXTRA_TEXT, mt.getBody());
+                        startActivity(mail);
+                        return true;
+                    } else if (url.startsWith("geo:")) {
+                        Uri gmmIntentUri = Uri.parse(url);
+                        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                        mapIntent.setPackage("com.google.android.apps.maps");
+                        try {
+                            startActivity(mapIntent);
+                        } catch (Exception e) {
+                            Toast.makeText(UmangWebActivity.this, "Map app not found", Toast.LENGTH_SHORT).show();
+                            Log.e("Map exception", e.toString());
+                        }
+                        return true;
                     }
-                    return true;
-                }
-                return true;
+                    return true;*/
+//                }
+//                return true;
             }
 
 
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
-
-                super.onPageStarted(view,url,favicon);
+                super.onPageStarted(view, url, favicon);
                 //do you  work
-                if(isError){
-                    isError=false;
-
-                    if(Utils.isNetworkConnected(UmangWebActivity.this)) {
+                if (isError) {
+                    isError = false;
+                    if (Utils.isNetworkConnected(UmangWebActivity.this)) {
                         Intent intent = getIntent();
                         finish();
                         startActivity(intent);
                     }
                 }
-
                 Log.i("Info", "BaseWebActivity onPageStarted");
             }
 
@@ -580,9 +794,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
     /**
      * Method to set webview dynamically to top main layout
      */
-    private void setWebView(){
-
-        Map<String,String> header;
+    private void setWebView() {
 
         JSONObject myObject = new JSONObject();
         try {
@@ -594,22 +806,23 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
         }
 
         header = new HashMap<>();
-        header.put(deptUrl, "Umang-Assistive=" +myObject);
+        header.put(deptUrl, "Umang-Assistive=" + myObject);
         CookieManager cookieMgr = CookieManager.getInstance();
         cookieMgr.acceptCookie();
-        cookieMgr.setCookie(deptUrl, "Umang-Assistive=" +myObject);
-        AgentWebConfig.syncCookie(deptUrl, "Umang-Assistive=" +myObject);
-        AgentWebConfig.debug();
-
-        mAgentWeb= AgentWeb.with(this)
+        cookieMgr.setCookie(deptUrl, "Umang-Assistive=" + myObject);
+        AgentWebConfig.syncCookie(deptUrl, "Umang-Assistive=" + myObject);
+        if (BuildConfig.BUILD_TYPE.equalsIgnoreCase("debug")) {
+            AgentWebConfig.debug();
+        }
+        mAgentWeb = AgentWeb.with(this)
                 .setAgentWebParent(binding.main, new LinearLayout.LayoutParams(-1, -1))
                 .useDefaultIndicator(Color.parseColor(loaderColor))
-                .setMainFrameErrorView(R.layout.web_error_page, R.id.retryWebBtn)
-                .setWebChromeClient(customWebchromeClient)
                 .setWebViewClient(mWebViewClient)
+                .setWebChromeClient(customWebchromeClient)
+                .setMainFrameErrorView(R.layout.web_error_page, R.id.retryWebBtn)
                 .setSecurityType(AgentWeb.SecurityType.DEFAULT_CHECK)
                 .setOpenOtherPageWays(DefaultWebClient.OpenOtherPageWays.ASK)
-                .additionalHttpHeader(deptUrl,header)
+                .additionalHttpHeader(deptUrl, header)
                 .interceptUnkownUrl()
                 .createAgentWeb()
                 .ready()
@@ -619,18 +832,18 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
         commonInterface = new CommonInterface(this);
         cameraInterface = new CameraInterface(this);
         locationInterface = new LocationInterface(this);
-        contactInterface = new ContactInterface(this);
-        downloadInterface= new DownloadInterface(this);
-        mhaInterface= new MHAInterface(this);
+        downloadInterface = new DownloadInterface(this);
+        mhaInterface = new MHAInterface(this);
+        jeevanPramaanInterface = new JeevanPramaanInterface(this, this);
 
         //set java script interfaces
         Map<String, Object> callbackInterfaces = new HashMap();
         callbackInterfaces.put("Common", commonInterface);
         callbackInterfaces.put("Camera", cameraInterface);
         callbackInterfaces.put("Location", locationInterface);
-        callbackInterfaces.put("Contacts", contactInterface);
         callbackInterfaces.put("FileDownload", downloadInterface);
         callbackInterfaces.put("MHA", mhaInterface);
+        callbackInterfaces.put("JeevanPramaan", jeevanPramaanInterface);
 
         mAgentWeb.getJsInterfaceHolder().addJavaObjects(callbackInterfaces);
 
@@ -647,19 +860,20 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
         mAgentWeb.getAgentWebSettings().getWebSettings().setLoadWithOverviewMode(true);
         mAgentWeb.getAgentWebSettings().getWebSettings().setUseWideViewPort(true);
 
-        mAgentWeb.getAgentWebSettings().getWebSettings().setAppCacheEnabled(true);
-        mAgentWeb.getAgentWebSettings().getWebSettings().setAppCachePath(
-                this.getCacheDir().getAbsolutePath());
+        /*deprecated*/
+//        mAgentWeb.getAgentWebSettings().getWebSettings().setAppCacheEnabled(true);
+//        mAgentWeb.getAgentWebSettings().getWebSettings().setAppCachePath(
+//                this.getCacheDir().getAbsolutePath());
+        if (BuildConfig.BUILD_TYPE.equalsIgnoreCase("debug"))
+            mAgentWeb.getAgentWebSettings().getWebSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+        else
+            mAgentWeb.getAgentWebSettings().getWebSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
 
 
-        mAgentWeb.getAgentWebSettings().getWebSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
-
-
-        if(!Utils.isNetworkConnected(this)){
-            mAgentWeb.getAgentWebSettings().getWebSettings().setCacheMode(WebSettings.LOAD_CACHE_ONLY);
+        if (!Utils.isNetworkConnected(this)) {
+            mAgentWeb.getAgentWebSettings().getWebSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
         }
 
-        AgentWebConfig.debug();
 
         mAgentWeb.getAgentWebSettings().getWebSettings().setGeolocationEnabled(true);
 
@@ -694,7 +908,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                         fos.write(buffer, 0, read);
                     }
                     fos.flush();
-                    Toast.makeText(this,getString(R.string.download_success) + " : " + file.getAbsolutePath(),Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, getString(R.string.download_success) + " : " + file.getAbsolutePath(), Toast.LENGTH_LONG).show();
                 } catch (Exception ed) {
 
                 } finally {
@@ -767,7 +981,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                             try {
                                 startActivity(intent);
                             } catch (ActivityNotFoundException e) {
-                                Toast.makeText(this,getString(R.string.no_app_found),Toast.LENGTH_LONG).show();
+                                Toast.makeText(this, getString(R.string.no_app_found), Toast.LENGTH_LONG).show();
                             }
                         } else {
                             Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -780,7 +994,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                             try {
                                 startActivity(intent);
                             } catch (Exception e) {
-                                Toast.makeText(this,getString(R.string.no_app_found),Toast.LENGTH_LONG).show();
+                                Toast.makeText(this, getString(R.string.no_app_found), Toast.LENGTH_LONG).show();
                             }
                         }
 
@@ -854,7 +1068,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                         fos.write(buffer, 0, read);
                     }
                     fos.flush();
-                    Toast.makeText(this,getString(R.string.download_success)+ " : " + file.getAbsolutePath(),Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, getString(R.string.download_success) + " : " + file.getAbsolutePath(), Toast.LENGTH_LONG).show();
                     if (file != null) {
 
                         Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -867,7 +1081,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                         try {
                             startActivity(intent);
                         } catch (Exception e) {
-                            Toast.makeText(this,getString(R.string.no_app_found),Toast.LENGTH_LONG).show();
+                            Toast.makeText(this, getString(R.string.no_app_found), Toast.LENGTH_LONG).show();
                         }
                     }
                 } catch (Exception ed) {
@@ -983,7 +1197,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
     public void hideLoading() {
 
-        if(!isFinishing()){
+        if (!isFinishing()) {
             if (mProgressDialog != null && mProgressDialog.isShowing()) {
                 mProgressDialog.cancel();
             }
@@ -994,7 +1208,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
     public void showLoading() {
         hideLoading();
 
-        if(!isFinishing())
+        if (!isFinishing())
             mProgressDialog = Utils.showLoadingDialog(this);
     }
 
@@ -1059,7 +1273,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                         fos.write(buffer, 0, read);
                     }
                     fos.flush();
-                    Toast.makeText(this,getString(R.string.download_success)+ " : " + file.getAbsolutePath(),Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, getString(R.string.download_success) + " : " + file.getAbsolutePath(), Toast.LENGTH_LONG).show();
                     if (file != null && file.exists()) {
 
                         Intent intent = new Intent(Intent.ACTION_SEND);
@@ -1135,7 +1349,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             case Constants.MY_PERMISSIONS_REQUEST_CODE: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
-                        &&  (grantResults[0] == PackageManager.PERMISSION_GRANTED
+                        && (grantResults[0] == PackageManager.PERMISSION_GRANTED
                         && grantResults[1] == PackageManager.PERMISSION_GRANTED
                 )) {
 
@@ -1279,7 +1493,8 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
                 }
                 return;
-            }case Constants.MY_PERMISSIONS_WRITE_EXTERNAL_STORATE_FOR_DELETE: {
+            }
+            case Constants.MY_PERMISSIONS_WRITE_EXTERNAL_STORATE_FOR_DELETE: {
 
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -1638,351 +1853,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                 }
                 return;
             }
-            case Constants.PERMISSIONS_READ_CALL_LOGS_COMMON_METHOD: {
 
-                Map<String, Integer> perms = new HashMap<String, Integer>();
-                // Initial
-                perms.put(Manifest.permission.READ_CALL_LOG, PackageManager.PERMISSION_GRANTED);
-                perms.put(Manifest.permission.READ_CONTACTS, PackageManager.PERMISSION_GRANTED);
-                // Fill with results
-                for (int i = 0; i < permissions.length; i++)
-                    perms.put(permissions[i], grantResults[i]);
-                // Check for ACCESS_FINE_LOCATION
-                if (perms.get(Manifest.permission.READ_CALL_LOG) == PackageManager.PERMISSION_GRANTED
-                        && perms.get(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED
-                ) {
-                    // All Permissions Granted
-                    //traiInterface.getCallLogs(callBackSuccessFunction, mJsonParams);
-                } else {
-                    // Permission Denied
-
-                    // Permission Denied
-                    String TYPE = "PERMISSION";
-//                    openDialog(getResources().getString(R.string.permission_required),
-//                            getResources().getString(R.string.denied_read_calllogs_permission_help_text),
-//                            getResources().getString(R.string.open_settings),
-//                            getResources().getString(R.string.cancel),
-//                            TYPE);
-                    try {
-                        JSONObject object = new JSONObject();
-                        object.put("status", "f");
-                        object.put("message", "permission_denied");
-                        sendLogs(object.toString());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                return;
-            }
-            case Constants.PERMISSIONS_READ_CALL_LOGS_COMMON_METHOD_TRAI: {
-
-                Map<String, Integer> perms = new HashMap<String, Integer>();
-                // Initial
-                perms.put(Manifest.permission.READ_CALL_LOG, PackageManager.PERMISSION_GRANTED);
-                perms.put(Manifest.permission.READ_CONTACTS, PackageManager.PERMISSION_GRANTED);
-                // Fill with results
-                for (int i = 0; i < permissions.length; i++)
-                    perms.put(permissions[i], grantResults[i]);
-                // Check for ACCESS_FINE_LOCATION
-                if (perms.get(Manifest.permission.READ_CALL_LOG) == PackageManager.PERMISSION_GRANTED
-                        && perms.get(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED
-                ) {
-                    // All Permissions Granted
-                    //traiInterface.getCallLogNumber(callBackSuccessFunction, mJsonParams);
-                } else {
-                    // Permission Denied
-
-                    // Permission Denied
-                    String TYPE = "PERMISSION";
-//                    openDialog(getResources().getString(R.string.permission_required),
-//                            getResources().getString(R.string.denied_read_calllogs_permission_help_text),
-//                            getResources().getString(R.string.open_settings),
-//                            getResources().getString(R.string.cancel),
-//                            TYPE);
-                    try {
-                        JSONObject object = new JSONObject();
-                        object.put("status", "f");
-                        object.put("message", "permission_denied");
-                        sendLogs(object.toString());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                return;
-            }
-            case Constants.PERMISSIONS_READ_SMS_LOGS_COMMON_METHOD: {
-
-                Map<String, Integer> perms = new HashMap<String, Integer>();
-                // Initial
-                perms.put(Manifest.permission.READ_SMS, PackageManager.PERMISSION_GRANTED);
-                perms.put(Manifest.permission.READ_PHONE_STATE, PackageManager.PERMISSION_GRANTED);
-                perms.put(Manifest.permission.READ_CONTACTS, PackageManager.PERMISSION_GRANTED);
-                // Fill with results
-                for (int i = 0; i < permissions.length; i++)
-                    perms.put(permissions[i], grantResults[i]);
-                // Check for ACCESS_FINE_LOCATION
-                if (perms.get(Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED
-                        && perms.get(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED
-                        && perms.get(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED
-                ) {
-                    // All Permissions Granted
-                   // traiInterface.getSMSLogs(callBackSuccessFunction, mJsonParams);
-                } else {
-
-                    // Permission Denied
-                    String TYPE = "PERMISSION";
-//                    openDialog(getResources().getString(R.string.permission_required),
-//                            getResources().getString(R.string.denied_sms_and_phone_permission_help_text_read_sms),
-//                            getResources().getString(R.string.open_settings),
-//                            getResources().getString(R.string.cancel),
-//                            TYPE);
-
-                    try {
-                        JSONObject object = new JSONObject();
-                        object.put("status", "f");
-                        object.put("message", "permission_denied");
-                        //sendBase64Logs(object.toString());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-                return;
-            }
-            case Constants.PERMISSIONS_READ_SMS_LOGS_COMMON_METHOD_TRAI: {
-
-                Map<String, Integer> perms = new HashMap<String, Integer>();
-                // Initial
-                perms.put(Manifest.permission.READ_SMS, PackageManager.PERMISSION_GRANTED);
-                perms.put(Manifest.permission.READ_PHONE_STATE, PackageManager.PERMISSION_GRANTED);
-                perms.put(Manifest.permission.READ_CONTACTS, PackageManager.PERMISSION_GRANTED);
-                // Fill with results
-                for (int i = 0; i < permissions.length; i++)
-                    perms.put(permissions[i], grantResults[i]);
-                // Check for ACCESS_FINE_LOCATION
-                if (perms.get(Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED
-                        && perms.get(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED
-                        && perms.get(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED
-                ) {
-                    // All Permissions Granted
-                    //traiInterface.getSMSLogDetail(callBackSuccessFunction, mJsonParams);
-                } else {
-                    // Permission Denied
-                    String TYPE = "PERMISSION";
-//                    openDialog(getResources().getString(R.string.permission_required),
-//                            getResources().getString(R.string.denied_sms_contact_and_phone_permission_help_text_read_sms),
-//                            getResources().getString(R.string.open_settings),
-//                            getResources().getString(R.string.cancel),
-//                            TYPE);
-                    try {
-                        JSONObject object = new JSONObject();
-                        object.put("status", "f");
-                        object.put("message", "permission_denied");
-                        //sendBase64Logs(object.toString());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-                return;
-            }
-            case Constants.MY_PERMISSIONS_SMS_AND_PHONE: {
-
-                Map<String, Integer> perms = new HashMap<String, Integer>();
-                // Initial
-                perms.put(Manifest.permission.SEND_SMS, PackageManager.PERMISSION_GRANTED);
-                perms.put(Manifest.permission.READ_PHONE_STATE, PackageManager.PERMISSION_GRANTED);
-                // Fill with results
-                for (int i = 0; i < permissions.length; i++)
-                    perms.put(permissions[i], grantResults[i]);
-                // Check for ACCESS_FINE_LOCATION
-                if (perms.get(Manifest.permission.SEND_SMS) == PackageManager.PERMISSION_GRANTED
-                        && perms.get(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED
-                ) {
-                    // All Permissions Granted
-                    //traiInterface.sendSMS(callBackSuccessFunction, mJsonParams);
-                } else {
-                    // Permission Denied
-                    String TYPE = "PERMISSION";
-//                    openDialog(getResources().getString(R.string.permission_required),
-//                            getResources().getString(R.string.denied_sms_and_phone_permission_help_text),
-//                            getResources().getString(R.string.open_settings),
-//                            getResources().getString(R.string.cancel),
-//                            TYPE);
-                    try {
-                        JSONObject object = new JSONObject();
-                        object.put("status", "f");
-                        object.put("message", "permission_denied");
-                        sendLogs(object.toString());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-                return;
-            }
-            /*
-             * This case will check permission is granted and call sendSMS to send message in baclground
-             */
-            case Constants.PERMISSIONS_SEND_SMS_COMMON_METHOD: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    //traiInterface.sendSMS(callBackSuccessFunction, mJsonParams);
-                } else {
-                    Log.d(TAG, "Permission denied........................................");
-                    // Permission Denied
-                    String TYPE = "PERMISSION";
-//                    openDialog(getResources().getString(R.string.permission_required),
-//                            getResources().getString(R.string.denied_send_sms_permission_help_text),
-//                            getResources().getString(R.string.open_settings),
-//                            getResources().getString(R.string.cancel),
-//                            TYPE);
-                    try {
-                        JSONObject object = new JSONObject();
-                        object.put("status", "f");
-                        object.put("message", "permission_denied");
-                        sendLogs(object.toString());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-                return;
-            }
-            case Constants.PERMISSIONS_READ_SMS_TRAI_METHOD: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    //traiInterface.hasOTPReadPermission(callBackSuccessFunction);
-                } else {
-                    Log.d(TAG, "Permission denied........................................");
-                    // Permission Denied
-                    String TYPE = "PERMISSION";
-//                    openDialog(getResources().getString(R.string.permission_required),
-//                            getResources().getString(R.string.allow_sms_and_phone_permission_help_text),
-//                            getResources().getString(R.string.open_settings),
-//                            getResources().getString(R.string.cancel),
-//                            TYPE);
-                    try {
-                        JSONObject object = new JSONObject();
-                        object.put("status", "f");
-                        object.put("message", "permission_denied");
-                        sendLogs(object.toString());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-                return;
-            }
-            case Constants.PERMISSIONS_READ_SMS_OTP_TRAI_METHOD: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    //traiInterface.startOTPAutoRead(callBackSuccessFunction, mJsonParams);
-                } else {
-                    Log.d(TAG, "Permission denied........................................");
-
-                    // Permission Denied
-                    String TYPE = "PERMISSION";
-//                    openDialog(getResources().getString(R.string.permission_required),
-//                            getResources().getString(R.string.denied_read_otp_permission_help_text),
-//                            getResources().getString(R.string.open_settings),
-//                            getResources().getString(R.string.cancel),
-//                            TYPE);
-
-                    try {
-                        JSONObject object = new JSONObject();
-                        object.put("status", "f");
-                        object.put("message", "permission_denied");
-                        sendLogs(object.toString());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-                return;
-            }
-            case Constants.PERMISSIONS_READ_PHONE_STATE_METHOD2: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    //traiInterface.startOTPAutoRead(callBackSuccessFunction, mJsonParams);
-                } else {
-                    Log.d(TAG, "Permission denied........................................");
-
-                    // Permission Denied
-                    String TYPE = "PERMISSION";
-//                    openDialog(getResources().getString(R.string.permission_required),
-//                            getResources().getString(R.string.denied_read_otp_permission_help_text),
-//                            getResources().getString(R.string.open_settings),
-//                            getResources().getString(R.string.cancel),
-//                            TYPE);
-
-                    try {
-                        JSONObject object = new JSONObject();
-                        object.put("status", "f");
-                        object.put("message", "permission_denied");
-                        sendLogs(object.toString());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-                return;
-            }
-            case Constants.PERMISSIONS_READ_PHONE_STATE_METHOD: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    //traiInterface.getOperatorList(callBackSuccessFunction);
-
-                } else {
-                    Log.d(TAG, "Permission denied........................................");
-
-                    // Permission Denied
-                    String TYPE = "PERMISSION";
-//                    openDialog(getResources().getString(R.string.permission_required),
-//                            getResources().getString(R.string.denied_phone_state_permission_help_text),
-//                            getResources().getString(R.string.open_settings),
-//                            getResources().getString(R.string.cancel),
-//                            TYPE);
-
-
-                    try {
-                        JSONObject object = new JSONObject();
-                        object.put("status", "f");
-                        object.put("message", "permission_denied");
-                        sendLogs(object.toString());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-                return;
-            }
-
-            case Constants.PERMISSIONS_CHECK_REGISTERED_NUMBRE: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                   // traiInterface.checkRegisteredNumber(callBackSuccessFunction);
-
-                } else {
-                    Log.d(TAG, "Permission denied........................................");
-
-                    // Permission Denied
-                    String TYPE = "PERMISSION";
-//                    openDialog(getResources().getString(R.string.permission_required),
-//                            getResources().getString(R.string.denied_phone_state_permission_help_text),
-//                            getResources().getString(R.string.open_settings),
-//                            getResources().getString(R.string.cancel),
-//                            TYPE);
-                    try {
-                        JSONObject object = new JSONObject();
-                        object.put("status", "f");
-                        object.put("message", "permission_denied");
-                        sendLogs(object.toString());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-                return;
-            }
             case Constants.PERMISSIONS_WRITE_EXTERNAL_STORATE_FOR_NDL_DELETE: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -2065,9 +1936,9 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-                    try{
+                    try {
                         //downloadInterface.downloadPDF(DownloadInterface.mFileName, DownloadInterface.mFileURL);
-                    }catch (Exception ex){
+                    } catch (Exception ex) {
                         //LogUtil.printStackTrace(ex);
                     }
 
@@ -2083,38 +1954,6 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                             getResources().getString(R.string.cancel),
                             TYPE);
                 }
-                return;
-            }
-            case Constants.PERMISSIONS_MY_CALL_ENABLE: {
-
-                Map<String, Integer> perms = new HashMap<String, Integer>();
-                // Initial
-                perms.put(Manifest.permission.READ_CALL_LOG, PackageManager.PERMISSION_GRANTED);
-                perms.put(Manifest.permission.READ_CONTACTS, PackageManager.PERMISSION_GRANTED);
-                perms.put(Manifest.permission.READ_PHONE_STATE, PackageManager.PERMISSION_GRANTED);
-                // Fill with results
-                for (int i = 0; i < permissions.length; i++)
-                    perms.put(permissions[i], grantResults[i]);
-                // Check for ACCESS_FINE_LOCATION
-                if (perms.get(Manifest.permission.READ_CALL_LOG) == PackageManager.PERMISSION_GRANTED
-                        && perms.get(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED
-                        && perms.get(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
-                } else {
-
-                    Log.d(TAG, "Permission denied........................................");
-
-                    // Permission Denied
-                    String TYPE = "PERMISSION";
-                    try {
-                        JSONObject object = new JSONObject();
-                        object.put("status", "f");
-                        object.put("message", "permission_denied");
-                        sendLogs(object.toString());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-
                 return;
             }
             case Constants.MY_PERMISSIONS_WRITE_EXTERNAL_STORATE_DIGILOCKER: {
@@ -2148,7 +1987,6 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
         if (this.isFinishing()) {
             return;
         }
-
         if (requestCode == mRequestCodeFilePicker) {
             if (resultCode == Activity.RESULT_OK) {
                 if (intent != null) {
@@ -2190,9 +2028,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                     mFileUploadCallbackSecond = null;
                 }
             }
-        }
-
-        else if (requestCode == Constants.BIO_RD_INFO_REQUEST_CODE && resultCode == RESULT_OK) {
+        } else if (requestCode == Constants.BIO_RD_INFO_REQUEST_CODE && resultCode == RESULT_OK) {
             try {
                 if (intent != null) {
                     String deviceSelected = intent.getStringExtra("deviceSelected");
@@ -2213,7 +2049,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                 }
             } catch (Exception e) {
 
-                Utils.showInfoDialog(this,"Please check your biometric device is properly connected and try again.");
+                Utils.showInfoDialog(this, "Please check your biometric device is properly connected and try again.");
 
 
             }
@@ -2225,7 +2061,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                 }
             } catch (Exception e) {
 
-                Utils.showInfoDialog(this,"Not able to capture your fingerprint properly, please try again");
+                Utils.showInfoDialog(this, "Not able to capture your fingerprint properly, please try again");
 
             }
         } else if (requestCode == 2016 && resultCode == RESULT_CANCELED) {
@@ -2240,13 +2076,13 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
             handleImageResultForUri(intent);
 
-        } else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+//        } else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
 
             //crop activity result
-            final CropImage.ActivityResult result = CropImage.getActivityResult(intent);
+//            final CropImage.ActivityResult result = CropImage.getActivityResult(intent);
 
             //method to handle crop activity result and send the result to web
-            handleCropActivityResult(result, resultCode);
+//            handleCropActivityResult(result, resultCode);
         } else if (requestCode == 1001 && resultCode == RESULT_OK) {
             try {
                 //TODO need to check
@@ -2278,7 +2114,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
             handleIdentityProofResult(intent);
 
-        } else if (resultCode == RESULT_OK && requestCode == Constants.REQUEST_PDF_FILE){
+        } else if (resultCode == RESULT_OK && requestCode == Constants.REQUEST_PDF_FILE) {
 
             handlePdfFile(intent);
 
@@ -2301,15 +2137,15 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
             handleBioMetricAuthDepResult(intent);
 
-        }  else if (requestCode == Constants.BIO_DEVICE_REGISTERATION_STEP && resultCode == RESULT_OK) {
+        } else if (requestCode == Constants.BIO_DEVICE_REGISTERATION_STEP && resultCode == RESULT_OK) {
 
             handleBioMetricRegistrationStepsResult(intent);
 
-        } else if (requestCode == Constants.BARCODE_SCAN_REQUEST_CODE && resultCode == RESULT_OK){
+        } else if (requestCode == Constants.BARCODE_SCAN_REQUEST_CODE && resultCode == RESULT_OK) {
 
             handleBarcodeScannerResult(intent);
 
-        } else if(requestCode == Constants.DIGI_GET_DOC_REQUEST_CODE && resultCode == RESULT_OK){
+        } else if (requestCode == Constants.DIGI_GET_DOC_REQUEST_CODE && resultCode == RESULT_OK) {
 
             //viewModel.handleDigiLockerGetDocsResult(intent);
 
@@ -2325,7 +2161,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
             String data = intent.getStringExtra("message");
             sendLogs(data);
-        }  else if (requestCode == Constants.INTENT_SMS_TRAI_SMS_LOG_ACTIVITY && resultCode == RESULT_OK) {
+        } else if (requestCode == Constants.INTENT_SMS_TRAI_SMS_LOG_ACTIVITY && resultCode == RESULT_OK) {
 
             String data = intent.getStringExtra("message");
             sendLogs(data);
@@ -2338,7 +2174,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
             sendMHAFile(intent.getData(), true);
 
-        }  else if (requestCode == Constants.INTENT_CALL_RATE_TRAI_RETURN) {
+        } else if (requestCode == Constants.INTENT_CALL_RATE_TRAI_RETURN) {
 
             //viewModel.handleIntentForCallRate(resultCode, intent);
 
@@ -2352,10 +2188,38 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             } else {
                 //TODO send fail login response
             }
-        } else{
+        }
+        else if (requestCode == FACE_SCAN_REQUEST_CODE && resultCode == RESULT_OK) {
+            try {
+                if (intent != null) {
+                    //handle face capture info from RD service capture
+                    jeevanPramaanInterface.handleRdFaceCapture(intent);
+                }
+            } catch (Exception e) {
+
+                CommonUtils.showInfoDialog(this, "Not able to capture your fingerprint properly, please try again");
+
+                AppLogger.e(TAG, "Error while user finger print capture", e.toString());
+            }
+        }
+        else if (requestCode == FACE_SCAN_XML_REQUEST_CODE && resultCode == RESULT_OK) {
+            try {
+                if (intent != null) {
+                    //handle face capture info from RD service capture and send result back as XML
+                    jeevanPramaanInterface.handleRdFaceCaptureXML(intent);
+                }
+            } catch (Exception e) {
+
+                CommonUtils.showInfoDialog(this, "Not able to capture your fingerprint properly, please try again");
+
+                AppLogger.e(TAG, "Error while user finger print capture", e.toString());
+            }
+        }
+        else {
 
         }
     }
+
     private String deviceInfoSuccessCallback;
 
     /**
@@ -2376,7 +2240,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                 startActivityForResult(intent1, Constants.BIOMETRIC_DEVICE_INFO);
                 UmangAssistiveAndroidSdk.openingIntent = true;
             } catch (ActivityNotFoundException e) {
-                Toast.makeText(this,getString(R.string.bio_other_device_txt1),Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.bio_other_device_txt1), Toast.LENGTH_LONG).show();
             } catch (Exception e) {
             }
         } else {
@@ -2388,6 +2252,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             });
         }
     }
+
     /**
      * Jeevan Praman (JP) send device info to web
      * Method to send Bio Metric Device Info to web
@@ -2417,7 +2282,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
 
             String DeviceInfoXml = intent.getStringExtra("DEVICE_INFO");
-           
+
 
             if (DeviceInfoXml != null) {
                 if (DeviceInfoXml.equals("") || DeviceInfoXml.isEmpty()) {
@@ -2512,6 +2377,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             }
         }
     }
+
     /**
      * Jeevan Praman (JP)
      * Method to send Finger prints to Web
@@ -2531,7 +2397,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             }
             if (pidDataXML.startsWith("ERROR:-")) {
                 AppLogger.d(TAG, "ERROR............." + pidDataXML);
-                CommonUtils.showInfoDialog(this,"An error occurred while capturing your fingerprint. Please try again.");
+                CommonUtils.showInfoDialog(this, "An error occurred while capturing your fingerprint. Please try again.");
                 return;
             }
             DocumentBuilderFactory db = DocumentBuilderFactory.newInstance();
@@ -2565,7 +2431,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                     if (Integer.parseInt(errCodeStr) > 0) {
                         AppLogger.d(TAG, "Capture error :- " + errCodeStr + " , " + errInfoStr);
 //                        onFingerPrintError(errInfoStr);
-                        CommonUtils.showInfoDialog(this,errInfoStr);
+                        CommonUtils.showInfoDialog(this, errInfoStr);
                         return;
                     }
                 }
@@ -2668,6 +2534,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             //getNavigator().onFingerPrintError("Please check your device ");
         }
     }
+
     /**
      * Method to send result canceled to Web
      */
@@ -2690,11 +2557,11 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                 @Override
                 public void run() {
                     SharedPreferences pref = UmangWebActivity.this.getSharedPreferences("UmangSdkPref", 0);
-                    requestImageFor= pref.getString(Constants.PREF_REQUEST_IMAGE_FOR,"");
+                    requestImageFor = pref.getString(Constants.PREF_REQUEST_IMAGE_FOR, "");
                     if (requestImageFor.equalsIgnoreCase("edistrict")) {
                         try {
 
-                            String tempUri= pref.getString(Constants.PREF_CAMERA_IMAGE_URI,imageSelectedPath);
+                            String tempUri = pref.getString(Constants.PREF_CAMERA_IMAGE_URI, imageSelectedPath);
                             Bitmap bitmap = ImageUtils.rescaleImage(UmangWebActivity.this, Uri.parse(tempUri), 500);
                             ByteArrayOutputStream stream = new ByteArrayOutputStream();
                             bitmap.compress(Bitmap.CompressFormat.JPEG, 70, stream);
@@ -2711,21 +2578,23 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                             //Log.e(e.toString());
                         }
                     } else {
-                        String tempUri= pref.getString(Constants.PREF_CAMERA_IMAGE_URI,imageSelectedPath);
-                        CropImage.activity(Uri.parse(tempUri))
+                        String tempUri = pref.getString(Constants.PREF_CAMERA_IMAGE_URI, imageSelectedPath);
+                        startImageCropping(Uri.parse(tempUri), true, true, 500, 500, 0);
+                        /*CropImage.activity(Uri.parse(tempUri))
                                 .setAspectRatio(500, 500)
                                 .setFixAspectRatio(true)
                                 .setGuidelines(CropImageView.Guidelines.ON)
-                                .start(UmangWebActivity.this);
+                                .start(UmangWebActivity.this);*/
                     }
 
                 }
             });
         } catch (Exception e) {
             //Log.e(e.toString());
-            Toast.makeText(this,getString(R.string.please_try_again),Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.please_try_again), Toast.LENGTH_LONG).show();
         }
     }
+
     /**
      * check the size of Input stream  with max size
      *
@@ -2756,6 +2625,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
         }
         return false;
     }
+
     /**
      * Method to handle image result for URI
      *
@@ -2768,7 +2638,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                 public void run() {
                     Uri uri = intent.getData();
                     SharedPreferences pref = UmangWebActivity.this.getSharedPreferences("UmangSdkPref", 0);
-                    requestImageFor= pref.getString(Constants.PREF_REQUEST_IMAGE_FOR,"");
+                    requestImageFor = pref.getString(Constants.PREF_REQUEST_IMAGE_FOR, "");
                     if (requestImageFor.equalsIgnoreCase("edistrict")) {
                         try {
 
@@ -2791,26 +2661,29 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                             //Log.e(e.toString());
                         }
                     } else {
-                        CropImage.activity(Uri.parse(uri.toString()))
+                        startImageCropping(uri, true, true, 500, 500, 0);
+                       /* CropImage.activity(Uri.parse(uri.toString()))
                                 .setAspectRatio(500, 500)
                                 .setFixAspectRatio(true)
                                 .setGuidelines(CropImageView.Guidelines.ON)
-                                .start(UmangWebActivity.this);
+                                .start(UmangWebActivity.this);*/
                     }
                 }
             });
         } catch (Exception e) {
             //Log.e(e.toString());
-            Toast.makeText(this,getString(R.string.please_try_again),Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.please_try_again), Toast.LENGTH_LONG).show();
             //activity.showToast(activity.getResources().getString(R.string.please_try_again));
         }
     }
+
     /**
      * Method to handle result from CropActivity
      *
      * @param result
      * @param resultCode
      */
+/*
     public void handleCropActivityResult(final CropImage.ActivityResult result, int resultCode) {
         if (resultCode == RESULT_OK) {
 
@@ -3051,6 +2924,247 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
         }
 
     }
+*/
+    public void handleCropActivityResult(final com.canhub.cropper.CropImageView.CropResult result, int resultCode) {
+        if (resultCode == RESULT_OK) {
+
+            if (!isFinishing()) {
+                // loadurl on UI main thread
+                runOnUiThread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        Uri resultUri = result.getUriContent();
+                        if (CropImageId == 1) {
+                            CropImageId = 0;
+
+                            Bitmap bitma = null;
+                            try {
+
+                                String name = String.format("Pan1-%s.jpg", Calendar.getInstance().getTimeInMillis());
+                                File outputDir = new File(getFilesDir(), "Pan");
+                                if (!outputDir.exists()) {
+                                    outputDir.mkdirs(); // should succeed
+                                }
+                                File outputFile = new File(outputDir, name);
+
+                                Bitmap bmp = BitmapFactory.decodeFile(resultUri.getPath(), null);
+
+                                boolean isWidthMax = false;
+                                if (bmp != null) {
+                                    int height = bmp.getHeight();
+                                    int width = bmp.getWidth();
+
+                                    if (height > width) {
+                                        isWidthMax = false;
+                                    } else {
+                                        isWidthMax = true;
+                                    }
+                                }
+                                int maxHeight = 842;
+                                int maxWidth = 595;
+
+                                if (isWidthMax) {
+                                    maxHeight = 595;
+                                    maxWidth = 842;
+                                }
+
+                                Compressor comp = new Compressor(UmangWebActivity.this)
+                                        .setMaxWidth(maxWidth)
+                                        .setMaxHeight(maxHeight)
+                                        .setQuality(60)
+                                        .setDestinationDirectoryPath(Environment.getExternalStoragePublicDirectory(
+                                                Environment.DIRECTORY_PICTURES).getAbsolutePath());
+
+                                File file = comp.compressToFile(FileUtils.from(UmangWebActivity.this, resultUri));
+
+                                byte[] b = new byte[(int) file.length()];
+                                try {
+                                    FileInputStream fileInputStream = new FileInputStream(file);
+                                    fileInputStream.read(b);
+                                    for (int i = 0; i < b.length; i++) {
+                                        System.out.print((char) b[i]);
+                                    }
+                                } catch (FileNotFoundException e) {
+                                    System.out.println("File Not Found.");
+                                    e.printStackTrace();
+                                } catch (IOException e1) {
+                                    System.out.println("Error Reading The File.");
+                                    e1.printStackTrace();
+                                }
+
+                                String encoded = Base64.encodeToString(b, Base64.DEFAULT);
+                                callWebService(encoded, "JPG");
+                            } catch (IOException e) {
+                                //Log.e(e.toString());
+                            }
+
+                            return;
+                        } else if (CropImageId == 2) {
+                            CropImageId = 0;
+                            Bitmap bitma = null;
+                            try {
+
+                                String name = String.format("Pan1-%s.jpg", Calendar.getInstance().getTimeInMillis());
+                                File outputDir = new File(getFilesDir(), "Pan");
+                                if (!outputDir.exists()) {
+                                    outputDir.mkdirs(); // should succeed
+                                }
+                                File outputFile = new File(outputDir, name);
+
+                                File OutDir = new File(getFilesDir(), "Pan");
+
+                                Compressor comp = new Compressor(UmangWebActivity.this)
+                                        .setMaxWidth(213)
+                                        .setMaxHeight(213)
+                                        .setQuality(60)
+//                                            .setCompressFormat(Bitmap.CompressFormat.WEBP)
+                                        .setDestinationDirectoryPath(OutDir.getAbsolutePath());
+
+                                File uriFile = FileUtils.from(UmangWebActivity.this, resultUri);
+
+                                File file = comp.compressToFile(FileUtils.from(UmangWebActivity.this, resultUri));
+
+                                byte[] b = new byte[(int) file.length()];
+                                try {
+                                    FileInputStream fileInputStream = new FileInputStream(file);
+                                    fileInputStream.read(b);
+                                    for (int i = 0; i < b.length; i++) {
+                                        System.out.print((char) b[i]);
+                                    }
+                                } catch (FileNotFoundException e) {
+                                    System.out.println("File Not Found.");
+                                    e.printStackTrace();
+                                } catch (IOException e1) {
+                                    System.out.println("Error Reading The File.");
+                                    e1.printStackTrace();
+                                }
+
+                                String encoded = Base64.encodeToString(b, Base64.DEFAULT);
+
+                                callWebService(encoded, "JPG");
+
+                            } catch (IOException e) {
+                                //Log.e(e.toString());
+                                mAgentWeb.getWebCreator().getWebView().loadUrl("javascript:" + callBackFailureFunction + "(\"" + Constants.IO_EXCEPTION + "\")");
+                            } catch (OutOfMemoryError e) {
+                                //Log.e(e.toString());
+                                mAgentWeb.getWebCreator().getWebView().loadUrl("javascript:" + callBackFailureFunction + "(\"" + Constants.IMAGE_SIZE_EXCEEDED + "\")");
+
+                            }
+
+                            return;
+                        } else if (CropImageId == 3) {
+                            CropImageId = 0;
+
+                            byte[] imgArray = compressDocumentImage(resultUri, 0, 60);
+
+                            //Log.e("Sizeee before sig", "" + imgArray.length);
+                            imgArray = setDpi(imgArray, 600);
+                            //Log.e("Sizeee after sig", "" + imgArray.length);
+                            if (isSizeGood(imgArray, 60)) {
+
+                                Bitmap blackAndWhite = createBlackAndWhite(BitmapFactory.decodeByteArray(imgArray, 0, imgArray.length));
+                                String encodedStr = ImageUtils.encodeImage(blackAndWhite);
+                                String mimetype = getMineType(resultUri);
+
+
+                                callWebService(encodedStr, mimetype);
+                            } else {
+                                mAgentWeb.getWebCreator().getWebView().loadUrl("javascript:" + callBackFailureFunction + "(\"" + Constants.IMAGE_SIZE_EXCEEDED + "\")");
+                            }
+                            return;
+                        } else if (CropImageId == 4) {
+                            CropImageId = 0;
+                            BitmapFactory.Options o = new BitmapFactory.Options();
+                            o.inJustDecodeBounds = true;
+                            try {
+                                Bitmap bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(resultUri), null, o);
+                                if (bitmap != null) {
+                                    //Log.e("Bitmap", bitmap.getHeight() + "");
+                                } else {
+                                    //Log.e("Bitmap", "Bitmap is nulll ");
+                                }
+                            } catch (FileNotFoundException e) {
+                                e.printStackTrace();
+                            }
+
+                            return;
+                        } else if (CropImageId == 5) {
+                            CropImageId = 0;
+                            //byte[] imageArray = compressDocumentImage(resultUri, 500, Integer.parseInt(activity.MaxSize));
+                            byte[] imageArray = new byte[0];
+                            try {
+                                imageArray = ImageUtils.getBytesFromUri(resultUri, UmangWebActivity.this);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                            //ImageUtils.showImageBitmapInDialog(imageArray,activity);
+
+                            //Log.e("Sizeee", "" + imageArray.length);
+                            try {
+                                if (isSizeGood(imageArray, Integer.valueOf(MaxSize))) {
+                                    String encodedStr = Base64.encodeToString(imageArray, Base64.DEFAULT);
+                                    String mimetype = getMineType(resultUri);
+                                    callWebService(encodedStr, mimetype);
+                                } else {
+                                    mAgentWeb.getWebCreator().getWebView().loadUrl("javascript:" + callBackFailureFunction + "(\"" + Constants.IMAGE_SIZE_EXCEEDED + "\")");
+                                }
+                            } catch (NumberFormatException e) {
+                                mAgentWeb.getWebCreator().getWebView().loadUrl("javascript:" + callBackFailureFunction + "(\"" + Constants.IO_EXCEPTION + "\")");
+                            } catch (Exception e) {
+                                mAgentWeb.getWebCreator().getWebView().loadUrl("javascript:" + callBackFailureFunction + "(\"" + Constants.IO_EXCEPTION + "\")");
+                            }
+
+                            return;
+                        }
+
+                        imageSelectedPath = resultUri.toString();
+                        try {
+
+                            Bitmap bitmap = ImageUtils.rescaleImage(UmangWebActivity.this, resultUri, 500);
+                            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, 70, stream);
+                            final InputStream imageStream = new ByteArrayInputStream(stream.toByteArray());
+                            //final InputStream imageStream = getContentResolver().openInputStream(resultUri);
+                            final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+                            String encodedStr = ImageUtils.encodeImage(selectedImage);
+
+                            mAgentWeb.getWebCreator().getWebView().loadUrl("javascript:" + callBackSuccessFunction + "(\"data:image/png;base64," + encodedStr + "\")");
+
+                        } catch (IOException e) {
+                            mAgentWeb.getWebCreator().getWebView().loadUrl("javascript:" + callBackFailureFunction + "(\"" + Constants.IO_EXCEPTION + "\")");
+                            //Log.e(e.toString());
+                        }
+
+                    }
+                });
+            }
+        } else if (resultCode == 1) {
+            Exception error = result.getError();
+            if (!isFinishing()) {
+                // loadurl on UI main thread
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mAgentWeb.getWebCreator().getWebView().loadUrl("javascript:" + callBackFailureFunction + "(\"Action cancelled\")");
+                    }
+                });
+            }
+        } else {
+            if (!isFinishing()) {
+                // loadurl on UI main thread
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mAgentWeb.getWebCreator().getWebView().loadUrl("javascript:" + callBackFailureFunction + "(\"Action cancelled\")");
+                    }
+                });
+            }
+        }
+
+    }
 
     private void callWebService(String encodedStr, String mimetype) {
 
@@ -3105,7 +3219,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             return compressedImageByte;
         } catch (FileNotFoundException e) {
             mAgentWeb.getWebCreator().getWebView().loadUrl("javascript:" + callBackFailureFunction + "(\"" + Constants.FILE_NOT_FOUND + "\")");
-           // Log.e(e.toString());
+            // Log.e(e.toString());
             return null;
         }
     }
@@ -3268,7 +3382,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                                     } else
                                         mAgentWeb.getWebCreator().getWebView().loadUrl("javascript:" + CommonInterface.m4agriImageSuccessCallback + "(\"" + encodedStr.replaceAll("\\s+", "") + "\")");
                                 } else {
-                                    Toast.makeText(UmangWebActivity.this,"Maximum of three images can be selected",Toast.LENGTH_LONG).show();
+                                    Toast.makeText(UmangWebActivity.this, "Maximum of three images can be selected", Toast.LENGTH_LONG).show();
                                 }
                             } catch (Exception e) {
                                 sendImagesFailToWeb();
@@ -3279,9 +3393,8 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             });
         } catch (Exception e) {
             //Log.e(e.toString());
-            Toast.makeText(UmangWebActivity.this,getString(R.string.please_try_again),Toast.LENGTH_LONG).show();
+            Toast.makeText(UmangWebActivity.this, getString(R.string.please_try_again), Toast.LENGTH_LONG).show();
         }
-
     }
 
     /**
@@ -3293,7 +3406,6 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-
                     try {
                         Bitmap bitmap = ImageUtils.rescaleImage(UmangWebActivity.this, imageSelect.mCapturedImageURI, 400);
                         ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -3320,7 +3432,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
         } catch (Exception e) {
             //Log.e(e.toString());
             sendImagesFailToWeb();
-            Toast.makeText(UmangWebActivity.this,getString(R.string.please_try_again),Toast.LENGTH_LONG).show();
+            Toast.makeText(UmangWebActivity.this, getString(R.string.please_try_again), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -3363,9 +3475,10 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                 Bitmap orignalBitmap = decodeSampledBitmapFromInputStream(inputStream, inputStream2, 500, 500);
 
                 CropImageId = 1;
-                CropImage.activity(getImageUri(this, orignalBitmap))
+                startImageCropping(getImageUri(this, orignalBitmap), true);
+              /*  CropImage.activity(getImageUri(this, orignalBitmap))
                         .setGuidelines(CropImageView.Guidelines.ON)
-                        .start(this);
+                        .start(this);*/
             }
 
         } catch (FileNotFoundException e) {
@@ -3453,7 +3566,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
      */
 
     public Uri getImageUri(Context inContext, Bitmap inImage) throws Exception {
-        if (ContextCompat.checkSelfPermission(this,
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU || ContextCompat.checkSelfPermission(this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED) {
 
@@ -3550,11 +3663,12 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
             final InputStream imageStream2 = getContentResolver().openInputStream(imageUri);
             CropImageId = 2;
-            CropImage.activity(imageUri)
+            startImageCropping(imageUri, true, true, 0, 0, 70);
+           /* CropImage.activity(imageUri)
                     .setFixAspectRatio(true)
                     .setOutputCompressQuality(70)
                     .setGuidelines(CropImageView.Guidelines.ON)
-                    .start(this);
+                    .start(this);*/
 
         } catch (FileNotFoundException e) {
             mAgentWeb.getWebCreator().getWebView().loadUrl("javascript:" + callBackFailureFunction + "(\"" + Constants.FILE_NOT_FOUND + "\")");
@@ -3562,7 +3676,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
             try {
                 mAgentWeb.getWebCreator().getWebView().loadUrl("javascript:" + callBackFailureFunction + "(\"" + Constants.PERMISSION_NOT_GRANTED + "\")");
-            }catch (Exception ex){
+            } catch (Exception ex) {
 
             }
         }
@@ -3600,18 +3714,28 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                         aspectRatio = false;
                     }
                     CropImageId = 5;
-                    CropImage.ActivityBuilder builder = CropImage.activity(getImageUri(UmangWebActivity.this, orignalBitmap));
+//                    CropImage.ActivityBuilder builder = CropImage.activity(getImageUri(UmangWebActivity.this, orignalBitmap));
 
                     if (mCropType.equalsIgnoreCase("aspect")) {
-                        builder.setAspectRatio(mCropHeight, mCropWidth);
-                        builder.setFixAspectRatio(aspectRatio);
+//                        builder.setAspectRatio(mCropHeight, mCropWidth);
+//                        builder.setFixAspectRatio(aspectRatio);
+                        startImageCropping(getImageUri(UmangWebActivity.this, orignalBitmap),
+                                true, aspectRatio,
+                                mCropHeight,
+                                mCropWidth,
+                                0);
 
                     } else if (mCropType.equalsIgnoreCase("pixel")) {
-                        builder.setMinCropResultSize(mCropWidth, mCropHeight);
-
+//                        builder.setMinCropResultSize(mCropWidth, mCropHeight);
+                        startImageCropping(getImageUri(UmangWebActivity.this, orignalBitmap),
+                                true,
+                                false, 0, 0,
+                                0, 0, 0,
+                                mCropWidth, mCropHeight
+                        );
                     }
-                    builder.setGuidelines(CropImageView.Guidelines.ON)
-                            .start(UmangWebActivity.this);
+//                    builder.setGuidelines(CropImageView.Guidelines.ON)
+//                            .start(UmangWebActivity.this);
                 } else {
                     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
@@ -3657,13 +3781,20 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             final InputStream imageStream2 = getContentResolver().openInputStream(imageUri);
             Bitmap orignalBitmap = decodeSampledBitmapFromInputStream(imageStream, imageStream2, 500, 500);
             CropImageId = 4;
-            CropImage.activity(getImageUri(this, orignalBitmap))
+            startImageCropping(getImageUri(this, orignalBitmap),
+                    true,
+                    true,
+                    135, 145,
+                    70,
+                    600, 600,
+                    0,0);
+           /* CropImage.activity(getImageUri(this, orignalBitmap))
                     .setAspectRatio(135, 145)
                     .setFixAspectRatio(true)
                     .setMaxCropResultSize(600, 600)
                     .setOutputCompressQuality(70)
                     .setGuidelines(CropImageView.Guidelines.ON)
-                    .start(this);
+                    .start(this);*/
 
         } catch (FileNotFoundException e) {
             //Log.e(e.toString());
@@ -3703,10 +3834,12 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             final InputStream imageStream2 = getContentResolver().openInputStream(imageUri);
             Bitmap orignalBitmap = decodeSampledBitmapFromInputStream(imageStream, imageStream2, 400, 300);
             CropImageId = 3;
-            CropImage.activity(getImageUri(this, orignalBitmap))
+            startImageCropping(getImageUri(this, orignalBitmap), true);
+
+           /* CropImage.activity(getImageUri(this, orignalBitmap))
                     .setOutputCompressQuality(70)
                     .setGuidelines(CropImageView.Guidelines.ON)
-                    .start(this);
+                    .start(this);*/
         } catch (FileNotFoundException e) {
             mAgentWeb.getWebCreator().getWebView().loadUrl("javascript:" + callBackFailureFunction + "(\"" + Constants.FILE_NOT_FOUND + "\")");
             //Log.e(e.toString());
@@ -3768,7 +3901,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                 public void run() {
                     try {
                         SharedPreferences pref = UmangWebActivity.this.getSharedPreferences("UmangSdkPref", 0);
-                        String tempUri= pref.getString(Constants.PREF_CAMERA_IMAGE_URI,imageSelectedPath);
+                        String tempUri = pref.getString(Constants.PREF_CAMERA_IMAGE_URI, imageSelectedPath);
                         Uri uri = Uri.parse(tempUri);
                         Bitmap bitmap = ImageUtils.rescaleImage(UmangWebActivity.this, Uri.parse(tempUri), 500);
 
@@ -3778,18 +3911,26 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                                 aspectRatio = false;
                             }
                             CropImageId = 5;
-                            CropImage.ActivityBuilder builder = CropImage.activity(getImageUri(UmangWebActivity.this, bitmap));
+//                            CropImage.ActivityBuilder builder = CropImage.activity(getImageUri(UmangWebActivity.this, bitmap));
 
                             if (mCropType.equalsIgnoreCase("aspect")) {
-                                builder.setAspectRatio(mCropHeight, mCropWidth);
-                                builder.setFixAspectRatio(aspectRatio);
+//                                builder.setAspectRatio(mCropHeight, mCropWidth);
+//                                builder.setFixAspectRatio(aspectRatio);
+                                startImageCropping(getImageUri(UmangWebActivity.this, bitmap),
+                                        true,
+                                        aspectRatio, mCropHeight, mCropWidth, 0);
 
                             } else if (mCropType.equalsIgnoreCase("pixel")) {
-                                builder.setMinCropResultSize(mCropWidth, mCropHeight);
+//                                builder.setMinCropResultSize(mCropWidth, mCropHeight);
+                                startImageCropping(getImageUri(UmangWebActivity.this, bitmap),
+                                        true,
+                                        false, 0, 0, 0,
+                                        0, 0,
+                                        mCropWidth, mCropHeight);
 
                             }
-                            builder.setGuidelines(CropImageView.Guidelines.ON)
-                                    .start(UmangWebActivity.this);
+//                            builder.setGuidelines(CropImageView.Guidelines.ON)
+//                                    .start(UmangWebActivity.this);
                         } else {
                             ByteArrayOutputStream stream = new ByteArrayOutputStream();
                             bitmap.compress(Bitmap.CompressFormat.JPEG, 70, stream);
@@ -3818,7 +3959,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(UmangWebActivity.this,getString(R.string.please_try_again),Toast.LENGTH_LONG).show();
+                        Toast.makeText(UmangWebActivity.this, getString(R.string.please_try_again), Toast.LENGTH_LONG).show();
                     }
                 });
             }
@@ -3853,20 +3994,32 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                             aspectRatio = false;
                         }
                         CropImageId = 5;
-                        CropImage.ActivityBuilder builder = CropImage.activity(uri);
+//                        CropImage.ActivityBuilder builder = CropImage.activity(uri);
 
                         if (mCropType.equalsIgnoreCase("aspect")) {
-                            builder.setAspectRatio(mCropHeight, mCropWidth);
-                            builder.setFixAspectRatio(aspectRatio);
+//                            builder.setAspectRatio(mCropHeight, mCropWidth);
+//                            builder.setFixAspectRatio(aspectRatio);
+                            startImageCropping(uri,
+                                    true,
+                                    aspectRatio, mCropHeight, mCropWidth,
+                                    0,
+                                    2000, 2000,
+                                    0, 0);
 
                         } else if (mCropType.equalsIgnoreCase("pixel")) {
-                            builder.setMinCropResultSize(mCropWidth, mCropHeight);
+//                            builder.setMinCropResultSize(mCropWidth, mCropHeight);
+                            startImageCropping(uri,
+                                    true,
+                                    false, 0, 0,
+                                    0,
+                                    2000, 2000,
+                                    mCropWidth, mCropWidth);
 
                         }
 
-                        builder.setMaxCropResultSize(2000, 2000);
-                        builder.setGuidelines(CropImageView.Guidelines.ON)
-                                .start(UmangWebActivity.this);
+//                        builder.setMaxCropResultSize(2000, 2000);
+//                        builder.setGuidelines(CropImageView.Guidelines.ON)
+//                                .start(UmangWebActivity.this);
                     } else {
                         String mimetype = getMineType(uri);
                         ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -3918,13 +4071,13 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
     }
 
-    private boolean isFromGpsSettings=false;
+    private boolean isFromGpsSettings = false;
 
     @Override
     public void onOkClick(String type) {
         switch (type) {
             case "PERMISSION":
-                isFromGpsSettings=true;
+                isFromGpsSettings = true;
                 Intent intent = new Intent();
                 intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
                 Uri uri = Uri.fromParts("package", getPackageName(), null);
@@ -3946,7 +4099,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
     @Override
     public void onCancelClick(String type) {
 
-        switch (type){
+        switch (type) {
             case "LOCATION_DISABLE":
                 sendLocationCallBack("F", "", LocationInterface.locationResponse);
                 break;
@@ -3955,6 +4108,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
 
     private GpsTracker gpsTracker;
+
     @SuppressLint("MissingPermission")
     public void getLastLocation() {
         if (checkPermissions()) {
@@ -3962,7 +4116,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
 
                 gpsTracker = new GpsTracker(UmangWebActivity.this);
-                if(gpsTracker.canGetLocation()){
+                if (gpsTracker.canGetLocation()) {
 
 
                     double latitude = gpsTracker.getLatitude();
@@ -3982,8 +4136,6 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             requestPermissions();
         }
     }
-
-
 
 
     private boolean checkPermissions() {
@@ -4011,8 +4163,9 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
 
     /**
-     *  From: - Location Interface
-     *  Method to send location to web
+     * From: - Location Interface
+     * Method to send location to web
+     *
      * @param action
      * @param latlng
      * @param s
@@ -4057,7 +4210,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
     }
 
 
-    public  void openEmailShareWithAttachment(String emailAddrss) {
+    public void openEmailShareWithAttachment(String emailAddrss) {
 
         String downloadFilePath = "file:////storage/emulated/0/Download/android-app-testing.pdf";
         Intent mail = new Intent(Intent.ACTION_SEND);
@@ -4077,12 +4230,13 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             public void run() {
 
 
-                if(mAgentWeb !=null)
+                if (mAgentWeb != null)
                     mAgentWeb.getWebCreator().getWebView().loadUrl("javascript:" + methodName + "(\"" + response + "\")");
 
             }
         });
     }
+
     public void openBiometricDeviceScreen(final String successCallback, final String failureCallback) {
         Intent i = new Intent(UmangWebActivity.this, JPDeviceSelectActivity.class);
         i.putExtra("successCallback", successCallback);
@@ -4090,7 +4244,153 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
         startActivityForResult(i, Constants.BIO_RD_INFO_REQUEST_CODE);
     }
 
-    class CustomWebChromeClient extends WebChromeClient{
+    @Override
+    public String getUserInfo() {
+        return "";
+    }
+
+    @Override
+    public String getNssoPayload() {
+        if(nssoPayload == null) {
+            return "";
+        } else {
+            return nssoPayload;
+        }
+    }
+
+    @Override
+    public String getSharedPreferencesValue(String key, String defaultValue) {
+        if(appSharedPreferences!=null) {
+            return appSharedPreferences.getStringPreference(key, defaultValue);
+        }
+        return defaultValue;
+    }
+
+    @Override
+    public void setSharedPreferencesValue(String key, String value) {
+        if(appSharedPreferences!=null) {
+            appSharedPreferences.writeStringPreference(key, value);
+        }
+    }
+
+    @Override
+     public AppCompatActivity getContext() {
+         return this;
+     }
+
+     @Override
+     public void showToastMessage(String message) {
+         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();;
+     }
+
+     @Override
+     public void showToastMessage(int messageId) {
+         Toast.makeText(this, getString(messageId), Toast.LENGTH_SHORT).show();;
+
+     }
+
+     @Override
+     public void showInfoPopup(String message, int stringResId, Boolean forceBack) {
+         if(forceBack) {
+             CommonUtils.showInfoDialog(this, message.isEmpty()? getString(stringResId) : message, "FORCEBACK" , this);
+         } else {
+             CommonUtils.showInfoDialog(this, message);
+         }
+     }
+
+     @Override
+     public void redirectToPlayStore(String url) {
+         try {
+             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$url")));
+         } catch (ActivityNotFoundException e) {
+             startActivity(
+                     new Intent(
+                             Intent.ACTION_VIEW,
+                             Uri.parse("https://play.google.com/store/apps/details?id=$url")
+                     )
+             );
+         }
+     }
+
+     @Override
+     public void startActivityForResultWithLauncher(Intent intent, ActivityResultLauncher<Intent> launcher) {
+         launcher.launch(intent);
+     }
+
+     @Override
+     public void setCallbackFunctions(String successCallback, String failureCallback) {
+         callBackSuccessFunction = successCallback;
+         callBackFailureFunction = failureCallback;
+     }
+
+     @Override
+     public String getSuccessCallbackFunction() {
+         return callBackSuccessFunction;
+     }
+
+     @Override
+     public String getFailureCallbackFunction() {
+         return callBackFailureFunction;
+     }
+
+     @Override
+     public void evaluateJavascriptInterface(String script, ValueCallback<String> resultCallback) {
+         mAgentWeb.getWebCreator().getWebView().evaluateJavascript(script, resultCallback);
+     }
+
+     @Override
+     public void loadWebUrl(String url) {
+         mAgentWeb.getWebCreator().getWebView().loadUrl(url);
+     }
+
+     @Override
+     public void shareBase64(String base64, String shareText) {
+        CommonUtils.shareImageViaShareIntent(this, CommonUtils.imageBase64ToUri(this, base64), shareText);
+     }
+
+    @Override
+    public void showDepartmentHeader(String headerName) {
+        runOnUiThread(() -> {
+            binding.tvDeptName.setText(headerName);
+            if (headerName.isEmpty()) {
+                binding.llDeptHeader.setVisibility(View.GONE);
+            } else {
+                // Used a handler to delay the visibility change if the headerName is not empty
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    binding.llDeptHeader.setVisibility(View.VISIBLE);
+                }, 1000);
+            }
+        });
+    }
+
+    @Override
+    public String getAesEncryptedMobileNumber() {
+        if(getIntent() == null || getIntent().getStringExtra(Constants.SDK_LOGGED_IN_USER_MOBILE_NUMBER) == null) {
+            return "";
+        } else {
+            return new AESUtil().aesEncryption(getIntent().getStringExtra(Constants.SDK_LOGGED_IN_USER_MOBILE_NUMBER));
+        }
+    }
+
+    @Override
+    public String getMobileNumber() {
+        if(getIntent() == null || getIntent().getStringExtra(Constants.SDK_LOGGED_IN_USER_MOBILE_NUMBER) == null) {
+            return "";
+        } else {
+            return getIntent().getStringExtra(Constants.SDK_LOGGED_IN_USER_MOBILE_NUMBER);
+        }
+    }
+
+    @Override
+    public String getServicesViewType() {
+        if(getIntent() == null || getIntent().getStringExtra(Constants.SDK_SERVICES_VIEW_TYPE) == null) {
+            return "";
+        } else {
+            return getIntent().getStringExtra(Constants.SDK_SERVICES_VIEW_TYPE);
+        }
+    }
+
+    class CustomWebChromeClient extends WebChromeClient {
 
         private Bitmap mDefaultVideoPoster;
         private View mVideoProgressView;
@@ -4131,60 +4431,65 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
 
         @Override
         public void onShowCustomView(View view, CustomViewCallback callback) {
-
             // if a view already exists then immediately terminate the new one
             if (videoView != null) {
                 callback.onCustomViewHidden();
                 return;
             }
-            getSupportActionBar().hide();
-            runOnUiThread(new Runnable() {
-                public void run() {
-                    //stuff that updates ui
-                    UmangWebActivity.this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                    UmangWebActivity.this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-                }
-            });
-            videoView = view;
-            if(mAgentWeb !=null)
-                mAgentWeb.getWebCreator().getWebView().setVisibility(View.GONE);
-            binding.customViewContainer.setVisibility(View.VISIBLE);
-            binding.customViewContainer.addView(view);
-            videoViewCallback = callback;
+            try {
+               showHideHeaderFooters(false);
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        //stuff that updates ui
+                        UmangWebActivity.this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                        UmangWebActivity.this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                    }
+                });
+                videoView = view;
+                if (mAgentWeb != null)
+                    mAgentWeb.getWebCreator().getWebView().setVisibility(View.GONE);
+                binding.customViewContainer.setVisibility(View.VISIBLE);
+                binding.customViewContainer.addView(view);
+                videoViewCallback = callback;
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
         }
 
         @Override
         public void onHideCustomView() {
             super.onHideCustomView();    //To change body of overridden methods use File | Settings | File Templates.
+            try {
+                showHideHeaderFooters(true);
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        //stuff that updates ui
+                        UmangWebActivity.this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                        UmangWebActivity.this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                    }
+                });
+                if (videoView == null)
+                    return;
 
-            getSupportActionBar().show();
+                if (mAgentWeb != null)
+                    mAgentWeb.getWebCreator().getWebView().setVisibility(View.VISIBLE);
 
-            runOnUiThread(new Runnable() {
-                public void run() {
+                binding.customViewContainer.setVisibility(View.GONE);
 
-                    //stuff that updates ui
-                    UmangWebActivity.this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                    UmangWebActivity.this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-                }
-            });
-            if (videoView == null)
-                return;
+                // Hide the custom view.
+                videoView.setVisibility(View.GONE);
 
-            if(mAgentWeb !=null)
-                mAgentWeb.getWebCreator().getWebView().setVisibility(View.VISIBLE);
+                // Remove the custom view from its container.
+                binding.customViewContainer.removeView(videoView);
 
-            binding.customViewContainer.setVisibility(View.GONE);
+                videoViewCallback.onCustomViewHidden();
 
-            // Hide the custom view.
-            videoView.setVisibility(View.GONE);
-
-            // Remove the custom view from its container.
-            binding.customViewContainer.removeView(videoView);
-
-            videoViewCallback.onCustomViewHidden();
-
-            videoView = null;
+                videoView = null;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -4263,6 +4568,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
         //check bio device connection
         showBioDeviceConnectionInfo();
     }
+
     /**
      * Jeevan Praman (JP)
      * Method to show Connected device
@@ -4288,6 +4594,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             });
         }
     }
+
     /**
      * Jeevan Praman (JP)
      * Method to scan connected Bio Devices
@@ -4465,5 +4772,45 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
             return "";
         }
         return myval;
+    }
+
+    private void startImageCropping(Uri uri, boolean guidelines) {
+        startImageCropping(uri, guidelines, false, 0, 0, 0);
+    }
+    private void startImageCropping(Uri uri, boolean guidelines, boolean fixAspectRatio, int aspectRatioX, int aspectRatioY, int compressQuality) {
+        startImageCropping(uri, guidelines, fixAspectRatio, aspectRatioX, aspectRatioY, compressQuality, 0, 0, 0, 0);
+    }
+    private void startImageCropping(Uri uri, boolean guidelines, boolean fixAspectRatio, int aspectRatioX, int aspectRatioY, int compressQuality,
+                                    int maxCropResultWidth, int maxCropResultHeight, int minCropResultWidth, int minCropResultHeight) {
+        CropImageOptions options = new CropImageOptions();
+        if(guidelines) {
+            options.guidelines = com.canhub.cropper.CropImageView.Guidelines.ON;
+        }
+        if(fixAspectRatio) {
+            options.fixAspectRatio = true;
+        }
+        if(aspectRatioX > 0 ) {
+            options.aspectRatioX = aspectRatioX;
+        }
+        if(aspectRatioY > 0 ) {
+            options.aspectRatioY = aspectRatioY;
+        }
+        if(compressQuality>0) {
+            options.outputCompressQuality = compressQuality;
+        }
+        if(maxCropResultWidth > 0 ) {
+            options.maxCropResultWidth = maxCropResultWidth;
+        }
+        if(maxCropResultHeight > 0 ) {
+            options.maxCropResultHeight = maxCropResultHeight;
+        }
+        if(minCropResultWidth > 0 ) {
+            options.minCropResultWidth = minCropResultWidth;
+        }
+        if(minCropResultHeight > 0 ) {
+            options.minCropResultHeight = minCropResultHeight;
+        }
+        cropImageLauncher.launch(new CropImageContractOptions(uri, options));
+
     }
 }

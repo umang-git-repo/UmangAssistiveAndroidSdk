@@ -146,7 +146,7 @@ public class CommonParams implements Serializable {
             deviceMnc=DeviceUtils.getMNC(context);
             deviceLac=DeviceUtils.getLAC(context);
             deviceCellId=DeviceUtils.getCellId(context);
-            deviceEmail=DeviceUtils.getEmail(context);
+            deviceEmail="";
             mode="app";
             deviceAccuracy="";
             deviceLatitude="";

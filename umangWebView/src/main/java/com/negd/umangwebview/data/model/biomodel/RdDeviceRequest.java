@@ -40,6 +40,18 @@ public class RdDeviceRequest {
     private String mRot;
     @SerializedName("ver")
     private String mVer;
+    @SerializedName("tkn")
+    private String tkn;
+    @SerializedName("osver")
+    public String deviceOsVersion;
+    @SerializedName("aadhr")
+    public String userAadhar;
+    @SerializedName("node")
+    public String node;
+    @SerializedName("imsi")
+    public String deviceImsi;
+    @SerializedName("pkg")
+    public String appPackage;
 
     public String getAcc() {
         return mAcc;
@@ -153,6 +165,7 @@ public class RdDeviceRequest {
         mOs = os;
     }
 
+
     public String getPeml() {
         return mPeml;
     }
@@ -177,4 +190,51 @@ public class RdDeviceRequest {
         mVer = ver;
     }
 
+    public String getTkn() {
+        return tkn;
+    }
+
+    public void setTkn(String tkn) {
+        this.tkn = tkn;
+    }
+
+    public String getDeviceOsVersion() {
+        return deviceOsVersion;
+    }
+
+    public void setDeviceOsVersion(String deviceOsVersion) {
+        this.deviceOsVersion = deviceOsVersion;
+    }
+
+    public String getUserAadhar() {
+        return userAadhar;
+    }
+
+    public void setUserAadhar(String userAadhar) {
+        this.userAadhar = userAadhar;
+    }
+
+    public String getNode() {
+        return node;
+    }
+
+    public void setNode(String node) {
+        this.node = node;
+    }
+
+    public String getDeviceImsi() {
+        return deviceImsi;
+    }
+
+    public void setDeviceImsi(String deviceImsi) {
+        this.deviceImsi = deviceImsi;
+    }
+
+    public String getAppPackage() {
+        return appPackage;
+    }
+
+    public void setAppPackage(String appPackage) {
+        this.appPackage = appPackage;
+    }
 }
