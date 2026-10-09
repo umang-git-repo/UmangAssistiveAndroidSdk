@@ -812,8 +812,13 @@ public class DownloadInterface {
             }
             request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, toFilename + ".pdf");
 
-            mAct.registerReceiver(attachmentDownloadCompleteReceive, new IntentFilter(
-                    DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                mAct.registerReceiver(attachmentDownloadCompleteReceive, new IntentFilter(
+                        DownloadManager.ACTION_DOWNLOAD_COMPLETE), Context.RECEIVER_EXPORTED);
+            } else {
+                mAct.registerReceiver(attachmentDownloadCompleteReceive, new IntentFilter(
+                        DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+            }
 
             final DownloadManager dm = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
 
