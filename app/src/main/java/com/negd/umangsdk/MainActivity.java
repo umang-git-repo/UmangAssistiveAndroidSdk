@@ -35,8 +35,8 @@ public class MainActivity extends AppCompatActivity implements IUmangAssistiveLi
         binding.btStartSpiceMoney.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                String PARTNER_URL = "https://web.umang.gov.in/assistive?tenantId=spicemoney.com&domain=spicemoney.com&token=dg96341a3738jjk64y53dbdb8815ty689c271642fde03hdd4sm10f";
-                String PARTNER_URL = "https://web.umang.gov.in/assistive_stg?tenantId=spicemoney.com&domain=spicemoney.com&token=dg96341a3738jjk64y53dbdb8815ty689c271642fde03hdd4sm10f";
+               String PARTNER_URL = "https://web.umang.gov.in/assistive?tenantId=spicemoney.com&domain=spicemoney.com&token=dg96341a3738jjk64y53dbdb8815ty689c271642fde03hdd4sm10f";
+                //String PARTNER_URL = "https://web.umang.gov.in/assistive_stg?tenantId=spicemoney.com&domain=spicemoney.com&token=dg96341a3738jjk64y53dbdb8815ty689c271642fde03hdd4sm10f";
                 if(binding.etSpiceStagingUrl.getText().toString()!=null && !binding.etBoiStagingUrl.getText().toString().isEmpty()) {
                     PARTNER_URL = binding.etSpiceStagingUrl.getText().toString().trim();
                 }
