@@ -4,6 +4,7 @@ import static com.negd.umangwebview.utils.Constants.FACE_SCAN_REQUEST_CODE;
 import static com.negd.umangwebview.utils.Constants.FACE_SCAN_XML_REQUEST_CODE;
 import static com.negd.umangwebview.utils.Constants.ENABLE_DEPT_HEADER;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -250,6 +251,15 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
         binding = ActivityUmangWebBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        // Back handling: required for targetSdk 36 (predictive back is on by default,
+        // so an onBackPressed() override is no longer called by the system).
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                handleBackNavigation();
+            }
+        });
+
         ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, windowInsets) -> {
             Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(insets.left, insets.top, insets.right, insets.bottom);
@@ -278,7 +288,7 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
                 if (UmangAssistiveAndroidSdk.assistiveListener != null) {
                     UmangAssistiveAndroidSdk.assistiveListener.onHeaderClickAction(UmangWebActivity.this);
                 }
-                onBackPressed();
+                handleBackNavigation();
             }
         });
 
@@ -326,8 +336,12 @@ public class UmangWebActivity extends AppCompatActivity implements CustomDialog.
         }
     }
 
-    @Override
-    public void onBackPressed() {
+    /**
+     * Back navigation logic for the web view.
+     * Registered with the OnBackPressedDispatcher in onCreate() because, from targetSdk 36
+     * (Android 16), the system no longer calls Activity.onBackPressed() for back gestures.
+     */
+    private void handleBackNavigation() {
         if (mAgentWeb != null && mAgentWeb.getWebCreator() != null) {
 
             mAgentWeb.getWebCreator().getWebView().requestFocus();

@@ -1,29 +1,12 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-
+// NOTE: Repositories are declared ONLY in settings.gradle (dependencyResolutionManagement).
+// Do not add an allprojects { repositories { ... } } block here - it conflicts with
+// RepositoriesMode.FAIL_ON_PROJECT_REPOS and breaks the build.
 
 plugins {
     id 'com.android.application' version '8.13.0' apply false
     id 'com.android.library' version '8.13.0' apply false
 }
-
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-        maven { url "https://s3.amazonaws.com/repo.commonsware.com" }
-        maven {
-            url "https://jitpack.io"
-        }
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
-//        flatDir {
-//            dirs("libs")
-//        }
-//        jcenter() // remove jcenter()
-    }
-}
-
-task clean(type: Delete) {
-    delete rootProject.buildDir
+tasks.register('clean', Delete) {
+    delete rootProject.layout.buildDirectory
 }
