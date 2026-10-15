@@ -41,7 +41,12 @@ android {
 
     libraryVariants.configureEach { variant ->
         variant.outputs.all {
-            outputFileName = "UmangAssistiveSdk.aar"
+            // Each variant MUST have a unique file name. If debug and release both
+            // write "UmangAssistiveSdk.aar", Gradle 8.x fails the publish task
+            // (generateMetadataFileForReleasePublication) with an implicit-dependency error.
+            outputFileName = variant.buildType.name == "release" ?
+                    "UmangAssistiveSdk.aar" :
+                    "UmangAssistiveSdk-${variant.buildType.name}.aar"
         }
     }
 
