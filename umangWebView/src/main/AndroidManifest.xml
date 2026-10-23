@@ -42,13 +42,14 @@
         android:largeHeap="true">
         <activity
             android:name=".ui.BarCodeScannerActivity"
+            android:theme="@style/UmangSdk.Theme"
             android:exported="false" />
-<!--        android:theme="@style/AppTheme"-->
         <activity
             android:launchMode="standard"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity"
             android:name=".ui.UmangWebActivity"
+            android:theme="@style/UmangSdk.Theme"
             android:exported="false"
             android:windowSoftInputMode="adjustPan"
             />
@@ -59,15 +60,18 @@
 
         <activity
             android:exported="false"
-            android:name=".ui.jeevan_pramaan.JPDeviceSelectActivity"/>
+            android:name=".ui.jeevan_pramaan.JPDeviceSelectActivity"
+            android:theme="@style/UmangSdk.Theme"/>
 
         <activity
             android:exported="false"
-            android:name=".ui.jeevan_pramaan.DeviceInfoActivity"/>
+            android:name=".ui.jeevan_pramaan.DeviceInfoActivity"
+            android:theme="@style/UmangSdk.Theme"/>
 
         <activity
             android:exported="false"
-            android:name=".ui.jeevan_pramaan.OtherDeviceActivity"/>
+            android:name=".ui.jeevan_pramaan.OtherDeviceActivity"
+            android:theme="@style/UmangSdk.Theme"/>
 
         <provider
             android:name=".utils.UmangFileProvider"

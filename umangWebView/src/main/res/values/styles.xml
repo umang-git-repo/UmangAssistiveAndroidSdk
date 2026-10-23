@@ -7,6 +7,15 @@
     </style>
 
 
+    <!-- Theme for the SDK's own activities. Prefixed so it can't be overridden by
+         a host app resource of the same name, and set explicitly in the manifest so
+         the host app's (possibly non-AppCompat, e.g. Material3/Compose) theme is
+         never applied to these AppCompatActivity screens. -->
+    <style name="UmangSdk.Theme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
     <style name="CustomProgressBar" parent="android:Widget.ProgressBar.Horizontal">
         <item name="android:indeterminateOnly">false</item>
         <item name="android:progressDrawable">@drawable/custom_progress_bar_horizontal</item>
