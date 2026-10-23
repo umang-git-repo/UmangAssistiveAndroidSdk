@@ -65,7 +65,7 @@ Add the SDK dependency to your module's `build.gradle` file:
 ```groovy
 dependencies {
     // UMANG Assistive Android SDK
-    implementation 'com.github.umang-git-repo:UmangAssistiveAndroidSdk:1.3.2'
+    implementation 'com.github.umang-git-repo:UmangAssistiveAndroidSdk:1.3.3'
 }
 ```
 
@@ -88,13 +88,10 @@ android {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
-
-    buildFeatures {
-        dataBinding true
-        viewBinding true
-    }
 }
 ```
+
+From 1.3.3 the SDK uses plain View Binding internally, so the host app no longer needs `dataBinding true`. On 1.3.2 and older, enable `dataBinding true` in the app or the SDK crashes with `NoClassDefFoundError: androidx.databinding.DataBinderMapperImpl`.
 
 ---
 
