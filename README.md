@@ -65,7 +65,7 @@ Add the SDK dependency to your module's `build.gradle` file:
 ```groovy
 dependencies {
     // UMANG Assistive Android SDK
-    implementation 'com.github.umang-git-repo:UmangAssistiveAndroidSdk:1.0.0'
+    implementation 'com.github.umang-git-repo:UmangAssistiveAndroidSdk:1.3.2'
 }
 ```
 
