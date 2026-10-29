@@ -10,7 +10,7 @@ android {
     compileSdk 36
 
     defaultConfig {
-        minSdk 29
+        minSdk 24
         targetSdk 36
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

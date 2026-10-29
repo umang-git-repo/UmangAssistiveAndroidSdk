@@ -23,13 +23,13 @@
 
 ## 📋 System Requirements
 
-| Parameter | Minimum Requirement |
-|---|---|
-| **Minimum SDK Version** | API 29 (Android 10) |
-| **Target SDK Version** | API 36 |
-| **Java Compatibility** | Java 17 |
+| Parameter | Minimum Requirement  |
+|---|----------------------|
+| **Minimum SDK Version** | API 24 (Android 10)  |
+| **Target SDK Version** | API 36               |
+| **Java Compatibility** | Java 17              |
 | **Build System** | Gradle 8.x or higher |
-| **AndroidX** | Required |
+| **AndroidX** | Required             |
 
 ---
 
